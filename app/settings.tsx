@@ -15,18 +15,10 @@ import { router } from 'expo-router';
 export default function SettingsScreen() {
   const { signOut } = useAuth();
 
-  const handleSignOut = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign Out',
-        style: 'destructive',
-        onPress: async () => {
-          await signOut();
-          router.replace('/auth/login');
-        },
-      },
-    ]);
+  const handleSignOut = async () => {
+    console.log('Signing out...');
+    await signOut();
+    router.replace('/auth/login');
   };
 
   return (

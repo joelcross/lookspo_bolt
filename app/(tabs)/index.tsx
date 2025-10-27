@@ -52,7 +52,10 @@ export default function HomeScreen() {
         `
         )
         .order('created_at', { ascending: false })
-        .range(currentPage * POSTS_PER_PAGE, (currentPage + 1) * POSTS_PER_PAGE - 1);
+        .range(
+          currentPage * POSTS_PER_PAGE,
+          (currentPage + 1) * POSTS_PER_PAGE - 1
+        );
 
       if (feedType === 'following') {
         const { data: followingData } = await supabase
@@ -157,10 +160,10 @@ export default function HomeScreen() {
     const { signOut } = useAuth();
 
     const handleSignOut = async () => {
-  console.log('Signing out...');
-  await signOut();
-  router.replace('/auth/login');
-};
+      console.log('Signing out...');
+      await signOut();
+      router.replace('/auth/login');
+    };
 
     return (
       <View style={styles.emptyContainer}>
@@ -180,7 +183,10 @@ export default function HomeScreen() {
         <Text style={styles.logo}>Lookspo</Text>
         <View style={styles.toggleContainer}>
           <TouchableOpacity
-            style={[styles.toggle, feedType === 'following' && styles.toggleActive]}
+            style={[
+              styles.toggle,
+              feedType === 'following' && styles.toggleActive,
+            ]}
             onPress={() => setFeedType('following')}
           >
             <Text
@@ -193,7 +199,10 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.toggle, feedType === 'explore' && styles.toggleActive]}
+            style={[
+              styles.toggle,
+              feedType === 'explore' && styles.toggleActive,
+            ]}
             onPress={() => setFeedType('explore')}
           >
             <Text

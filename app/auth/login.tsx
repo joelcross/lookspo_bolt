@@ -31,6 +31,7 @@ export default function LoginScreen() {
 
     try {
       await signIn(email, password);
+      router.replace('/');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in');
     } finally {

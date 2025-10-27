@@ -40,17 +40,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      (async () => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-          setLoading(false);
-        }
-      })();
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session ?? null);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -80,16 +78,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
 
-    // Update local state immediately
-    setSession(data.session ?? null);
-    setUser(data.user ?? null);
-    if (data.user) await fetchProfile(data.user.id);
+      // Manually update state
+      setSession(data.session ?? null);
+      setUser(data.user ?? null);
+
+      if (data.user) {
+        await fetchProfile(data.user.id);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signUp = async (

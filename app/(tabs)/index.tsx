@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Post } from '@/lib/types';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard';
 import SaveModal from '@/components/SaveModal';
@@ -21,6 +22,8 @@ type FeedType = 'following' | 'explore';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  useRequireAuth();
+
   const [feedType, setFeedType] = useState<FeedType>('following');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);

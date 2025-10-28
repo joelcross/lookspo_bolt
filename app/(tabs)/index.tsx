@@ -140,6 +140,7 @@ export default function HomeScreen() {
   const renderPost = ({ item }: { item: Post }) => (
     <PostCard
       post={item}
+      showActions={false} // hide Like/Save buttons in feed
       onLikeToggle={() => fetchPosts(true)}
       onSavePress={() => handleSavePress(item)}
     />

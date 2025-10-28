@@ -19,9 +19,15 @@ interface PostCardProps {
   post: Post;
   onLikeToggle?: () => void;
   onSavePress?: () => void;
+  showActions?: boolean; // new prop
 }
 
-export default function PostCard({ post, onLikeToggle, onSavePress }: PostCardProps) {
+export default function PostCard({
+  post,
+  onLikeToggle,
+  onSavePress,
+  showActions = true,
+}: PostCardProps) {
   const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(post.is_liked || false);
   const [isLiking, setIsLiking] = useState(false);
@@ -71,35 +77,44 @@ export default function PostCard({ post, onLikeToggle, onSavePress }: PostCardPr
     }
   };
 
+  const handleCardPress = () => {
+    router.push(`/post/${post.id}`);
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: post.image_url }} style={styles.image} />
-        <View style={styles.overlay}>
-          <TouchableOpacity onPress={handleUsernamePress}>
-            <Text style={styles.username}>@{post.profiles?.username}</Text>
-          </TouchableOpacity>
+    <TouchableOpacity onPress={handleCardPress} activeOpacity={0.9}>
+      <View style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: post.image_url }} style={styles.image} />
+          <View style={styles.overlay}>
+            <TouchableOpacity onPress={handleUsernamePress}>
+              <Text style={styles.username}>@{post.profiles?.username}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
-          <Heart
-            color={isLiked ? '#ff3b30' : '#000'}
-            fill={isLiked ? '#ff3b30' : 'none'}
-            size={24}
-          />
-        </TouchableOpacity>
+        {/* Only show like/save if showActions is true */}
+        {showActions && (
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
+              <Heart
+                color={isLiked ? '#ff3b30' : '#000'}
+                fill={isLiked ? '#ff3b30' : 'none'}
+                size={24}
+              />
+            </TouchableOpacity>
 
-        <TouchableOpacity onPress={onSavePress} style={styles.actionButton}>
-          {post.is_saved ? (
-            <Check color="#000" size={24} />
-          ) : (
-            <Plus color="#000" size={24} />
-          )}
-        </TouchableOpacity>
+            <TouchableOpacity onPress={onSavePress} style={styles.actionButton}>
+              {post.is_saved ? (
+                <Check color="#000" size={24} />
+              ) : (
+                <Plus color="#000" size={24} />
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

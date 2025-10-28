@@ -84,15 +84,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       });
-      if (error) throw error;
 
-      // Manually update state
+      if (error) {
+        console.error('Login failed:', error.message);
+        // Clear any existing session so a bad login can't "reuse" it
+        await supabase.auth.signOut();
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        throw error;
+      }
+
+      // Success case
       setSession(data.session ?? null);
       setUser(data.user ?? null);
 
       if (data.user) {
         await fetchProfile(data.user.id);
       }
+    } catch (error) {
+      console.error('Sign-in error caught:', error);
+      throw error;
     } finally {
       setLoading(false);
     }

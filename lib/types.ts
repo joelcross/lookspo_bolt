@@ -54,7 +54,9 @@ export interface Activity {
   target_user_id: string;
   type: 'like' | 'save' | 'follow';
   post_id: string | null;
+  collection_id?: string | null;
   created_at: string;
   actor?: Profile;
   post?: Post;
+  collection?: Collection;
 }

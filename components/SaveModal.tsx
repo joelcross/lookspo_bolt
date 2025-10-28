@@ -31,7 +31,9 @@ export default function SaveModal({
 }: SaveModalProps) {
   const { user } = useAuth();
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [savedCollectionIds, setSavedCollectionIds] = useState<Set<string>>(new Set());
+  const [savedCollectionIds, setSavedCollectionIds] = useState<Set<string>>(
+    new Set()
+  );
   const [loading, setLoading] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -115,6 +117,7 @@ export default function SaveModal({
           target_user_id: postUserId,
           type: 'save',
           post_id: postId,
+          collection_id: collectionId,
         });
 
         setSavedCollectionIds(new Set(savedCollectionIds).add(collectionId));
@@ -184,7 +187,11 @@ export default function SaveModal({
           </View>
 
           {loading ? (
-            <ActivityIndicator size="large" color="#000" style={{ marginTop: 24 }} />
+            <ActivityIndicator
+              size="large"
+              color="#000"
+              style={{ marginTop: 24 }}
+            />
           ) : (
             <FlatList
               data={collections}

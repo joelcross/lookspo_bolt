@@ -91,25 +91,40 @@ export default function UserProfileScreen() {
 
     try {
       if (newFollowingState) {
+        // Follow
         const { error: followError } = await supabase.from('follows').insert({
           follower_id: user.id,
           following_id: profile.id,
         });
-
         if (followError) throw followError;
 
-        await supabase.from('activities').insert({
-          actor_id: user.id,
-          target_user_id: profile.id,
-          type: 'follow',
-          post_id: null,
-        });
+        // Add activity
+        const { error: activityError } = await supabase
+          .from('activities')
+          .insert({
+            actor_id: user.id,
+            target_user_id: profile.id,
+            type: 'follow',
+            post_id: null,
+          });
+        if (activityError) throw activityError;
       } else {
-        await supabase
+        // Unfollow
+        const { error: unfollowError } = await supabase
           .from('follows')
           .delete()
           .eq('follower_id', user.id)
           .eq('following_id', profile.id);
+        if (unfollowError) throw unfollowError;
+
+        // Delete follow activity
+        const { error: deleteActivityError } = await supabase
+          .from('activities')
+          .delete()
+          .eq('actor_id', user.id)
+          .eq('target_user_id', profile.id)
+          .eq('type', 'follow');
+        if (deleteActivityError) throw deleteActivityError;
       }
     } catch (error) {
       console.error('Error toggling follow:', error);
@@ -157,7 +172,10 @@ export default function UserProfileScreen() {
 
           <View style={styles.avatarContainer}>
             {profile.avatar_url ? (
-              <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
+              <Image
+                source={{ uri: profile.avatar_url }}
+                style={styles.avatar}
+              />
             ) : (
               <View style={[styles.avatar, styles.avatarPlaceholder]}>
                 <Text style={styles.avatarText}>
@@ -175,12 +193,18 @@ export default function UserProfileScreen() {
 
           {!isOwnProfile && (
             <TouchableOpacity
-              style={[styles.followButton, isFollowing && styles.followingButton]}
+              style={[
+                styles.followButton,
+                isFollowing && styles.followingButton,
+              ]}
               onPress={handleFollowToggle}
               disabled={followLoading}
             >
               {followLoading ? (
-                <ActivityIndicator size="small" color={isFollowing ? '#000' : '#fff'} />
+                <ActivityIndicator
+                  size="small"
+                  color={isFollowing ? '#000' : '#fff'}
+                />
               ) : (
                 <Text
                   style={[
@@ -211,7 +235,8 @@ export default function UserProfileScreen() {
                   <View>
                     <Text style={styles.collectionName}>{collection.name}</Text>
                     <Text style={styles.collectionCount}>
-                      {collection.post_count || 0} post{collection.post_count !== 1 ? 's' : ''}
+                      {collection.post_count || 0} post
+                      {collection.post_count !== 1 ? 's' : ''}
                     </Text>
                   </View>
                 </TouchableOpacity>

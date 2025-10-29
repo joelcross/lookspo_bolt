@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
+  Alert,
   Text,
+  TextInput,
+  Modal,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -19,6 +22,9 @@ export default function ProfileScreen() {
   const { profile } = useAuth();
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState('');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     const fetchCollections = async () => {
@@ -114,29 +120,104 @@ export default function ProfileScreen() {
               color="#000"
               style={{ marginTop: 20 }}
             />
-          ) : collections.length === 0 ? (
-            <Text style={styles.emptyText}>No collections yet</Text>
           ) : (
-            <View style={styles.collectionsList}>
+            <View style={styles.grid}>
               {collections.map((collection) => (
                 <TouchableOpacity
                   key={collection.id}
-                  style={styles.collectionItem}
+                  style={styles.collectionTile}
                   onPress={() => router.push(`/collection/${collection.id}`)}
                 >
-                  <View>
-                    <Text style={styles.collectionName}>{collection.name}</Text>
-                    <Text style={styles.collectionCount}>
-                      {collection.post_count} post
-                      {collection.post_count !== 1 ? 's' : ''}
-                    </Text>
-                  </View>
+                  <Text style={styles.collectionTileName}>
+                    {collection.name}
+                  </Text>
+                  <Text style={styles.collectionTileCount}>
+                    {collection.post_count} post
+                    {collection.post_count !== 1 ? 's' : ''}
+                  </Text>
                 </TouchableOpacity>
               ))}
+
+              {/* ➕ New Collection Square */}
+              <TouchableOpacity
+                style={[styles.collectionTile, styles.newCollectionTile]}
+                onPress={() => setShowModal(true)}
+              >
+                <Text style={styles.newCollectionPlus}>＋</Text>
+                <Text style={styles.collectionName}>Add new collection</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
       </ScrollView>
+      <Modal
+        visible={showModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>New Collection</Text>
+
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter collection name"
+              value={newCollectionName}
+              onChangeText={setNewCollectionName}
+              placeholderTextColor="#999"
+            />
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.createButton]}
+                onPress={async () => {
+                  if (!newCollectionName.trim()) {
+                    Alert.alert('Please enter a name');
+                    return;
+                  }
+
+                  setCreating(true);
+                  const { error } = await supabase
+                    .from('collections')
+                    .insert([
+                      { name: newCollectionName.trim(), user_id: profile.id },
+                    ]);
+
+                  setCreating(false);
+                  if (error) {
+                    console.error('Error creating collection:', error);
+                    Alert.alert('Error creating collection');
+                  } else {
+                    setNewCollectionName('');
+                    setShowModal(false);
+                    // Refresh collections
+                    const { data: collectionsData } = await supabase
+                      .from('collections')
+                      .select('*')
+                      .eq('user_id', profile.id)
+                      .order('created_at', { ascending: false });
+
+                    setCollections(collectionsData || []);
+                  }
+                }}
+                disabled={creating}
+              >
+                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
+                  {creating ? 'Creating...' : 'Create'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -197,5 +278,113 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     marginTop: 20,
+  },
+  newCollectionItem: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fafafa',
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#ccc',
+  },
+  newCollectionText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+
+  collectionTile: {
+    width: '31%', // fits 3 per row with small gaps
+    aspectRatio: 1, // perfect square
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  collectionTileName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    textAlign: 'center',
+  },
+
+  collectionTileCount: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+
+  newCollectionTile: {
+    backgroundColor: '#eaeaea',
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderStyle: 'dashed',
+  },
+
+  newCollectionPlus: {
+    fontSize: 40,
+    fontWeight: '300',
+    color: '#555',
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 12,
+  },
+  modalInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 8,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f5f5f5',
+  },
+  createButton: {
+    backgroundColor: '#000',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
   },
 });

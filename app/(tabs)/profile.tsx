@@ -122,30 +122,34 @@ export default function ProfileScreen() {
             />
           ) : (
             <View style={styles.grid}>
-              {collections.map((collection) => (
-                <TouchableOpacity
-                  key={collection.id}
-                  style={styles.collectionTile}
-                  onPress={() => router.push(`/collection/${collection.id}`)}
-                >
-                  <Text style={styles.collectionTileName}>
-                    {collection.name}
-                  </Text>
-                  <Text style={styles.collectionTileCount}>
-                    {collection.post_count} post
-                    {collection.post_count !== 1 ? 's' : ''}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-
-              {/* ➕ New Collection Square */}
-              <TouchableOpacity
-                style={[styles.collectionTile, styles.newCollectionTile]}
-                onPress={() => setShowModal(true)}
-              >
-                <Text style={styles.newCollectionPlus}>＋</Text>
-                <Text style={styles.collectionName}>Add new collection</Text>
-              </TouchableOpacity>
+              {[...collections, { id: 'new', isNew: true }].map((collection) =>
+                collection.isNew ? (
+                  <TouchableOpacity
+                    key="new"
+                    style={[styles.collectionTile, styles.newCollectionTile]}
+                    onPress={() => setShowModal(true)}
+                  >
+                    <Text style={styles.newCollectionPlus}>＋</Text>
+                    <Text style={styles.collectionName}>
+                      Add new collection
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    key={collection.id}
+                    style={styles.collectionTile}
+                    onPress={() => router.push(`/collection/${collection.id}`)}
+                  >
+                    <Text style={styles.collectionTileName}>
+                      {collection.name}
+                    </Text>
+                    <Text style={styles.collectionTileCount}>
+                      {collection.post_count} post
+                      {collection.post_count !== 1 ? 's' : ''}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              )}
             </View>
           )}
         </View>
@@ -295,45 +299,41 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
 
   collectionTile: {
-    width: '31%', // fits 3 per row with small gaps
-    aspectRatio: 1, // perfect square
+    flexBasis: '33.33%',
+    padding: 8,
+    marginBottom: 12,
+    alignItems: 'center',
     backgroundColor: '#f5f5f5',
     borderRadius: 12,
-    padding: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
   },
 
   collectionTileName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000',
-    textAlign: 'center',
+    marginTop: 8,
   },
 
   collectionTileCount: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#666',
-    marginTop: 4,
-    textAlign: 'center',
   },
 
   newCollectionTile: {
-    backgroundColor: '#eaeaea',
-    borderWidth: 2,
-    borderColor: '#ccc',
-    borderStyle: 'dashed',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
   },
 
   newCollectionPlus: {
-    fontSize: 40,
-    fontWeight: '300',
-    color: '#555',
+    fontSize: 32,
+    color: '#000',
+    marginBottom: 4,
   },
 
   modalOverlay: {

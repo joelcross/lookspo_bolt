@@ -47,16 +47,21 @@ export interface Follow {
   following_id: string;
   created_at: string;
 }
-
 export interface Activity {
   id: string;
   actor_id: string;
-  target_user_id: string;
+  target_user_id?: string | null; // keep optional in case not all activities have a target user
   type: 'like' | 'save' | 'follow';
-  post_id: string | null;
+  post_id?: string | null;
   collection_id?: string | null;
   created_at: string;
+
+  // expanded relations
   actor?: Profile;
+  target_user?: {
+    id: string;
+    username: string;
+  };
   post?: Post;
   collection?: Collection;
 }

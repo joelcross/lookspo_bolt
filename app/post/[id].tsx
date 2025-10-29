@@ -17,11 +17,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Heart, Plus, Check, ArrowLeft } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
 
-const { width } = Dimensions.get('window');
-
 export default function PostDetailScreen() {
   const router = useRouter();
-  console.log('router', router);
   const params = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const postId = params.id;
@@ -39,39 +36,65 @@ export default function PostDetailScreen() {
   const fetchPost = async () => {
     try {
       setLoading(true);
-      // Fetch post + author
-      const { data, error } = await supabase
+
+      // Fetch post + author (single row)
+      const { data: postData, error: postError } = await supabase
         .from('posts')
         .select(
           `
           *,
-          profiles:user_id (id, username),
-          saves:user_id (*)
+          profiles:user_id (id, username)
         `
         )
         .eq('id', postId)
         .maybeSingle();
 
-      if (error) throw error;
-      if (!data) return;
+      if (postError) throw postError;
+      if (!postData) return;
 
-      setPost(data);
-      setIsLiked(!!data.is_liked);
-      setIsSaved(!!data.is_saved);
+      setPost(postData);
 
-      // Fetch collections this post is saved in
-      const { data: collectionsData, error: collectionsError } = await supabase
-        .from('collections')
-        .select(
+      // Check if current user liked this post
+      const { data: likeData, error: likeError } = await supabase
+        .from('likes')
+        .select('id')
+        .eq('user_id', user?.id)
+        .eq('post_id', postId);
+
+      if (likeError) throw likeError;
+      setIsLiked((likeData?.length || 0) > 0);
+
+      // Fetch saves for this post
+      const { data: savesData, error: savesError } = await supabase
+        .from('saves')
+        .select('*')
+        .eq('post_id', postId);
+
+      if (savesError) throw savesError;
+
+      const saved = (savesData || []).some((s: any) => s.user_id === user?.id);
+      setIsSaved(saved);
+
+      // Fetch collections that include this post
+      const collectionIds = (savesData || []).map((s: any) => s.collection_id);
+
+      if (collectionIds.length > 0) {
+        const { data: collectionsData, error: collectionsError } =
+          await supabase
+            .from('collections')
+            .select(
+              `
+            *,
+            user:user_id (username)
           `
-          *,
-          user: user_id (username)
-        `
-        )
-        .in('id', data.saves?.map((s: any) => s.collection_id) || []);
+            )
+            .in('id', collectionIds);
 
-      if (collectionsError) throw collectionsError;
-      setCollections(collectionsData || []);
+        if (collectionsError) throw collectionsError;
+        setCollections(collectionsData || []);
+      } else {
+        setCollections([]);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -87,15 +110,39 @@ export default function PostDetailScreen() {
 
     try {
       if (newState) {
-        await supabase
+        // Add like
+        const { error: likeError } = await supabase
           .from('likes')
           .insert({ user_id: user.id, post_id: post.id });
+        if (likeError) throw likeError;
+
+        // Add activity
+        const { error: activityError } = await supabase
+          .from('activities')
+          .insert({
+            actor_id: user.id,
+            type: 'like',
+            post_id: post.id,
+            target_user_id: post.user_id,
+          });
+        if (activityError) throw activityError;
       } else {
-        await supabase
+        // Remove like
+        const { error: unlikeError } = await supabase
           .from('likes')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.id);
+        if (unlikeError) throw unlikeError;
+
+        // Remove activity
+        const { error: deleteActivityError } = await supabase
+          .from('activities')
+          .delete()
+          .eq('actor_id', user.id)
+          .eq('post_id', post.id)
+          .eq('type', 'like');
+        if (deleteActivityError) throw deleteActivityError;
       }
     } catch (err) {
       console.error(err);
@@ -105,9 +152,7 @@ export default function PostDetailScreen() {
 
   const handleSave = async () => {
     if (!user || !post) return;
-
-    // Placeholder: actual save logic may include selecting a collection
-    setIsSaved(!isSaved);
+    router.push(`/select-collections/${post.id}`);
   };
 
   const renderArticleRow = (item: {
@@ -135,9 +180,8 @@ export default function PostDetailScreen() {
   const renderCollection = ({ item }: { item: Collection }) => (
     <View style={styles.collectionItem}>
       <View style={styles.collectionThumbnail}>
-        {/* Placeholder: use first post in collection or a default image */}
         <Image
-          source={{ uri: item.image_url || 'https://via.placeholder.com/100' }}
+          source={{ uri: item.cover_url || 'https://via.placeholder.com/100' }}
           style={styles.collectionImage}
         />
       </View>
@@ -156,19 +200,16 @@ export default function PostDetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Top Bar */}
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => router.back()}>
           <ArrowLeft size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.topBarTitle}>Look</Text>
-        <View style={{ width: 24 }} /> {/* Spacer for centering */}
+        <View style={{ width: 24 }} />
       </View>
 
-      {/* Post Image */}
       <Image source={{ uri: post.image_url }} style={styles.postImage} />
 
-      {/* Like/Save Buttons */}
       <View style={styles.actions}>
         <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
           <Heart
@@ -186,15 +227,10 @@ export default function PostDetailScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Caption */}
       {post.caption ? <Text style={styles.caption}>{post.caption}</Text> : null}
-
-      {/* Post Author */}
       <Text style={styles.authorHeading}>@{post.profiles.username}'s look</Text>
 
-      {/* Article/Brand Table */}
       <View style={styles.table}>
-        {/* Placeholder rows */}
         {[
           { article: 'Jacket', brand: 'Acne', url: 'https://example.com' },
           { article: 'Sneakers', brand: 'Nike' },
@@ -206,21 +242,25 @@ export default function PostDetailScreen() {
         ))}
       </View>
 
-      {/* Lookbooks Heading */}
       <Text style={styles.lookbooksHeading}>Lookbooks</Text>
 
-      {/* Collections Grid */}
       <FlatList
         data={collections}
         keyExtractor={(item) => item.id}
         renderItem={renderCollection}
         numColumns={3}
-        scrollEnabled={false} // because we’re already in ScrollView
+        scrollEnabled={false}
         columnWrapperStyle={styles.columnWrapper}
       />
     </ScrollView>
   );
 }
+
+const { width } = Dimensions.get('window');
+const columnMargin = 8;
+const numColumns = 3;
+const columnWidth =
+  (width - 16 * 2 - columnMargin * 2 * numColumns) / numColumns;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
@@ -258,15 +298,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 8,
   },
-  collectionItem: { flex: 1 / 3, margin: 8, alignItems: 'center' },
+  collectionItem: {
+    width: columnWidth,
+    margin: columnMargin,
+    alignItems: 'center',
+  },
   collectionThumbnail: {
-    width: 100,
-    height: 100,
+    width: columnWidth,
+    height: columnWidth,
     backgroundColor: '#f5f5f5',
     marginBottom: 4,
   },
   collectionImage: { width: '100%', height: '100%', borderRadius: 8 },
   collectionName: { fontSize: 14, fontWeight: '600' },
   collectionUser: { fontSize: 12, color: '#666' },
-  columnWrapper: { justifyContent: 'space-between' },
+  columnWrapper: {
+    justifyContent: 'flex-start',
+  },
 });

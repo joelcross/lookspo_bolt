@@ -36,19 +36,27 @@ export default function ActivityScreen() {
         .from('activities')
         .select(
           `
-          *,
-          actor:actor_id (*),
-          post:post_id (
-            id,
-            image_url,
-            user_id,
-            profiles:user_id (username)
-          ),
-          collection:collection_id (
-            id,
-            name
-          )
-        `
+        *,
+        actor:actor_id (
+          id,
+          username,
+          avatar_url
+        ),
+        target_user:target_user_id (
+          id,
+          username
+        ),
+        post:post_id (
+          id,
+          image_url,
+          user_id,
+          profiles:user_id (username)
+        ),
+        collection:collection_id (
+          id,
+          name
+        )
+      `
         )
         .order('created_at', { ascending: false })
         .limit(50);
@@ -92,32 +100,38 @@ export default function ActivityScreen() {
   const getActivityText = (activity: Activity) => {
     const actorUsername = activity.actor?.username || 'Someone';
     const collectionName = activity.collection?.name;
+    const targetUsername = activity.target_user?.username;
 
     switch (activity.type) {
       case 'like':
         if (feedType === 'you') {
           return `@${actorUsername} liked your post`;
         } else {
-          const targetUsername = activity.post?.profiles?.username || 'a post';
-          return `@${actorUsername} liked @${targetUsername}'s post`;
+          const postOwner = activity.post?.profiles?.username || 'a post';
+          return `@${actorUsername} liked @${postOwner}'s post`;
         }
+
       case 'save':
         if (feedType === 'you') {
           return collectionName
             ? `@${actorUsername} saved your post to "${collectionName}"`
             : `@${actorUsername} saved your post`;
         } else {
-          const targetUsername = activity.post?.profiles?.username || 'a post';
+          const postOwner = activity.post?.profiles?.username || 'a post';
           return collectionName
-            ? `@${actorUsername} saved @${targetUsername}'s post to "${collectionName}"`
-            : `@${actorUsername} saved @${targetUsername}'s post`;
+            ? `@${actorUsername} saved @${postOwner}'s post to "${collectionName}"`
+            : `@${actorUsername} saved @${postOwner}'s post`;
         }
+
       case 'follow':
         if (feedType === 'you') {
           return `@${actorUsername} started following you`;
+        } else if (targetUsername) {
+          return `@${actorUsername} followed @${targetUsername}`;
         } else {
           return `@${actorUsername} followed someone`;
         }
+
       default:
         return '';
     }

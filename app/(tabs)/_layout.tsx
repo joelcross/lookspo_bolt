@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Bell, PlusSquare, User } from 'lucide-react-native';
+import { Home, Bell, PlusSquare, User, Search } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -23,15 +23,23 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="activity"
+        name="search"
         options={{
-          tabBarIcon: ({ color, size }) => <Bell color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Search color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="new-post"
         options={{
-          tabBarIcon: ({ color, size }) => <PlusSquare color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <PlusSquare color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="activity"
+        options={{
+          tabBarIcon: ({ color, size }) => <Bell color={color} size={size} />,
         }}
       />
       <Tabs.Screen

@@ -230,17 +230,19 @@ export default function PostDetailScreen() {
       {post.caption ? <Text style={styles.caption}>{post.caption}</Text> : null}
       <Text style={styles.authorHeading}>@{post.profiles.username}'s look</Text>
 
-      <View style={styles.table}>
-        {[
-          { article: 'Jacket', brand: 'Acne', url: 'https://example.com' },
-          { article: 'Sneakers', brand: 'Nike' },
-          { article: 'Shirt', brand: 'Nike' },
-          { article: 'Pants', brand: 'Levis' },
-          { article: 'Socks', brand: 'Zara' },
-        ].map((row, i) => (
-          <View key={i}>{renderArticleRow(row)}</View>
-        ))}
-      </View>
+      {post.pieces && post.pieces.length > 0 && (
+        <View style={styles.table}>
+          {post.pieces.map((piece: any, i: number) => (
+            <View key={i}>
+              {renderArticleRow({
+                article: piece.name || piece.article || '',
+                brand: piece.brand || '',
+                url: piece.url || undefined,
+              })}
+            </View>
+          ))}
+        </View>
+      )}
 
       <Text style={styles.lookbooksHeading}>Lookbooks</Text>
 

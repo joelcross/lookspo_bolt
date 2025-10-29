@@ -16,6 +16,11 @@ export interface Post {
   profiles?: Profile;
   is_liked?: boolean;
   is_saved?: boolean;
+  pieces?: {
+    name: string;
+    brand: string;
+    url?: string;
+  }[];
 }
 
 export interface Like {

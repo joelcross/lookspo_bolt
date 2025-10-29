@@ -20,6 +20,7 @@ export default function SignUpScreen() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const { signUp } = useAuth();
 
   const handleSignUp = async () => {
@@ -35,10 +36,19 @@ export default function SignUpScreen() {
 
     setLoading(true);
     setError('');
+    setMessage('');
 
     try {
-      await signUp(email, password, username, name);
+      const { user, error: signUpError } = await signUp(
+        email,
+        password,
+        username,
+        name
+      );
+      if (signUpError) throw signUpError;
+      setMessage('Check your email to confirm your account.');
     } catch (err: any) {
+      console.error('Error in signUp:', err);
       setError(err.message || 'Failed to sign up');
     } finally {
       setLoading(false);
@@ -58,6 +68,8 @@ export default function SignUpScreen() {
           <Text style={styles.title}>Lookspo</Text>
           <Text style={styles.subtitle}>Create your account</Text>
 
+          {loading && <ActivityIndicator color="#000" />}
+          {message ? <Text style={styles.message}>{message}</Text> : null}
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <TextInput
@@ -169,6 +181,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: '#ff3b30',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  message: {
+    color: '#38a22aff',
     marginBottom: 16,
     textAlign: 'center',
   },

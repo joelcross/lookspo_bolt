@@ -15,13 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { X, Upload } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface Piece {
-  name: string;
-  brand: string;
-  url?: string;
-  isTemplate?: boolean;
-}
+import { Piece } from '@/lib/types';
 
 export default function NewPostScreen() {
   const { user } = useAuth();

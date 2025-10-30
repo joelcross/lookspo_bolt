@@ -36,6 +36,7 @@ export interface Collection {
   user_id: string;
   created_at: string;
   post_count?: number;
+  cover_url?: string;
 }
 
 export interface Save {
@@ -69,4 +70,11 @@ export interface Activity {
   };
   post?: Post;
   collection?: Collection;
+}
+
+export interface Piece {
+  name: string;
+  brand: string;
+  url?: string;
+  isTemplate?: boolean;
 }

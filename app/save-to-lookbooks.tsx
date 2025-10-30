@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
+import { Piece } from '@/lib/types';
 
 interface Collection {
   id: string;
@@ -85,7 +86,7 @@ export default function SaveToLookbooksScreen() {
           image_url: publicUrl,
           caption: params.caption || '',
           user_id: user.id,
-          pieces: parsedPieces.filter((p) => !p.isTemplate), // remove the blank row
+          pieces: parsedPieces.filter((p: Piece) => !p.isTemplate), // remove the blank row
         })
         .select()
         .single();

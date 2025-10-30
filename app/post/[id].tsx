@@ -10,11 +10,12 @@ import {
   Linking,
   Dimensions,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Heart, Plus, Check, ArrowLeft } from 'lucide-react-native';
+import { Heart, Plus, Check, ArrowLeft, Pencil, X } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
 
 export default function PostDetailScreen() {
@@ -29,15 +30,71 @@ export default function PostDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState<Collection[]>([]);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editedCaption, setEditedCaption] = useState('');
+  const [editedPieces, setEditedPieces] = useState<any[]>([]);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
+
   useEffect(() => {
     if (postId) fetchPost();
   }, [postId]);
 
+  useEffect(() => {
+    if (isEditing && post) {
+      setEditedCaption(post.caption || '');
+      setEditedPieces(post.pieces || []);
+    }
+  }, [isEditing, post]);
+
+  const handlePieceChange = (index: number, field: string, value: string) => {
+    const updated = [...editedPieces];
+    updated[index][field] = value;
+    setEditedPieces(updated);
+  };
+
+  const handleSaveEdits = async () => {
+    const trimmedCaption = editedCaption.trim();
+    setShowValidationErrors(true);
+
+    // Validate pieces
+    for (const piece of editedPieces) {
+      if (!piece.name.trim() || !piece.brand.trim()) {
+        alert('Each piece must include both a name and a brand.');
+        return;
+      }
+    }
+
+    try {
+      setIsSaving(true);
+      const { error } = await supabase
+        .from('posts')
+        .update({
+          caption: trimmedCaption,
+          pieces: editedPieces,
+        })
+        .eq('id', post.id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      setShowValidationErrors(false); // reset once successful
+      fetchPost();
+    } catch (err) {
+      console.error(err);
+      alert('Error saving post');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdits = () => {
+    setIsEditing(false);
+  };
+
   const fetchPost = async () => {
     try {
       setLoading(true);
-
-      // Fetch post + author (single row)
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .select(
@@ -54,43 +111,29 @@ export default function PostDetailScreen() {
 
       setPost(postData);
 
-      // Check if current user liked this post
-      const { data: likeData, error: likeError } = await supabase
+      const { data: likeData } = await supabase
         .from('likes')
         .select('id')
         .eq('user_id', user?.id)
         .eq('post_id', postId);
 
-      if (likeError) throw likeError;
       setIsLiked((likeData?.length || 0) > 0);
 
-      // Fetch saves for this post
-      const { data: savesData, error: savesError } = await supabase
+      const { data: savesData } = await supabase
         .from('saves')
         .select('*')
         .eq('post_id', postId);
 
-      if (savesError) throw savesError;
-
       const saved = (savesData || []).some((s: any) => s.user_id === user?.id);
       setIsSaved(saved);
 
-      // Fetch collections that include this post
       const collectionIds = (savesData || []).map((s: any) => s.collection_id);
 
       if (collectionIds.length > 0) {
-        const { data: collectionsData, error: collectionsError } =
-          await supabase
-            .from('collections')
-            .select(
-              `
-            *,
-            user:user_id (username)
-          `
-            )
-            .in('id', collectionIds);
-
-        if (collectionsError) throw collectionsError;
+        const { data: collectionsData } = await supabase
+          .from('collections')
+          .select('*, user:user_id (username)')
+          .in('id', collectionIds);
         setCollections(collectionsData || []);
       } else {
         setCollections([]);
@@ -110,39 +153,27 @@ export default function PostDetailScreen() {
 
     try {
       if (newState) {
-        // Add like
-        const { error: likeError } = await supabase
+        await supabase
           .from('likes')
           .insert({ user_id: user.id, post_id: post.id });
-        if (likeError) throw likeError;
-
-        // Add activity
-        const { error: activityError } = await supabase
-          .from('activities')
-          .insert({
-            actor_id: user.id,
-            type: 'like',
-            post_id: post.id,
-            target_user_id: post.user_id,
-          });
-        if (activityError) throw activityError;
+        await supabase.from('activities').insert({
+          actor_id: user.id,
+          type: 'like',
+          post_id: post.id,
+          target_user_id: post.user_id,
+        });
       } else {
-        // Remove like
-        const { error: unlikeError } = await supabase
+        await supabase
           .from('likes')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.id);
-        if (unlikeError) throw unlikeError;
-
-        // Remove activity
-        const { error: deleteActivityError } = await supabase
+        await supabase
           .from('activities')
           .delete()
           .eq('actor_id', user.id)
           .eq('post_id', post.id)
           .eq('type', 'like');
-        if (deleteActivityError) throw deleteActivityError;
       }
     } catch (err) {
       console.error(err);
@@ -156,12 +187,12 @@ export default function PostDetailScreen() {
   };
 
   const renderArticleRow = (item: {
-    article: string;
+    name: string;
     brand: string;
     url?: string;
   }) => (
     <View style={styles.tableRow}>
-      <Text style={styles.tableCell}>{item.article}</Text>
+      <Text style={styles.tableCell}>{item.name}</Text>
       {item.url ? (
         <TouchableOpacity
           onPress={() => Linking.openURL(item.url)}
@@ -228,23 +259,119 @@ export default function PostDetailScreen() {
             <Plus color="#000" size={28} />
           )}
         </TouchableOpacity>
+        {post.user_id === user?.id && !isEditing && (
+          <TouchableOpacity
+            onPress={() => setIsEditing(true)}
+            style={styles.actionButton}
+          >
+            <Pencil color="#000" size={24} />
+          </TouchableOpacity>
+        )}
       </View>
 
-      {post.caption ? <Text style={styles.caption}>{post.caption}</Text> : null}
-      <Text style={styles.authorHeading}>@{post.profiles.username}'s look</Text>
+      {isEditing ? (
+        <>
+          <TextInput
+            style={styles.editCaptionInput}
+            multiline
+            value={editedCaption}
+            onChangeText={setEditedCaption}
+            placeholder="Write a caption..."
+          />
 
-      {post.pieces && post.pieces.length > 0 && (
-        <View style={styles.table}>
-          {post.pieces.map((piece: any, i: number) => (
-            <View key={i}>
-              {renderArticleRow({
-                article: piece.name || piece.article || '',
-                brand: piece.brand || '',
-                url: piece.url || undefined,
-              })}
+          <Text style={styles.sectionTitle}>Pieces</Text>
+
+          {editedPieces.map((piece, i) => (
+            <View key={i} style={styles.tableRow}>
+              <TextInput
+                style={[
+                  styles.cellInput,
+                  { flex: 2 },
+                  showValidationErrors && !piece.name.trim()
+                    ? styles.invalidInput
+                    : null,
+                ]}
+                placeholder="Name"
+                value={piece.name}
+                onChangeText={(t) => handlePieceChange(i, 'name', t)}
+              />
+
+              <TextInput
+                style={[
+                  styles.cellInput,
+                  { flex: 2 },
+                  showValidationErrors && !piece.brand.trim()
+                    ? styles.invalidInput
+                    : null,
+                ]}
+                placeholder="Brand"
+                value={piece.brand}
+                onChangeText={(t) => handlePieceChange(i, 'brand', t)}
+              />
+              <TextInput
+                style={[styles.cellInput, { flex: 3 }]}
+                placeholder="URL (optional)"
+                value={piece.url}
+                onChangeText={(t) => handlePieceChange(i, 'url', t)}
+              />
+              <TouchableOpacity
+                onPress={() =>
+                  setEditedPieces((prev) => prev.filter((_, idx) => idx !== i))
+                }
+              >
+                <X color="#000" size={20} />
+              </TouchableOpacity>
             </View>
           ))}
-        </View>
+
+          <TouchableOpacity
+            style={styles.addPieceButton}
+            onPress={() =>
+              setEditedPieces((prev) => [
+                ...prev,
+                { name: '', brand: '', url: '' },
+              ])
+            }
+          >
+            <Plus color="#000" size={18} />
+            <Text style={styles.addPieceText}>Add piece</Text>
+          </TouchableOpacity>
+
+          <View style={styles.editActions}>
+            <TouchableOpacity
+              onPress={handleCancelEdits}
+              style={[styles.editButton, { backgroundColor: '#eee' }]}
+            >
+              <Text style={{ color: '#000' }}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              disabled={isSaving}
+              onPress={handleSaveEdits}
+              style={[styles.editButton, { backgroundColor: '#000' }]}
+            >
+              <Text style={{ color: '#fff' }}>
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : (
+        <>
+          {post.caption ? (
+            <Text style={styles.caption}>{post.caption}</Text>
+          ) : null}
+          <Text style={styles.authorHeading}>
+            @{post.profiles.username}'s look
+          </Text>
+
+          {post.pieces?.length && (
+            <View style={styles.table}>
+              {post.pieces.map((piece, i) => (
+                <View key={i}>{renderArticleRow(piece)}</View>
+              ))}
+            </View>
+          )}
+        </>
       )}
 
       <Text style={styles.lookbooksHeading}>Lookbooks</Text>
@@ -298,7 +425,7 @@ const styles = StyleSheet.create({
   table: { paddingHorizontal: 16, marginBottom: 16 },
   tableRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 4,
   },
   tableCell: { flex: 1 },
@@ -325,5 +452,50 @@ const styles = StyleSheet.create({
   collectionUser: { fontSize: 12, color: '#666' },
   columnWrapper: {
     justifyContent: 'flex-start',
+  },
+  editCaptionInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    marginHorizontal: 16,
+    marginBottom: 12,
+  },
+  cellInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 14,
+    color: '#000',
+    marginRight: 4,
+  },
+  invalidInput: {
+    borderColor: 'red',
+  },
+  editActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 16,
+  },
+  editButton: {
+    flex: 1,
+    padding: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  addPieceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginLeft: 16,
+  },
+  addPieceText: {
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

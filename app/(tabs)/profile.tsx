@@ -1,71 +1,138 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Alert,
   Text,
   TextInput,
-  Modal,
-  StyleSheet,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
   Image,
+  Alert,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings } from 'lucide-react-native';
-import { Collection } from '@/lib/types';
+import {
+  ArrowLeft,
+  Trash2,
+  Upload,
+  Settings,
+  Check,
+} from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function ProfileScreen() {
-  const { profile } = useAuth();
-  const [collections, setCollections] = useState<Collection[]>([]);
+  const { profile, refreshProfile } = useAuth();
+  const { edit } = useLocalSearchParams();
+  const [isEditing, setIsEditing] = useState(edit === 'true');
+  const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [newCollectionName, setNewCollectionName] = useState('');
-  const [creating, setCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    username: '',
+    bio: '',
+    avatar_url: '',
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name || '',
+        username: profile.username || '',
+        bio: profile.bio || '',
+        avatar_url: profile.avatar_url || '',
+      });
+    }
+  }, [profile]);
 
   useEffect(() => {
     const fetchCollections = async () => {
-      if (!profile) {
-        setCollections([]);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const { data: collectionsData, error } = await supabase
-          .from('collections')
-          .select('*')
-          .eq('user_id', profile.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        const collectionsWithCount = await Promise.all(
-          (collectionsData || []).map(async (collection) => {
-            const { count } = await supabase
-              .from('saves')
-              .select('*', { count: 'exact', head: true })
-              .eq('collection_id', collection.id);
-
-            return { ...collection, post_count: count || 0 };
-          })
-        );
-
-        setCollections(collectionsWithCount);
-      } catch (err) {
-        console.error('Error fetching collections:', err);
-        setCollections([]);
-      } finally {
-        setLoading(false);
-      }
+      if (!profile) return;
+      const { data } = await supabase
+        .from('collections')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false });
+      setCollections(data || []);
+      setLoading(false);
     };
-
     fetchCollections();
   }, [profile]);
+
+  const pickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled) {
+      const file = result.assets[0];
+      const ext = file.uri.split('.').pop();
+      const filePath = `${profile.id}/avatar.${ext}`;
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(
+          filePath,
+          { uri: file.uri, type: file.type || 'image/jpeg', name: filePath },
+          { upsert: true }
+        );
+      if (error) {
+        Alert.alert('Error uploading avatar', error.message);
+      } else {
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+        setForm({ ...form, avatar_url: urlData.publicUrl });
+      }
+    }
+  };
+
+  const saveProfile = async () => {
+    try {
+      setSaving(true);
+      const updates = {
+        id: profile.id,
+        name: form.name,
+        username: form.username,
+        bio: form.bio,
+        avatar_url: form.avatar_url,
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', profile.id);
+      if (error) throw error;
+
+      await refreshProfile?.(); // reload context
+      router.push('/profile');
+      setIsEditing(false);
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Error saving profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteCollection = async (id: string) => {
+    Alert.alert('Delete Collection', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await supabase.from('saves').delete().eq('collection_id', id);
+          await supabase.from('collections').delete().eq('id', id);
+          setCollections((prev) => prev.filter((c) => c.id !== id));
+        },
+      },
+    ]);
+  };
 
   if (!profile) {
     return (
@@ -76,152 +143,100 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity onPress={() => router.push('/settings')}>
-          <Settings color="#000" size={24} />
+        <TouchableOpacity onPress={() => router.back()}>
+          <ArrowLeft color="#000" size={24} />
         </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>
+          {isEditing ? 'Edit Profile' : 'Profile'}
+        </Text>
+
+        {isEditing ? (
+          <TouchableOpacity onPress={saveProfile} disabled={saving}>
+            <Check color="#000" size={24} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => router.push('/settings')}>
+            <Settings color="#000" size={24} />
+          </TouchableOpacity>
+        )}
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.profileSection}>
-          <Text style={styles.name}>{profile.name}</Text>
-          <Text style={styles.username}>@{profile.username}</Text>
-
-          <View style={styles.avatarContainer}>
-            {profile.avatar_url ? (
-              <Image
-                source={{ uri: profile.avatar_url }}
-                style={styles.avatar}
-              />
-            ) : (
-              <View style={[styles.avatar, styles.avatarPlaceholder]}>
-                <Text style={styles.avatarText}>
-                  {profile.name.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {profile.bio ? (
-            <Text style={styles.bio}>{profile.bio}</Text>
+      <ScrollView contentContainerStyle={{ padding: 24 }}>
+        <TouchableOpacity onPress={isEditing ? pickAvatar : undefined}>
+          {form.avatar_url ? (
+            <Image source={{ uri: form.avatar_url }} style={styles.avatar} />
           ) : (
-            <Text style={styles.bioPlaceholder}>No bio yet</Text>
+            <View style={[styles.avatar, styles.avatarPlaceholder]}>
+              <Text style={styles.avatarText}>
+                {form.name.charAt(0).toUpperCase()}
+              </Text>
+            </View>
           )}
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.collectionsSection}>
-          <Text style={styles.sectionTitle}>Collections</Text>
-
-          {loading ? (
-            <ActivityIndicator
-              size="small"
-              color="#000"
-              style={{ marginTop: 20 }}
+        {isEditing ? (
+          <>
+            <TextInput
+              style={styles.input}
+              value={form.name}
+              onChangeText={(t) => setForm({ ...form, name: t })}
+              placeholder="Name"
             />
+            <TextInput
+              style={styles.input}
+              value={form.username}
+              onChangeText={(t) => setForm({ ...form, username: t })}
+              placeholder="Username"
+            />
+            <TextInput
+              style={[styles.input, { height: 100 }]}
+              multiline
+              value={form.bio}
+              onChangeText={(t) => setForm({ ...form, bio: t })}
+              placeholder="Bio"
+            />
+          </>
+        ) : (
+          <>
+            <Text style={styles.name}>{profile.name}</Text>
+            <Text style={styles.username}>@{profile.username}</Text>
+            <Text style={styles.bio}>{profile.bio || 'No bio yet'}</Text>
+          </>
+        )}
+
+        <View style={{ marginTop: 32 }}>
+          <Text style={styles.sectionTitle}>Collections</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#000" />
           ) : (
             <View style={styles.grid}>
-              {[...collections, { id: 'new', isNew: true }].map((collection) =>
-                collection.isNew ? (
+              {collections.map((collection) => (
+                <View key={collection.id} style={styles.collectionTile}>
                   <TouchableOpacity
-                    key="new"
-                    style={[styles.collectionTile, styles.newCollectionTile]}
-                    onPress={() => setShowModal(true)}
-                  >
-                    <Text style={styles.newCollectionPlus}>＋</Text>
-                    <Text style={styles.collectionName}>
-                      Add new collection
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    key={collection.id}
-                    style={styles.collectionTile}
+                    disabled={isEditing}
                     onPress={() => router.push(`/collection/${collection.id}`)}
                   >
                     <Text style={styles.collectionTileName}>
                       {collection.name}
                     </Text>
-                    <Text style={styles.collectionTileCount}>
-                      {collection.post_count} post
-                      {collection.post_count !== 1 ? 's' : ''}
-                    </Text>
                   </TouchableOpacity>
-                )
-              )}
+                  {isEditing && (
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteCollection(collection.id)}
+                    >
+                      <Trash2 color="red" size={18} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
             </View>
           )}
         </View>
       </ScrollView>
-      <Modal
-        visible={showModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>New Collection</Text>
-
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Enter collection name"
-              value={newCollectionName}
-              onChangeText={setNewCollectionName}
-              placeholderTextColor="#999"
-            />
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowModal(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.modalButton, styles.createButton]}
-                onPress={async () => {
-                  if (!newCollectionName.trim()) {
-                    Alert.alert('Please enter a name');
-                    return;
-                  }
-
-                  setCreating(true);
-                  const { error } = await supabase
-                    .from('collections')
-                    .insert([
-                      { name: newCollectionName.trim(), user_id: profile.id },
-                    ]);
-
-                  setCreating(false);
-                  if (error) {
-                    console.error('Error creating collection:', error);
-                    Alert.alert('Error creating collection');
-                  } else {
-                    setNewCollectionName('');
-                    setShowModal(false);
-                    // Refresh collections
-                    const { data: collectionsData } = await supabase
-                      .from('collections')
-                      .select('*')
-                      .eq('user_id', profile.id)
-                      .order('created_at', { ascending: false });
-
-                    setCollections(collectionsData || []);
-                  }
-                }}
-                disabled={creating}
-              >
-                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
-                  {creating ? 'Creating...' : 'Create'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -230,161 +245,51 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  headerTitle: { fontSize: 24, fontWeight: '700', color: '#000' },
-  profileSection: {
-    padding: 24,
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  name: { fontSize: 28, fontWeight: '700', color: '#000', marginBottom: 4 },
-  username: { fontSize: 16, color: '#666', marginBottom: 24 },
-  avatarContainer: { marginBottom: 16 },
+  headerTitle: { fontSize: 20, fontWeight: '700' },
   avatar: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: '#f5f5f5',
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   avatarPlaceholder: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
   },
-  avatarText: { fontSize: 72, fontWeight: '700', color: '#fff' },
-  bio: { fontSize: 16, color: '#000', textAlign: 'center', lineHeight: 24 },
-  bioPlaceholder: { fontSize: 16, color: '#999', fontStyle: 'italic' },
-  collectionsSection: { padding: 24 },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 16,
-  },
-  collectionsList: { gap: 12 },
-  collectionItem: { padding: 16, backgroundColor: '#f5f5f5', borderRadius: 12 },
-  collectionName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-    marginBottom: 4,
-  },
-  collectionCount: { fontSize: 14, color: '#666' },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  newCollectionItem: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fafafa',
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: '#ccc',
-  },
-  newCollectionText: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-
-  collectionTile: {
-    flexBasis: '33.33%',
-    padding: 8,
-    marginBottom: 12,
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-  },
-
-  collectionTileName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-    marginTop: 8,
-  },
-
-  collectionTileCount: {
-    fontSize: 14,
-    color: '#666',
-  },
-
-  newCollectionTile: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    justifyContent: 'center',
-  },
-
-  newCollectionPlus: {
-    fontSize: 32,
-    color: '#000',
-    marginBottom: 4,
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 12,
-  },
-  modalInput: {
-    width: '100%',
+  avatarText: { fontSize: 48, color: '#fff', fontWeight: '700' },
+  input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
     padding: 10,
     fontSize: 16,
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    gap: 8,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+  name: { fontSize: 28, fontWeight: '700', textAlign: 'center' },
+  username: { textAlign: 'center', color: '#666', marginBottom: 12 },
+  bio: { textAlign: 'center', color: '#333', lineHeight: 22 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 12 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  collectionTile: {
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    borderRadius: 12,
+    flexBasis: '30%',
+    position: 'relative',
     alignItems: 'center',
   },
-  cancelButton: {
-    backgroundColor: '#f5f5f5',
-  },
-  createButton: {
-    backgroundColor: '#000',
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
+  collectionTileName: { fontWeight: '600' },
+  deleteButton: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
   },
 });

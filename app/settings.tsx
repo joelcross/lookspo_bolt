@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, LogOut } from 'lucide-react-native';
+import { ChevronLeft, LogOut, Mail, Pencil } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 
@@ -19,6 +19,14 @@ export default function SettingsScreen() {
     console.log('Signing out...');
     await signOut();
     router.replace('/auth/login');
+  };
+
+  const handlePressFeedback = async () => {
+    router.replace('/feedback');
+  };
+
+  const handlePressEditProfile = async () => {
+    router.push({ pathname: '/profile', params: { edit: 'true' } });
   };
 
   return (
@@ -39,6 +47,21 @@ export default function SettingsScreen() {
             <View style={styles.itemContent}>
               <LogOut color="#ff3b30" size={20} />
               <Text style={[styles.itemText, styles.dangerText]}>Sign Out</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={handlePressFeedback}>
+            <View style={styles.itemContent}>
+              <Mail color="#000000ff" size={20} />
+              <Text style={[styles.itemText]}>Feedback</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={handlePressEditProfile}
+          >
+            <View style={styles.itemContent}>
+              <Pencil color="#000000ff" size={20} />
+              <Text style={[styles.itemText]}>Edit Profile</Text>
             </View>
           </TouchableOpacity>
         </View>

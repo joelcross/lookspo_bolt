@@ -78,7 +78,7 @@ export default function SelectCollectionsScreen() {
           type: 'save',
           post_id: postId,
           target_user_id: postAuthorId,
-          collection_id,
+          collection_id: collectionId,
         }));
         await supabase.from('activities').insert(activityInserts);
       }
@@ -95,6 +95,7 @@ export default function SelectCollectionsScreen() {
       preSelected={preSelected}
       confirmText="Done"
       onConfirm={handleSave}
+      userId={user.id}
     />
   );
 }

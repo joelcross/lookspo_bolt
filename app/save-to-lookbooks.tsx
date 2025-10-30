@@ -90,8 +90,9 @@ export default function SaveToLookbooksScreen() {
   return (
     <SelectCollections
       collections={collections}
-      confirmText="Post"
-      onConfirm={handlePost}
+      confirmText="Post" // or "Done"
+      userId={user.id} // important for creating new collection
+      onConfirm={handlePost} // or handleSave
     />
   );
 }

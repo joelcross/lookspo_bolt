@@ -6,28 +6,32 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  Alert,
   ActivityIndicator,
   StyleSheet,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  ArrowLeft,
-  Trash2,
-  Upload,
-  Settings,
-  Check,
-} from 'lucide-react-native';
+import { ArrowLeft, Trash2, Settings, Check, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
+import { showConfirmDialog } from '@/lib/showConfirmDialog';
+import { Collection } from '@/lib/types';
 
 export default function ProfileScreen() {
   const { profile, refreshProfile } = useAuth();
   const { edit } = useLocalSearchParams();
   const [isEditing, setIsEditing] = useState(edit === 'true');
   const [collections, setCollections] = useState([]);
+  const [removedCollectionIds, setRemovedCollectionIds] = useState<string[]>(
+    []
+  );
+  const [showModal, setShowModal] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState('');
+  const [originalCollections, setOriginalCollections] = useState<Collection[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -37,6 +41,7 @@ export default function ProfileScreen() {
     avatar_url: '',
   });
 
+  // Initialize form state
   useEffect(() => {
     if (profile) {
       setForm({
@@ -48,20 +53,24 @@ export default function ProfileScreen() {
     }
   }, [profile]);
 
+  // Fetch collections
   useEffect(() => {
     const fetchCollections = async () => {
       if (!profile) return;
+      setLoading(true);
       const { data } = await supabase
         .from('collections')
         .select('*')
         .eq('user_id', profile.id)
         .order('created_at', { ascending: false });
       setCollections(data || []);
+      setOriginalCollections(data || []); // snapshot for cancel
       setLoading(false);
     };
     fetchCollections();
   }, [profile]);
 
+  // Pick new avatar
   const pickAvatar = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -81,7 +90,7 @@ export default function ProfileScreen() {
           { upsert: true }
         );
       if (error) {
-        Alert.alert('Error uploading avatar', error.message);
+        alert('Error uploading avatar: ' + error.message);
       } else {
         const { data: urlData } = supabase.storage
           .from('avatars')
@@ -91,47 +100,68 @@ export default function ProfileScreen() {
     }
   };
 
-  const saveProfile = async () => {
+  // Remove collection locally (staged)
+  const removeCollection = async (id: string) => {
+    const confirmed = await showConfirmDialog({
+      title: 'Remove Collection',
+      message:
+        'Are you sure you want to remove this collection from your profile?',
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    setRemovedCollectionIds((prev) => [...prev, id]);
+    setCollections((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  // Cancel editing
+  const handleCancel = () => {
+    setCollections(originalCollections); // restore original
+    setRemovedCollectionIds([]); // clear any staged deletions
+    setIsEditing(false);
+    router.push('/profile');
+  };
+
+  // Save all changes
+  const handleSave = async () => {
+    if (!profile) return;
+    setSaving(true);
     try {
-      setSaving(true);
-      const updates = {
-        id: profile.id,
-        name: form.name,
-        username: form.username,
-        bio: form.bio,
-        avatar_url: form.avatar_url,
-      };
-
-      const { error } = await supabase
+      // Update profile
+      const { error: updateProfileError } = await supabase
         .from('profiles')
-        .update(updates)
+        .update({
+          name: form.name,
+          username: form.username,
+          bio: form.bio,
+          avatar_url: form.avatar_url,
+        })
         .eq('id', profile.id);
-      if (error) throw error;
+      if (updateProfileError) throw updateProfileError;
 
-      await refreshProfile?.(); // reload context
-      router.push('/profile');
+      // Delete removed collections
+      for (const id of removedCollectionIds) {
+        await supabase.from('saves').delete().eq('collection_id', id);
+        await supabase.from('collections').delete().eq('id', id);
+      }
+
+      // Add any new collections
+      for (const c of collections.filter((c) => c.isTemp)) {
+        await supabase
+          .from('collections')
+          .insert({ name: c.name, user_id: profile.id });
+      }
+
+      await refreshProfile?.();
       setIsEditing(false);
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Error saving profile');
+      router.push('/profile');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save profile');
     } finally {
       setSaving(false);
     }
-  };
-
-  const deleteCollection = async (id: string) => {
-    Alert.alert('Delete Collection', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          await supabase.from('saves').delete().eq('collection_id', id);
-          await supabase.from('collections').delete().eq('id', id);
-          setCollections((prev) => prev.filter((c) => c.id !== id));
-        },
-      },
-    ]);
   };
 
   if (!profile) {
@@ -145,16 +175,22 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ArrowLeft color="#000" size={24} />
-        </TouchableOpacity>
+        {isEditing ? (
+          <TouchableOpacity onPress={handleCancel}>
+            <X color="#000" size={24} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => router.back()}>
+            <ArrowLeft color="#000" size={24} />
+          </TouchableOpacity>
+        )}
 
         <Text style={styles.headerTitle}>
           {isEditing ? 'Edit Profile' : 'Profile'}
         </Text>
 
         {isEditing ? (
-          <TouchableOpacity onPress={saveProfile} disabled={saving}>
+          <TouchableOpacity onPress={handleSave} disabled={saving}>
             <Check color="#000" size={24} />
           </TouchableOpacity>
         ) : (
@@ -213,30 +249,113 @@ export default function ProfileScreen() {
             <ActivityIndicator size="small" color="#000" />
           ) : (
             <View style={styles.grid}>
-              {collections.map((collection) => (
-                <View key={collection.id} style={styles.collectionTile}>
+              {[...collections, { id: 'new', isNew: true }].map((collection) =>
+                collection.isNew ? (
                   <TouchableOpacity
-                    disabled={isEditing}
-                    onPress={() => router.push(`/collection/${collection.id}`)}
+                    key="new"
+                    style={[styles.collectionTile, styles.newCollectionTile]}
+                    onPress={() => setShowModal(true)}
                   >
+                    <Text style={styles.newCollectionPlus}>＋</Text>
                     <Text style={styles.collectionTileName}>
-                      {collection.name}
+                      Add new collection
                     </Text>
                   </TouchableOpacity>
-                  {isEditing && (
+                ) : (
+                  <View key={collection.id} style={styles.collectionTile}>
                     <TouchableOpacity
-                      style={styles.deleteButton}
-                      onPress={() => deleteCollection(collection.id)}
+                      disabled={isEditing}
+                      onPress={() =>
+                        router.push(`/collection/${collection.id}`)
+                      }
                     >
-                      <Trash2 color="red" size={18} />
+                      <Text style={styles.collectionTileName}>
+                        {collection.name}
+                      </Text>
                     </TouchableOpacity>
-                  )}
-                </View>
-              ))}
+                    {isEditing && (
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => removeCollection(collection.id)}
+                      >
+                        <Trash2 color="red" size={18} />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )
+              )}
             </View>
           )}
         </View>
       </ScrollView>
+      <Modal
+        visible={showModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>New Collection</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter collection name"
+              value={newCollectionName}
+              onChangeText={setNewCollectionName}
+              placeholderTextColor="#999"
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.createButton]}
+                onPress={async () => {
+                  if (!newCollectionName.trim()) return;
+
+                  const tempCollection = {
+                    id: `temp-${Date.now()}`,
+                    name: newCollectionName.trim(),
+                    isTemp: true,
+                  };
+
+                  if (isEditing) {
+                    // Stage it locally; won't save to DB until user clicks Save
+                    setCollections([...collections, tempCollection]);
+                  } else {
+                    // Immediately insert into DB
+                    const { data, error } = await supabase
+                      .from('collections')
+                      .insert({
+                        name: newCollectionName.trim(),
+                        user_id: profile.id,
+                      })
+                      .select()
+                      .single();
+
+                    if (error) {
+                      alert('Error creating collection: ' + error.message);
+                      return;
+                    }
+
+                    setCollections([...collections, data]);
+                  }
+
+                  setNewCollectionName('');
+                  setShowModal(false);
+                }}
+              >
+                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
+                  Create
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -291,5 +410,57 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 12,
+  },
+  modalInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 8,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f5f5f5',
+  },
+  createButton: {
+    backgroundColor: '#000',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
   },
 });

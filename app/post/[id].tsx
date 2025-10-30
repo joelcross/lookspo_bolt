@@ -246,14 +246,20 @@ export default function PostDetailScreen() {
 
       <Text style={styles.lookbooksHeading}>Lookbooks</Text>
 
-      <FlatList
-        data={collections}
-        keyExtractor={(item) => item.id}
-        renderItem={renderCollection}
-        numColumns={3}
-        scrollEnabled={false}
-        columnWrapperStyle={styles.columnWrapper}
-      />
+      {collections.length ? (
+        <FlatList
+          data={collections}
+          keyExtractor={(item) => item.id}
+          renderItem={renderCollection}
+          numColumns={3}
+          scrollEnabled={false}
+          columnWrapperStyle={styles.columnWrapper}
+        />
+      ) : (
+        <Text style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+          This look is not saved in any lookbooks yet.
+        </Text>
+      )}
     </ScrollView>
   );
 }

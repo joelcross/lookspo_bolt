@@ -178,7 +178,10 @@ export default function PostDetailScreen() {
   );
 
   const renderCollection = ({ item }: { item: Collection }) => (
-    <View style={styles.collectionItem}>
+    <TouchableOpacity
+      style={styles.collectionItem}
+      onPress={() => router.push(`/collection/${item.id}`)}
+    >
       <View style={styles.collectionThumbnail}>
         <Image
           source={{ uri: item.cover_url || 'https://via.placeholder.com/100' }}
@@ -187,7 +190,7 @@ export default function PostDetailScreen() {
       </View>
       <Text style={styles.collectionName}>{item.name}</Text>
       <Text style={styles.collectionUser}>@{item.user.username}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading || !post) {

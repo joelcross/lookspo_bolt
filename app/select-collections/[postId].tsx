@@ -85,7 +85,7 @@ export default function SelectCollectionsScreen() {
     } catch (err) {
       console.error(err);
     } finally {
-      router.push(`/post/${postId}`);
+      router.back();
     }
   };
 

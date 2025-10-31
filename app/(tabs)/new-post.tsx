@@ -22,6 +22,7 @@ export default function NewPostScreen() {
   const { user } = useAuth();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [caption, setCaption] = useState('');
+  const [showDiscardModal, setShowDiscardModal] = useState(false);
   const [pieces, setPieces] = useState<Piece[]>([
     { name: '', brand: '', url: '', isTemplate: true },
   ]);
@@ -133,13 +134,71 @@ export default function NewPostScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity
+          onPress={() => {
+            // only prompt if there’s something filled
+            if (
+              selectedImage ||
+              caption.trim() ||
+              pieces.some((p) => !p.isTemplate && (p.name || p.brand || p.url))
+            ) {
+              setShowDiscardModal(true);
+            } else {
+              router.back();
+            }
+          }}
+        >
           <ChevronLeft color="#000" size={28} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>New Post</Text>
         <View style={{ width: 28 }} />
       </View>
+
+      {/* Discard confirmation modal */}
+      <Modal
+        visible={showDiscardModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDiscardModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Discard post?</Text>
+            <Text style={styles.modalText}>
+              Are you sure you want to discard your post? Your progress will be
+              lost.
+            </Text>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setShowDiscardModal(false)}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={() => {
+                  // clear draft state
+                  setSelectedImage(null);
+                  setCaption('');
+                  setPieces([
+                    { name: '', brand: '', url: '', isTemplate: true },
+                  ]);
+                  setShowDiscardModal(false);
+                  router.replace('/(tabs)'); // go home and clear nav stack
+                }}
+              >
+                <Text style={styles.confirmText}>Yes, discard</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView style={styles.content}>
         <Image source={{ uri: selectedImage }} style={styles.preview} />
 
@@ -277,4 +336,57 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   postButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    width: '80%',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 15,
+    color: '#555',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 6,
+  },
+  cancelButton: {
+    backgroundColor: '#eee',
+  },
+  confirmButton: {
+    backgroundColor: '#000',
+  },
+  cancelText: {
+    color: '#000',
+    fontWeight: '600',
+  },
+  confirmText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });

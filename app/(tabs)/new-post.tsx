@@ -9,11 +9,12 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { X, Upload } from 'lucide-react-native';
+import { X, Upload, ChevronLeft } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { Piece } from '@/lib/types';
 
@@ -132,6 +133,13 @@ export default function NewPostScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <ChevronLeft color="#000" size={28} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>New Post</Text>
+        <View style={{ width: 28 }} />
+      </View>
       <ScrollView style={styles.content}>
         <Image source={{ uri: selectedImage }} style={styles.preview} />
 
@@ -211,6 +219,20 @@ export default function NewPostScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
   uploadArea: {
     flex: 1,
     justifyContent: 'center',
@@ -237,6 +259,7 @@ const styles = StyleSheet.create({
   tableRow: { flexDirection: 'row', marginBottom: 8, alignItems: 'center' },
   cell: { fontWeight: '600', color: '#666' },
   cellInput: {
+    width: 10,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,

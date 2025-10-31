@@ -4,6 +4,17 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import SelectCollections, { Collection } from '@/components/SelectCollections';
 import { Piece } from '@/lib/types';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ChevronLeft } from 'lucide-react-native';
 
 interface Params {
   imageUri: string;
@@ -88,11 +99,41 @@ export default function SaveToLookbooksScreen() {
   };
 
   return (
-    <SelectCollections
-      collections={collections}
-      confirmText="Post" // or "Done"
-      userId={user.id} // important for creating new collection
-      onConfirm={handlePost} // or handleSave
-    />
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <ChevronLeft color="#000" size={28} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Save to lookbooks?</Text>
+        <View style={{ width: 28 }} />
+      </View>
+      <SelectCollections
+        collections={collections}
+        confirmText="Post" // or "Done"
+        userId={user.id} // important for creating new collection
+        onConfirm={handlePost} // or handleSave
+      />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
+});

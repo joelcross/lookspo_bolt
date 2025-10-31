@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Alert,
-  Button,
   Text,
   StyleSheet,
   FlatList,
@@ -11,7 +9,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Post } from '@/lib/types';
-import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
@@ -161,14 +158,6 @@ export default function HomeScreen() {
   const renderEmpty = () => {
     if (loading) return null;
 
-    const { signOut } = useAuth();
-
-    const handleSignOut = async () => {
-      console.log('Signing out...');
-      await signOut();
-      router.replace('/auth/login');
-    };
-
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>
@@ -176,7 +165,6 @@ export default function HomeScreen() {
             ? 'Follow users to see their posts here'
             : 'No posts yet'}
         </Text>
-        <Button title="Sign Out" onPress={handleSignOut} />
       </View>
     );
   };

@@ -42,11 +42,13 @@ export default function SettingsScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-
-          <TouchableOpacity style={styles.item} onPress={handleSignOut}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={handlePressEditProfile}
+          >
             <View style={styles.itemContent}>
-              <LogOut color="#ff3b30" size={20} />
-              <Text style={[styles.itemText, styles.dangerText]}>Sign Out</Text>
+              <Pencil color="#000000ff" size={20} />
+              <Text style={[styles.itemText]}>Edit Profile</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={handlePressFeedback}>
@@ -55,13 +57,10 @@ export default function SettingsScreen() {
               <Text style={[styles.itemText]}>Feedback</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.item}
-            onPress={handlePressEditProfile}
-          >
+          <TouchableOpacity style={styles.item} onPress={handleSignOut}>
             <View style={styles.itemContent}>
-              <Pencil color="#000000ff" size={20} />
-              <Text style={[styles.itemText]}>Edit Profile</Text>
+              <LogOut color="#ff3b30" size={20} />
+              <Text style={[styles.itemText, styles.dangerText]}>Sign Out</Text>
             </View>
           </TouchableOpacity>
         </View>

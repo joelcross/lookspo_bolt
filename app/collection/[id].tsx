@@ -36,7 +36,7 @@ export default function CollectionScreen() {
     try {
       const { data: collectionData } = await supabase
         .from('collections')
-        .select('*')
+        .select('*, user:user_id (username)')
         .eq('id', id)
         .maybeSingle();
 
@@ -121,7 +121,10 @@ export default function CollectionScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft color="#000" size={28} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{collection.name}</Text>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={styles.headerTitle}>{collection.name}</Text>
+          <Text style={styles.headerSubtitle}>@{collection.user.username}</Text>
+        </View>
         <View style={{ width: 28 }} />
       </View>
 
@@ -168,6 +171,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#000',
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#939393ff',
   },
   errorText: {
     fontSize: 16,

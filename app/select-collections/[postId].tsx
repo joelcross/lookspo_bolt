@@ -3,6 +3,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import SelectCollections, { Collection } from '@/components/SelectCollections';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ChevronLeft } from 'lucide-react-native';
 
 export default function SelectCollectionsScreen() {
   const { user } = useAuth();
@@ -90,12 +93,42 @@ export default function SelectCollectionsScreen() {
   };
 
   return (
-    <SelectCollections
-      collections={collections}
-      preSelected={preSelected}
-      confirmText="Done"
-      onConfirm={handleSave}
-      userId={user.id}
-    />
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <ChevronLeft color="#000" size={28} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Save to Lookbooks</Text>
+        <View style={{ width: 28 }} />
+      </View>
+      <SelectCollections
+        collections={collections}
+        preSelected={preSelected}
+        confirmText="Done"
+        onConfirm={handleSave}
+        userId={user.id}
+      />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
+});

@@ -10,13 +10,11 @@ I designed the UX/UI, built the frontend architecture, integrated Supabase for b
 
 ---
 
-## 🌱 Mission/Vision
+## Mission/Vision
 
 The idea behind Lookspo is to encourage inspiration within users and give them an outlet for curating content in a unique and thoughtful way that prioritizes authenticity. I envision Lookspo becoming the go-to platform for those seeking a refreshing and doom-free online experience that values originality and personal expression.
 
----
-
-## 🧰 Tech Stack
+## Tech Stack
 
 - **Frontend:** React Native (Expo)
 - **Backend:** Supabase (PostgreSQL, Auth, Storage)
@@ -24,9 +22,7 @@ The idea behind Lookspo is to encourage inspiration within users and give them a
 - **Design:** Figma, custom design system
 - **Deployment:** EAS / Expo Web
 
----
-
-## 🧭 Links
+## Links
 
 Check-out my process:
 

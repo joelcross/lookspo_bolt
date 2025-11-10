@@ -24,10 +24,7 @@ The idea behind Lookspo is to encourage inspiration within users and give them a
 
 ## Links
 
-Check-out my process:
-
-- [🖋 Initial Sketches](#)
-- [📐 Lo-Fi Wireframes](#)
-- [🎨 Hi-Fi Wireframes](#)
-- [🧩 Design System](#)
-- [🎬 Live Demo](#)
+- [📐 Lo-Fi Wireframes](https://www.figma.com/design/HpwsRo9srSZNkKaufgswj9/lookspo?node-id=9-2448&t=bq00jmkHRZpQixCe-1)
+- [🎨 Hi-Fi Wireframes](https://www.figma.com/design/HpwsRo9srSZNkKaufgswj9/lookspo?node-id=69-9&t=7BjUHGwm8cKIXLN6-1)
+- [🧩 Design System](https://www.figma.com/design/HpwsRo9srSZNkKaufgswj9/lookspo?node-id=61-2536&t=7BjUHGwm8cKIXLN6-1)
+- 🎬 Live Demo (coming soon)

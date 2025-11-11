@@ -7,7 +7,9 @@
     "dev": "EXPO_NO_TELEMETRY=1 expo start",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -47,8 +49,19 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@chromatic-com/storybook": "^4.1.2",
+    "@storybook/addon-a11y": "^10.0.7",
+    "@storybook/addon-docs": "^10.0.7",
+    "@storybook/addon-vitest": "^10.0.7",
+    "@storybook/react-native-web-vite": "^10.0.7",
     "@types/react": "~19.1.10",
+    "storybook": "^10.0.7",
     "supabase": "^2.53.6",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.8",
+    "playwright": "^1.56.1",
+    "@vitest/browser-playwright": "^4.0.8",
+    "@vitest/coverage-v8": "^4.0.8"
   }
 }

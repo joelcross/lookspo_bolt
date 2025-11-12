@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, TouchableWithoutFeedback, Animated, Easing } from 'react-native';
+import { Animated, Easing, TouchableWithoutFeedback } from 'react-native';
+import styled from 'styled-components/native';
 import {
   HouseIcon,
   MagnifyingGlassIcon,
@@ -7,9 +8,8 @@ import {
   ChatTeardropIcon,
   UserIcon,
 } from 'phosphor-react-native';
-import { styles } from './NavBar.styles';
 
-type TabKey = 'home' | 'search' | 'new-post' | 'activity' | 'profile';
+export type TabKey = 'home' | 'search' | 'new_post' | 'activity' | 'profile';
 
 type NavBarProps = {
   activeKey: TabKey;
@@ -19,25 +19,25 @@ type NavBarProps = {
 const ICONS = {
   home: HouseIcon,
   search: MagnifyingGlassIcon,
-  'new-post': PlusSquareIcon,
+  new_post: PlusSquareIcon,
   activity: ChatTeardropIcon,
   profile: UserIcon,
 };
 
-const NavBar: React.FC<NavBarProps> = ({ activeKey, onTabPress }) => {
+export function NavBar({ activeKey, onTabPress }: NavBarProps) {
   return (
-    <View style={styles.container}>
+    <Container>
       {(Object.keys(ICONS) as TabKey[]).map((key) => {
         const Icon = ICONS[key];
         const isActive = key === activeKey;
 
         const scale = React.useRef(
-          new Animated.Value(isActive ? 1.2 : 1)
+          new Animated.Value(isActive ? 1.0 : 1)
         ).current;
 
         React.useEffect(() => {
           Animated.timing(scale, {
-            toValue: isActive ? 1.2 : 1,
+            toValue: isActive ? 1.0 : 1,
             duration: 200,
             easing: Easing.out(Easing.quad),
             useNativeDriver: true,
@@ -55,25 +55,56 @@ const NavBar: React.FC<NavBarProps> = ({ activeKey, onTabPress }) => {
                   useNativeDriver: true,
                 }),
                 Animated.timing(scale, {
-                  toValue: 1.2,
+                  toValue: 1.0,
                   duration: 150,
                   useNativeDriver: true,
                 }),
               ]).start(() => onTabPress(key));
             }}
           >
-            <Animated.View style={[styles.item, { transform: [{ scale }] }]}>
+            <Item
+              style={[
+                {
+                  transform: [{ scale }],
+                  backgroundColor: isActive ? '#D8D89F' : 'transparent',
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                },
+              ]}
+            >
+              {' '}
               <Icon
-                color={isActive ? '#000' : '#999'}
+                color={isActive ? '#ffffffff' : '#b9b9b9ff'}
                 size={28}
                 weight={isActive ? 'fill' : 'regular'}
               />
-            </Animated.View>
+            </Item>
           </TouchableWithoutFeedback>
         );
       })}
-    </View>
+    </Container>
   );
-};
+}
 
 export default NavBar;
+
+const Container = styled.View`
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  border-top-width: 1px;
+  border-top-color: #eee;
+  background-color: #fff;
+  padding-vertical: 10px;
+  border-radius: 20px 20px 0px 0px;
+  shadow-color: #000;
+  shadow-offset: 0px 0px;
+  shadow-opacity: 0.15;
+  shadow-radius: 16px;
+`;
+
+const Item = styled(Animated.View)`
+  padding: 5px;
+  align-items: center;
+  justify-content: center;
+`;

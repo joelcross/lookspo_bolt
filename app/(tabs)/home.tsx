@@ -12,7 +12,7 @@ import { Post } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
-import PostCard from '@/components/PostCard';
+import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
 
 type FeedType = 'following' | 'explore';
@@ -172,7 +172,6 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.logo}>Lookspo</Text>
         <View style={styles.toggleContainer}>
           <TouchableOpacity
             style={[
@@ -238,19 +237,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-  },
-  logo: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 12,
   },
   toggleContainer: {
     flexDirection: 'row',

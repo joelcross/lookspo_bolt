@@ -1,6 +1,7 @@
-import { Slot, Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { useFonts } from 'expo-font';
 
 function RootLayoutInner() {
   const { session, loading } = useAuth();
@@ -24,6 +25,13 @@ function RootLayoutInner() {
 }
 
 export default function RootLayout() {
+  // Load your font
+  const [fontsLoaded] = useFonts({
+    Outfit: require('../assets/fonts/Outfit-Variable.ttf'),
+  });
+
+  if (!fontsLoaded) return null;
+
   return (
     <AuthProvider>
       <RootLayoutInner />

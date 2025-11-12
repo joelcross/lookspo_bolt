@@ -5,7 +5,7 @@ import BottomNavBar from '@/components/NavBar';
 
 export default function TabLayout() {
   const [activeTab, setActiveTab] = useState<
-    'home' | 'search' | 'new-post' | 'activity' | 'profile'
+    'home' | 'search' | 'new_post' | 'activity' | 'profile'
   >('home');
   const router = useRouter();
 
@@ -32,7 +32,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA', // your Off-White background
+    backgroundColor: '#FAFAFA',
   },
   content: {
     flex: 1,

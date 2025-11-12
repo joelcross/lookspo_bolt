@@ -22,7 +22,6 @@
     "expo-blur": "~15.0.7",
     "expo-camera": "~17.0.8",
     "expo-constants": "~18.0.9",
-    "expo-font": "~14.0.8",
     "expo-haptics": "~15.0.7",
     "expo-image-picker": "~17.0.8",
     "expo-linear-gradient": "~15.0.7",
@@ -45,7 +44,8 @@
     "react-native-svg": "15.12.1",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "^0.21.0",
-    "react-native-webview": "13.15.0"
+    "react-native-webview": "13.15.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -55,13 +55,13 @@
     "@storybook/addon-vitest": "^10.0.7",
     "@storybook/react-native-web-vite": "^10.0.7",
     "@types/react": "~19.1.10",
+    "@vitest/browser-playwright": "^4.0.8",
+    "@vitest/coverage-v8": "^4.0.8",
+    "playwright": "^1.56.1",
     "storybook": "^10.0.7",
     "supabase": "^2.53.6",
     "typescript": "~5.9.2",
     "vite": "^7.2.2",
-    "vitest": "^4.0.8",
-    "playwright": "^1.56.1",
-    "@vitest/browser-playwright": "^4.0.8",
-    "@vitest/coverage-v8": "^4.0.8"
+    "vitest": "^4.0.8"
   }
 }

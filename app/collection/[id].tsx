@@ -13,7 +13,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Post, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import PostCard from '@/components/PostCard';
+import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
 
 export default function CollectionScreen() {

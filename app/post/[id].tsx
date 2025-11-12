@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Heart, Plus, Check, ArrowLeft, Pencil, X } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
+import PostCard from '@/components/PostCard';
 
 export default function PostDetailScreen() {
   const router = useRouter();
@@ -241,6 +242,8 @@ export default function PostDetailScreen() {
         <Text style={styles.topBarTitle}>Look</Text>
         <View style={{ width: 24 }} />
       </View>
+
+      <PostCard post={post} showActions />
 
       <Image source={{ uri: post.image_url }} style={styles.postImage} />
 

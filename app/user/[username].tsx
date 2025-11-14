@@ -14,6 +14,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Profile, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import Header from '@/components/Header/Header';
 
 export default function UserProfileScreen() {
   const { username } = useLocalSearchParams<{ username: string }>();
@@ -157,13 +158,8 @@ export default function UserProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft color="#000" size={28} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>@{profile.username}</Text>
-        <View style={{ width: 28 }} />
-      </View>
+      <Header text="Profile" left="back" />
+      <Text style={styles.headerTitle}>@{profile.username}</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>

@@ -18,9 +18,15 @@ export const colors = {
     disabled: '#9F9F9F',
   },
   neutral: {
-    100: '#F5F5F5', // Off-White
+    100: '#FFFFFF', // Off-White
     200: '#E2E2E2', // Mist Grey
     400: '#A1A1A1', // Slate
     700: '#4B4B4B', // Slate
+  },
+  feedback: {
+    success: '#4ADE80', // Green
+    error: '#EF4444', // Red
+    warning: '#FBBF24', // Orange
+    info: '#60A5FA', // Blue
   },
 };

@@ -14,6 +14,7 @@ import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
+import Header from '@/components/Header/Header';
 
 type FeedType = 'following' | 'explore';
 
@@ -171,6 +172,8 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <Header text="Home" />
+
       <View style={styles.header}>
         <View style={styles.toggleContainer}>
           <TouchableOpacity

@@ -9,7 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import Header from '@/components/Header/Header';
 
 export default function FeedbackScreen() {
   const router = useRouter();
@@ -41,18 +41,11 @@ export default function FeedbackScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Top bar */}
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => router.push('/settings')}>
-          <ArrowLeft size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.topBarTitle}>Feedback</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <Header text="Feedback" left="back" />
 
       <View style={styles.content}>
         <Text style={styles.heading}>Have a question or a comment?</Text>
-        <Text style={styles.subheading}>We’d love to hear from you!</Text>
+        <Text style={styles.subheading}>We'd love to hear from you!</Text>
 
         <TextInput
           style={styles.textBox}

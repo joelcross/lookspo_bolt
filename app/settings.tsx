@@ -5,12 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
+import { colors } from '@/theme/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, LogOut, Mail, Pencil } from 'lucide-react-native';
+import { LogOut, Mail, Pencil } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
+import Header from '@/components/Header/Header';
 
 export default function SettingsScreen() {
   const { signOut } = useAuth();
@@ -31,13 +32,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft color="#000" size={28} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
-        <View style={{ width: 28 }} />
-      </View>
+      <Header text="Settings" left="back" />
 
       <ScrollView style={styles.content}>
         <View style={styles.section}>
@@ -118,6 +113,6 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   dangerText: {
-    color: '#ff3b30',
+    color: colors.feedback.error,
   },
 });

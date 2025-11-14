@@ -1,13 +1,15 @@
 export const typography = {
   heading1: {
-    fontFamily: 'Inter-Bold',
+    fontFamily: 'Satoshi-Bold',
     fontSize: 24,
     lineHeight: 32,
   },
   heading2: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 20,
-    lineHeight: 28,
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 14,
+    lineHeight: 24,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   body: {
     fontFamily: 'Outfit',

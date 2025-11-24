@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,7 +13,7 @@ import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
-import Header from '@/components/Header/Header';
+import HeaderDropdown from '@/components/HeaderDropdown/HeaderDropdown';
 
 type FeedType = 'following' | 'explore';
 
@@ -172,44 +171,14 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Header text="Home" />
-
-      <View style={styles.header}>
-        <View style={styles.toggleContainer}>
-          <TouchableOpacity
-            style={[
-              styles.toggle,
-              feedType === 'following' && styles.toggleActive,
-            ]}
-            onPress={() => setFeedType('following')}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                feedType === 'following' && styles.toggleTextActive,
-              ]}
-            >
-              Following
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.toggle,
-              feedType === 'explore' && styles.toggleActive,
-            ]}
-            onPress={() => setFeedType('explore')}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                feedType === 'explore' && styles.toggleTextActive,
-              ]}
-            >
-              Explore
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <HeaderDropdown
+        options={[
+          { label: 'Following', value: 'following' },
+          { label: 'Explore', value: 'explore' },
+        ]}
+        value={feedType}
+        onValueChange={setFeedType}
+      />
 
       <FlatList
         data={posts}
@@ -240,33 +209,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  toggle: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  toggleActive: {
-    backgroundColor: '#000',
-  },
-  toggleText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  toggleTextActive: {
-    color: '#fff',
   },
   footer: {
     paddingVertical: 20,

@@ -13,12 +13,13 @@ import { Activity } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-
-type ActivityFeedType = 'you' | 'following' | 'all';
+import HeaderDropdown, {
+  ActivityType,
+} from '@/components/HeaderDropdown/HeaderDropdown';
 
 export default function ActivityScreen() {
   const { user } = useAuth();
-  const [feedType, setFeedType] = useState<ActivityFeedType>('you');
+  const [feedType, setFeedType] = useState<ActivityType>('you');
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -194,27 +195,15 @@ export default function ActivityScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Activity</Text>
-        <View style={styles.toggleContainer}>
-          {['you', 'following', 'all'].map((type) => (
-            <TouchableOpacity
-              key={type}
-              style={[styles.toggle, feedType === type && styles.toggleActive]}
-              onPress={() => setFeedType(type as ActivityFeedType)}
-            >
-              <Text
-                style={[
-                  styles.toggleText,
-                  feedType === type && styles.toggleTextActive,
-                ]}
-              >
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
+      <HeaderDropdown
+        options={[
+          { label: 'You', value: 'you' },
+          { label: 'Following', value: 'following' },
+          { label: 'All', value: 'all' },
+        ]}
+        value={feedType}
+        onValueChange={setFeedType}
+      />
 
       {loading && !refreshing ? (
         <View style={styles.loadingContainer}>
@@ -236,24 +225,8 @@ export default function ActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
+  container: { flex: 1 },
   title: { fontSize: 24, fontWeight: '700', color: '#000', marginBottom: 12 },
-  toggleContainer: { flexDirection: 'row', gap: 12 },
-  toggle: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  toggleActive: { backgroundColor: '#000' },
-  toggleText: { fontSize: 14, fontWeight: '600', color: '#666' },
-  toggleTextActive: { color: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   activityItem: {
     paddingHorizontal: 16,

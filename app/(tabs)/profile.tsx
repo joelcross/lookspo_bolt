@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { showConfirmDialog } from '@/lib/showConfirmDialog';
 import { Collection } from '@/lib/types';
+import Header from '@/components/Header/Header';
 
 export default function ProfileScreen() {
   const { profile, refreshProfile } = useAuth();
@@ -174,6 +175,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header text={isEditing ? 'Edit Profile' : 'Profile'} />
       <View style={styles.header}>
         {isEditing ? (
           <TouchableOpacity onPress={handleCancel}>

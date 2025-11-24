@@ -12,10 +12,13 @@ import TextInput from '@/components/TextInput/TextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
+import HeaderDropdown, {
+  SearchType,
+} from '@/components/HeaderDropdown/HeaderDropdown';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
-  const [tab, setTab] = useState<'users' | 'collections'>('users');
+  const [tab, setTab] = useState<SearchType>('users');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -100,40 +103,17 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TextInput
-          placeholder="placeholder"
-          icon="search"
-          value={query}
-          onChangeText={setQuery}
-        />
+        <TextInput icon="search" value={query} onChangeText={setQuery} />
       </View>
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, tab === 'users' && styles.tabActive]}
-          onPress={() => setTab('users')}
-        >
-          <Text
-            style={[styles.tabText, tab === 'users' && styles.tabTextActive]}
-          >
-            Users
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tab, tab === 'collections' && styles.tabActive]}
-          onPress={() => setTab('collections')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              tab === 'collections' && styles.tabTextActive,
-            ]}
-          >
-            Collections
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <HeaderDropdown
+        options={[
+          { label: 'Users', value: 'users' },
+          { label: 'Collections', value: 'collections' },
+        ]}
+        value={tab}
+        onValueChange={setTab}
+      />
 
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} color="#000" />
@@ -167,38 +147,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
-  },
-  searchInput: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: '#000',
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  tabActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
-  },
-  tabText: {
-    fontSize: 16,
-    color: '#888',
-    fontWeight: '500',
-  },
-  tabTextActive: {
-    color: '#000',
-    fontWeight: '700',
   },
   userItem: {
     flexDirection: 'row',

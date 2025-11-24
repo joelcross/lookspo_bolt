@@ -1,12 +1,7 @@
 import React from 'react';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import {
-  TextInput as RNTextInput,
-  TextInputProps,
-  View,
-  StyleSheet,
-} from 'react-native';
+import { TextInput as RNTextInput, TextInputProps, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import {
   MagnifyingGlassIcon,

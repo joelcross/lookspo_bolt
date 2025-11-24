@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   FlatList,
   Image,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import TextInput from '@/components/TextInput/TextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
@@ -101,9 +101,8 @@ export default function SearchScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TextInput
-          style={styles.searchInput}
-          placeholder="Search..."
-          placeholderTextColor="#888"
+          placeholder="placeholder"
+          icon="search"
           value={query}
           onChangeText={setQuery}
         />

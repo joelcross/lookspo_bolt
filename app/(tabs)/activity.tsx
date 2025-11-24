@@ -16,6 +16,7 @@ import { router } from 'expo-router';
 import HeaderDropdown, {
   ActivityType,
 } from '@/components/HeaderDropdown/HeaderDropdown';
+import PillHeader from '@/components/PillHeader/PillHeader';
 
 export default function ActivityScreen() {
   const { user } = useAuth();
@@ -195,14 +196,22 @@ export default function ActivityScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <HeaderDropdown
+      {/* <HeaderDropdown
+        options={[
+          { label: 'You', value: 'you' },
+          { label: 'Following', value: 'following' },
+          { label: 'All', value: 'all' },
+        ]}
+      /> */}
+
+      <PillHeader
         options={[
           { label: 'You', value: 'you' },
           { label: 'Following', value: 'following' },
           { label: 'All', value: 'all' },
         ]}
         value={feedType}
-        onValueChange={setFeedType}
+        onChange={setFeedType}
       />
 
       {loading && !refreshing ? (

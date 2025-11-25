@@ -17,6 +17,7 @@ import HeaderDropdown, {
   ActivityType,
 } from '@/components/HeaderDropdown/HeaderDropdown';
 import PillHeader from '@/components/PillHeader/PillHeader';
+import ActivityItem from '@/components/ActivityItem/ActivityItem';
 
 export default function ActivityScreen() {
   const { user } = useAuth();
@@ -99,88 +100,6 @@ export default function ActivityScreen() {
     fetchActivities();
   };
 
-  const getActivityText = (activity: Activity) => {
-    const actorUsername = activity.actor?.username || 'Someone';
-    const collectionName = activity.collection?.name;
-    const targetUsername = activity.target_user?.username;
-
-    switch (activity.type) {
-      case 'like':
-        if (feedType === 'you') {
-          return `@${actorUsername} liked your post`;
-        } else {
-          const postOwner = activity.post?.profiles?.username || 'a post';
-          return `@${actorUsername} liked @${postOwner}'s post`;
-        }
-
-      case 'save':
-        if (feedType === 'you') {
-          return collectionName
-            ? `@${actorUsername} saved your post to "${collectionName}"`
-            : `@${actorUsername} saved your post`;
-        } else {
-          const postOwner = activity.post?.profiles?.username || 'a post';
-          return collectionName
-            ? `@${actorUsername} saved @${postOwner}'s post to "${collectionName}"`
-            : `@${actorUsername} saved @${postOwner}'s post`;
-        }
-
-      case 'follow':
-        if (feedType === 'you') {
-          return `@${actorUsername} started following you`;
-        } else if (targetUsername) {
-          return `@${actorUsername} followed @${targetUsername}`;
-        } else {
-          return `@${actorUsername} followed someone`;
-        }
-
-      default:
-        return '';
-    }
-  };
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return `${Math.floor(seconds / 604800)}w ago`;
-  };
-
-  const renderActivity = ({ item }: { item: Activity }) => (
-    <TouchableOpacity
-      style={styles.activityItem}
-      onPress={() => {
-        if (item.type === 'follow') {
-          router.push(`/user/${item.actor?.username}`);
-        } else if (item.post_id) {
-          router.push(`/post/${item.post_id}`);
-        }
-      }}
-    >
-      <View style={styles.activityContent}>
-        <View style={styles.activityText}>
-          <Text style={styles.activityDescription}>
-            {getActivityText(item)}
-          </Text>
-          <Text style={styles.activityTime}>
-            {formatTimeAgo(item.created_at)}
-          </Text>
-        </View>
-        {item.post?.image_url && (
-          <Image
-            source={{ uri: item.post.image_url }}
-            style={styles.activityThumbnail}
-          />
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
   const renderEmpty = () => {
     if (loading) return null;
     return (
@@ -193,6 +112,10 @@ export default function ActivityScreen() {
       </View>
     );
   };
+
+  const renderActivity = ({ item }: { item: Activity }) => (
+    <ActivityItem activity={item} feedType={feedType} />
+  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

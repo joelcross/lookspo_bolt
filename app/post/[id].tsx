@@ -22,6 +22,7 @@ import Header from '@/components/Header/Header';
 import PiecesCard from '@/components/PiecesCard/PiecesCard';
 import { colors } from '@/theme/colors';
 import styled from 'styled-components/native';
+import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
 
 export default function PostDetailScreen() {
   const router = useRouter();
@@ -191,22 +192,6 @@ export default function PostDetailScreen() {
     router.push(`/select-collections/${post.id}`);
   };
 
-  const renderCollection = ({ item }: { item: Collection }) => (
-    <TouchableOpacity
-      style={styles.collectionItem}
-      onPress={() => router.push(`/collection/${item.id}`)}
-    >
-      <View style={styles.collectionThumbnail}>
-        <Image
-          source={{ uri: item.cover_url || 'https://via.placeholder.com/100' }}
-          style={styles.collectionImage}
-        />
-      </View>
-      <Text style={styles.collectionName}>{item.name}</Text>
-      <Text style={styles.collectionUser}>@{item.user.username}</Text>
-    </TouchableOpacity>
-  );
-
   if (loading || !post) {
     return (
       <View style={styles.loadingContainer}>
@@ -324,22 +309,7 @@ export default function PostDetailScreen() {
 
         {post.pieces?.length && <PiecesCard pieces={post.pieces} />}
 
-        <Text style={styles.lookbooksHeading}>Featured In</Text>
-
-        {collections.length ? (
-          <FlatList
-            data={collections}
-            keyExtractor={(item) => item.id}
-            renderItem={renderCollection}
-            numColumns={3}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.columnWrapper}
-          />
-        ) : (
-          <Text style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-            This look is not saved to any lookbooks yet.
-          </Text>
-        )}
+        <LookbookCarousel collections={collections} />
       </Content>
     </Container>
   );

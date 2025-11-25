@@ -189,7 +189,7 @@ export default function NewPostScreen() {
                     { name: '', brand: '', url: '', isTemplate: true },
                   ]);
                   setShowDiscardModal(false);
-                  router.replace('/(tabs)'); // go home and clear nav stack
+                  router.replace('/home');
                 }}
               >
                 <Text style={styles.confirmText}>Yes, discard</Text>

@@ -11,6 +11,11 @@ export const typography = {
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
+  heading3: {
+    fontFamily: 'Satoshi-Bold',
+    fontSize: 16,
+    lineHeight: 24,
+  },
   body: {
     fontFamily: 'Outfit',
     fontWeight: '400',

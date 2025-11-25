@@ -18,6 +18,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Heart, Plus, Check, ArrowLeft, Pencil, X } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
+import Header from '@/components/Header/Header';
+import PiecesCard from '@/components/PiecesCard/PiecesCard';
+import { colors } from '@/theme/colors';
+import styled from 'styled-components/native';
 
 export default function PostDetailScreen() {
   const router = useRouter();
@@ -101,7 +105,7 @@ export default function PostDetailScreen() {
         .select(
           `
           *,
-          profiles:user_id (id, username)
+          profiles:user_id (id, username, avatar_url)
         `
         )
         .eq('id', postId)
@@ -187,28 +191,6 @@ export default function PostDetailScreen() {
     router.push(`/select-collections/${post.id}`);
   };
 
-  const renderArticleRow = (item: {
-    name: string;
-    brand: string;
-    url?: string;
-  }) => (
-    <View style={styles.tableRow}>
-      <Text style={styles.tableCell}>{item.name}</Text>
-      {item.url ? (
-        <TouchableOpacity
-          onPress={() => Linking.openURL(item.url)}
-          style={styles.tableCell}
-        >
-          <Text style={[styles.tableText, { color: 'blue' }]}>
-            {item.brand}
-          </Text>
-        </TouchableOpacity>
-      ) : (
-        <Text style={styles.tableCell}>{item.brand}</Text>
-      )}
-    </View>
-  );
-
   const renderCollection = ({ item }: { item: Collection }) => (
     <TouchableOpacity
       style={styles.collectionItem}
@@ -234,34 +216,12 @@ export default function PostDetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ArrowLeft size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.topBarTitle}>Look</Text>
-        <View style={{ width: 24 }} />
-      </View>
+    <Container>
+      <Header text="Look" left="back" />
+      <Content>
+        <PostCard post={post} showActions />
 
-      <PostCard post={post} showActions />
-
-      <Image source={{ uri: post.image_url }} style={styles.postImage} />
-
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={handleLike} style={styles.actionButton}>
-          <Heart
-            color={isLiked ? '#ff3b30' : '#000'}
-            fill={isLiked ? '#ff3b30' : 'none'}
-            size={28}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSave} style={styles.actionButton}>
-          {isSaved ? (
-            <Check color="#000" size={28} />
-          ) : (
-            <Plus color="#000" size={28} />
-          )}
-        </TouchableOpacity>
+        {/* <View style={styles.actions}>
         {post.user_id === user?.id && !isEditing && (
           <TouchableOpacity
             onPress={() => setIsEditing(true)}
@@ -270,130 +230,118 @@ export default function PostDetailScreen() {
             <Pencil color="#000" size={24} />
           </TouchableOpacity>
         )}
-      </View>
+      </View> */}
 
-      {isEditing ? (
-        <>
-          <TextInput
-            style={styles.editCaptionInput}
-            multiline
-            value={editedCaption}
-            onChangeText={setEditedCaption}
-            placeholder="Write a caption..."
-          />
+        {isEditing && (
+          <>
+            <TextInput
+              style={styles.editCaptionInput}
+              multiline
+              value={editedCaption}
+              onChangeText={setEditedCaption}
+              placeholder="Write a caption..."
+            />
 
-          <Text style={styles.sectionTitle}>Pieces</Text>
+            <Text>Pieces</Text>
 
-          {editedPieces.map((piece, i) => (
-            <View key={i} style={styles.tableRow}>
-              <TextInput
-                style={[
-                  styles.cellInput,
-                  { flex: 2 },
-                  showValidationErrors && !piece.name.trim()
-                    ? styles.invalidInput
-                    : null,
-                ]}
-                placeholder="Name"
-                value={piece.name}
-                onChangeText={(t) => handlePieceChange(i, 'name', t)}
-              />
+            {editedPieces.map((piece, i) => (
+              <View key={i} style={styles.tableRow}>
+                <TextInput
+                  style={[
+                    styles.cellInput,
+                    { flex: 2 },
+                    showValidationErrors && !piece.name.trim()
+                      ? styles.invalidInput
+                      : null,
+                  ]}
+                  placeholder="Name"
+                  value={piece.name}
+                  onChangeText={(t) => handlePieceChange(i, 'name', t)}
+                />
 
-              <TextInput
-                style={[
-                  styles.cellInput,
-                  { flex: 2 },
-                  showValidationErrors && !piece.brand.trim()
-                    ? styles.invalidInput
-                    : null,
-                ]}
-                placeholder="Brand"
-                value={piece.brand}
-                onChangeText={(t) => handlePieceChange(i, 'brand', t)}
-              />
-              <TextInput
-                style={[styles.cellInput, { flex: 3 }]}
-                placeholder="URL (optional)"
-                value={piece.url}
-                onChangeText={(t) => handlePieceChange(i, 'url', t)}
-              />
+                <TextInput
+                  style={[
+                    styles.cellInput,
+                    { flex: 2 },
+                    showValidationErrors && !piece.brand.trim()
+                      ? styles.invalidInput
+                      : null,
+                  ]}
+                  placeholder="Brand"
+                  value={piece.brand}
+                  onChangeText={(t) => handlePieceChange(i, 'brand', t)}
+                />
+                <TextInput
+                  style={[styles.cellInput, { flex: 3 }]}
+                  placeholder="URL (optional)"
+                  value={piece.url}
+                  onChangeText={(t) => handlePieceChange(i, 'url', t)}
+                />
+                <TouchableOpacity
+                  onPress={() =>
+                    setEditedPieces((prev) =>
+                      prev.filter((_, idx) => idx !== i)
+                    )
+                  }
+                >
+                  <X color="#000" size={20} />
+                </TouchableOpacity>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={styles.addPieceButton}
+              onPress={() =>
+                setEditedPieces((prev) => [
+                  ...prev,
+                  { name: '', brand: '', url: '' },
+                ])
+              }
+            >
+              <Plus color="#000" size={18} />
+              <Text style={styles.addPieceText}>Add piece</Text>
+            </TouchableOpacity>
+
+            <View style={styles.editActions}>
               <TouchableOpacity
-                onPress={() =>
-                  setEditedPieces((prev) => prev.filter((_, idx) => idx !== i))
-                }
+                onPress={handleCancelEdits}
+                style={[styles.editButton, { backgroundColor: '#eee' }]}
               >
-                <X color="#000" size={20} />
+                <Text style={{ color: '#000' }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={isSaving}
+                onPress={handleSaveEdits}
+                style={[styles.editButton, { backgroundColor: '#000' }]}
+              >
+                <Text style={{ color: '#fff' }}>
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Text>
               </TouchableOpacity>
             </View>
-          ))}
+          </>
+        )}
 
-          <TouchableOpacity
-            style={styles.addPieceButton}
-            onPress={() =>
-              setEditedPieces((prev) => [
-                ...prev,
-                { name: '', brand: '', url: '' },
-              ])
-            }
-          >
-            <Plus color="#000" size={18} />
-            <Text style={styles.addPieceText}>Add piece</Text>
-          </TouchableOpacity>
+        {post.pieces?.length && <PiecesCard pieces={post.pieces} />}
 
-          <View style={styles.editActions}>
-            <TouchableOpacity
-              onPress={handleCancelEdits}
-              style={[styles.editButton, { backgroundColor: '#eee' }]}
-            >
-              <Text style={{ color: '#000' }}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              disabled={isSaving}
-              onPress={handleSaveEdits}
-              style={[styles.editButton, { backgroundColor: '#000' }]}
-            >
-              <Text style={{ color: '#fff' }}>
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <>
-          {post.caption ? (
-            <Text style={styles.caption}>{post.caption}</Text>
-          ) : null}
-          <Text style={styles.authorHeading}>
-            @{post.profiles.username}'s look
+        <Text style={styles.lookbooksHeading}>Featured In</Text>
+
+        {collections.length ? (
+          <FlatList
+            data={collections}
+            keyExtractor={(item) => item.id}
+            renderItem={renderCollection}
+            numColumns={3}
+            scrollEnabled={false}
+            columnWrapperStyle={styles.columnWrapper}
+          />
+        ) : (
+          <Text style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+            This look is not saved to any lookbooks yet.
           </Text>
-
-          {post.pieces?.length && (
-            <View style={styles.table}>
-              {post.pieces.map((piece, i) => (
-                <View key={i}>{renderArticleRow(piece)}</View>
-              ))}
-            </View>
-          )}
-        </>
-      )}
-
-      <Text style={styles.lookbooksHeading}>Lookbooks</Text>
-
-      {collections.length ? (
-        <FlatList
-          data={collections}
-          keyExtractor={(item) => item.id}
-          renderItem={renderCollection}
-          numColumns={3}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.columnWrapper}
-        />
-      ) : (
-        <Text style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-          This look is not saved in any lookbooks yet.
-        </Text>
-      )}
-    </ScrollView>
+        )}
+      </Content>
+    </Container>
   );
 }
 
@@ -403,8 +351,16 @@ const numColumns = 3;
 const columnWidth =
   (width - 16 * 2 - columnMargin * 2 * numColumns) / numColumns;
 
+const Container = styled.ScrollView`
+  flex: 1;
+  background-color: ${colors.primary[100]};
+`;
+
+const Content = styled.View`
+  row-gap: 16px;
+`;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   topBar: {
     flexDirection: 'row',

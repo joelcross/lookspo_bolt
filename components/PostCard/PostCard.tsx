@@ -156,11 +156,9 @@ export default function PostCard({
 }
 
 const PostContainer = styled.View`
-  margin: 0px 10px 0px 10px;
+  margin-horizontal: 10px;
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
-  margin-bottom: 20px;
 `;
 
 const TopBanner = styled.View`
@@ -188,11 +186,13 @@ const Timestamp = styled.Text`
 `;
 
 const BottomContainer = styled.View`
+  background-color: white;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   font-size: 16px;
   padding: 8px;
+  border-radius: 10px;
 `;
 
 const ShadowWrapper = styled.View`

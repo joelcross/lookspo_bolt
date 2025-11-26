@@ -6,52 +6,67 @@ import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Collection } from '@/lib/types';
 
+const CARD_WIDTH = 140;
+
 interface LookbookSummaryProps {
   lookbook: Collection;
-  hideAuthor?: boolean;
 }
 
-const ClickableWrapper = styled.TouchableOpacity``;
-
-const Container = styled.View`
-  flex-direction: column;
-  background-color: blue;
-  border-radius: 10px 10px 0 0;
+const Card = styled.TouchableOpacity`
+  width: ${CARD_WIDTH}px;
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.08;
+  shadow-radius: 12px;
+  elevation: 6;
 `;
 
-const Thumbnail = styled.Image`
-  width: 48px;
-  height: 48px;
+const Thumbnail = styled.ImageBackground`
+  width: 100%;
+  height: 180px;
 `;
 
-const LookbookTitle = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  font-weight: ${typography.body.fontWeight};
-  color: ${colors.text.primary};
+const Overlay = styled.View`
+  background-color: rgba(0, 0, 0, 0.15);
+  justify-content: flex-end;
+  padding: 12px;
+`;
+
+const Title = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 const Author = styled.Text`
   font-family: ${typography.caption.fontFamily};
-  font-size: ${typography.caption.fontSize}px;
-  font-weight: ${typography.caption.fontWeight};
-  color: ${colors.neutral[400]};
+  font-size: 13px;
+  color: white;
+  opacity: 0.9;
+  margin-top: 2px;
 `;
 
-const LookbookSummary: React.FC<LookbookSummaryProps> = ({
-  lookbook,
-  hideAuthor = false,
-}) => {
+const LookbookSummary: React.FC<LookbookSummaryProps> = ({ lookbook }) => {
   const router = useRouter();
 
   return (
-    <ClickableWrapper onPress={() => router.push(`/collection/${lookbook.id}`)}>
-      <Container>
-        <Thumbnail source={{ uri: lookbook.cover_url }} resizeMode="cover" />
-        <LookbookTitle>{lookbook.name}</LookbookTitle>
-        {!hideAuthor && <Author>by {lookbook.user.username}</Author>}
-      </Container>
-    </ClickableWrapper>
+    <Card onPress={() => router.push(`/collection/${lookbook.id}`)}>
+      <Thumbnail
+        source={{
+          uri: lookbook.cover_url || 'https://via.placeholder.com/140',
+        }}
+      >
+        <Overlay>
+          <Title numberOfLines={2}>{lookbook.name}</Title>
+          <Author>by @{lookbook.user.username}</Author>
+        </Overlay>
+      </Thumbnail>
+    </Card>
   );
 };
 

@@ -30,7 +30,7 @@ interface DropdownOption {
 interface HeaderDropdownProps {
   options: readonly DropdownOption[]; // readonly prevents accidental mutation
   value?: FeedType | SearchType | ActivityType;
-  onValueChange?: (value: FeedType | SearchType | ActivityType) => void;
+  onChange?: (value: FeedType | SearchType | ActivityType) => void;
 }
 
 const DropdownContainer = styled.View`
@@ -78,7 +78,7 @@ const ItemText = styled.Text`
 const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
   options,
   value: controlledValue,
-  onValueChange,
+  onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -93,7 +93,7 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
   };
 
   const handleSelect = (option: DropdownOption) => {
-    onValueChange?.(option.value);
+    onChange?.(option.value);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsOpen(false);
   };

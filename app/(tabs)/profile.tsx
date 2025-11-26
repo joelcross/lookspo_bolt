@@ -176,7 +176,9 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Header text={isEditing ? 'Edit Profile' : 'Profile'} />
+
       <View style={styles.header}>
+        {/* cancel/back */}
         {isEditing ? (
           <TouchableOpacity onPress={handleCancel}>
             <X color="#000" size={24} />
@@ -187,10 +189,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
 
-        <Text style={styles.headerTitle}>
-          {isEditing ? 'Edit Profile' : 'Profile'}
-        </Text>
-
+        {/* save/settings */}
         {isEditing ? (
           <TouchableOpacity onPress={handleSave} disabled={saving}>
             <Check color="#000" size={24} />

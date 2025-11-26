@@ -14,6 +14,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
 import HeaderDropdown from '@/components/HeaderDropdown/HeaderDropdown';
+import styled from 'styled-components/native';
+import PillHeader from '@/components/PillHeader/PillHeader';
 
 type FeedType = 'following' | 'explore';
 
@@ -170,14 +172,14 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <HeaderDropdown
+    <Container>
+      <PillHeader
         options={[
           { label: 'Following', value: 'following' },
           { label: 'Explore', value: 'explore' },
         ]}
         value={feedType}
-        onValueChange={setFeedType}
+        onChange={setFeedType}
       />
 
       <FlatList
@@ -191,6 +193,7 @@ export default function HomeScreen() {
         ListFooterComponent={renderFooter}
         ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       />
 
       {selectedPost && (
@@ -202,14 +205,15 @@ export default function HomeScreen() {
           onSaved={() => fetchPosts(true)}
         />
       )}
-    </SafeAreaView>
+    </Container>
   );
 }
 
+const Container = styled.SafeAreaView`
+  flex: 1;
+`;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   footer: {
     paddingVertical: 20,
     alignItems: 'center',

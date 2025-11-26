@@ -1,15 +1,12 @@
+// screens/FeedbackScreen.tsx or wherever you keep it
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-  Linking,
-} from 'react-native';
+import { Alert, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
+import styled from 'styled-components/native';
 import Header from '@/components/Header/Header';
+import { colors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { Button } from '@/components/Button/Button';
 
 export default function FeedbackScreen() {
   const router = useRouter();
@@ -22,7 +19,7 @@ export default function FeedbackScreen() {
     }
 
     const subject = encodeURIComponent('App Feedback');
-    const body = encodeURIComponent(message);
+    const body = encodeURIComponent(message.trim());
     const email = 'joeldcross+support@gmail.com';
     const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
 
@@ -40,78 +37,81 @@ export default function FeedbackScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <Container>
       <Header text="Feedback" left="back" />
 
-      <View style={styles.content}>
-        <Text style={styles.heading}>Have a question or a comment?</Text>
-        <Text style={styles.subheading}>We'd love to hear from you!</Text>
+      <Content>
+        <Heading>Have a question or a comment?</Heading>
+        <Subheading>We'd love to hear from you!</Subheading>
 
-        <TextInput
-          style={styles.textBox}
+        <MessageInput
           placeholder="Type your feedback here..."
+          placeholderTextColor={colors.neutral[400]}
           multiline
           value={message}
           onChangeText={setMessage}
           textAlignVertical="top"
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        <Button
+          title="Submit"
+          onPress={handleSubmit}
+          activeOpacity={0.8}
+        ></Button>
+      </Content>
+    </Container>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomColor: '#eee',
-    borderBottomWidth: 1,
-  },
-  topBarTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  content: {
-    padding: 24,
-  },
-  heading: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  subheading: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
-  },
-  textBox: {
-    height: 160,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#000',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-});
+// Styled Components
+const Container = styled.SafeAreaView`
+  flex: 1;
+  background-color: ${colors.primary[100]};
+`;
+
+const Content = styled.View`
+  flex: 1;
+  padding: 24px;
+`;
+
+const Heading = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  font-weight: 600;
+  color: ${colors.secondary[500]};
+  margin-bottom: 4px;
+`;
+
+const Subheading = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: 16px;
+  color: ${colors.text.primary};
+  margin-bottom: 24px;
+`;
+
+const MessageInput = styled.TextInput`
+  height: 160px;
+  border: 1px solid ${colors.neutral[400]};
+  border-radius: 12px;
+  padding: 12px;
+  font-family: ${typography.body.fontFamily};
+  font-size: 16px;
+  color: ${colors.text.primary};
+  background-color: white;
+  margin-bottom: 24px;
+`;
+
+const SubmitButton = styled.TouchableOpacity`
+  background-color: ${colors.primary[900]};
+  border-radius: 12px;
+  padding-vertical: 14px;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SubmitButtonText = styled.Text`
+  color: white;
+  font-family: ${typography.body.fontFamily};
+  font-size: 16px;
+  font-weight: 700;
+`;

@@ -1,17 +1,16 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { StyleSheet } from 'react-native';
 import { colors } from '@/theme/colors';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LogOut, Mail, Pencil } from 'lucide-react-native';
+import {
+  PencilIcon,
+  EnvelopeSimpleIcon,
+  HandWavingIcon,
+} from 'phosphor-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 import Header from '@/components/Header/Header';
+import styled from 'styled-components/native';
+import { typography } from '@/theme/typography';
 
 export default function SettingsScreen() {
   const { signOut } = useAuth();
@@ -31,88 +30,45 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <Container>
       <Header text="Settings" left="back" />
 
-      <ScrollView style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
-          <TouchableOpacity
-            style={styles.item}
-            onPress={handlePressEditProfile}
-          >
-            <View style={styles.itemContent}>
-              <Pencil color="#000000ff" size={20} />
-              <Text style={[styles.itemText]}>Edit Profile</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.item} onPress={handlePressFeedback}>
-            <View style={styles.itemContent}>
-              <Mail color="#000000ff" size={20} />
-              <Text style={[styles.itemText]}>Feedback</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.item} onPress={handleSignOut}>
-            <View style={styles.itemContent}>
-              <LogOut color="#ff3b30" size={20} />
-              <Text style={[styles.itemText, styles.dangerText]}>Sign Out</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <ItemContainer onPress={handlePressEditProfile}>
+        <ItemWrapper>
+          <PencilIcon color="#000000ff" size={20} />
+          <ItemText>Edit Profile</ItemText>
+        </ItemWrapper>
+      </ItemContainer>
+      <ItemContainer onPress={handlePressFeedback}>
+        <ItemWrapper>
+          <EnvelopeSimpleIcon color="#000000ff" size={20} />
+          <ItemText>Feedback</ItemText>
+        </ItemWrapper>
+      </ItemContainer>
+      <ItemContainer onPress={handleSignOut}>
+        <ItemWrapper>
+          <HandWavingIcon color="#ff3b30" size={20} />
+          <ItemText>Sign Out</ItemText>
+        </ItemWrapper>
+      </ItemContainer>
+    </Container>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-  },
-  content: {
-    flex: 1,
-  },
-  section: {
-    paddingVertical: 24,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-    textTransform: 'uppercase',
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  item: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
-  itemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  itemText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  dangerText: {
-    color: colors.feedback.error,
-  },
-});
+const Container = styled.SafeAreaView``;
+
+const ItemContainer = styled.TouchableOpacity`
+  padding: 16px;
+`;
+
+const ItemWrapper = styled.View`
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+`;
+
+const ItemText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.text.primary};
+`;

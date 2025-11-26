@@ -1,26 +1,22 @@
 // components/LookbookCarousel.tsx
 import React from 'react';
-import { FlatList, Text } from 'react-native';
+import { FlatList, View, Text, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Collection } from '@/lib/types';
 import LookbookSummary from '../LookbookSummary/LookbookSummary';
 
+const ITEM_WIDTH = 140;
+const ITEM_SPACING = 12;
+
 interface LookbookCarouselProps {
   collections: Collection[];
 }
 
 const Container = styled.View`
-  background-color: white;
-  border-radius: 12px;
-  margin-horizontal: 10px;
-  padding: 16px 16px 0px 16px;
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.05;
-  shadow-radius: 10px;
-  elevation: 4;
+  margin-horizontal: 16px;
+  margin-vertical: 12px;
 `;
 
 const Header = styled.Text`
@@ -31,27 +27,49 @@ const Header = styled.Text`
   margin-bottom: 12px;
 `;
 
-const renderCollection = ({ item }: { item: Collection }) => (
-  <LookbookSummary lookbook={item} />
-);
+const CarouselWrapper = styled.View`
+  position: relative;
+`;
+
+const EmptyState = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.neutral[400]};
+  padding-vertical: 20px;
+  text-align: center;
+`;
 
 const LookbookCarousel: React.FC<LookbookCarouselProps> = ({ collections }) => {
+  if (collections.length === 0) {
+    return (
+      <Container>
+        <Header>Featured In</Header>
+        <EmptyState>This look is not saved to any lookbooks yet.</EmptyState>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Header>Featured In</Header>
 
-      {collections.length ? (
+      <CarouselWrapper>
         <FlatList
           data={collections}
+          horizontal
+          showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id}
-          renderItem={renderCollection}
-          numColumns={3}
-          scrollEnabled={true}
-          // columnWrapperStyle={styles.columnWrapper}
+          renderItem={({ item }) => <LookbookSummary lookbook={item} />}
+          ItemSeparatorComponent={() => (
+            <View style={{ width: ITEM_SPACING }} />
+          )}
+          contentContainerStyle={{ paddingHorizontal: 4 }}
+          snapToInterval={ITEM_WIDTH + ITEM_SPACING}
+          snapToAlignment="start"
+          decelerationRate="fast"
+          bounces={true}
         />
-      ) : (
-        <Text>This look is not saved to any lookbooks yet.</Text>
-      )}
+      </CarouselWrapper>
     </Container>
   );
 };

@@ -112,7 +112,7 @@ export default function SearchScreen() {
           { label: 'Collections', value: 'collections' },
         ]}
         value={tab}
-        onValueChange={setTab}
+        onChange={setTab}
       />
 
       {loading ? (

@@ -19,9 +19,9 @@ import PiecesCard from '@/components/PiecesCard/PiecesCard';
 import { colors } from '@/theme/colors';
 import styled from 'styled-components/native';
 import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import SaveModal from '@/components/SaveModal/SaveModal';
 
 export default function PostDetailScreen() {
-  const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const postId = params.id;
@@ -37,6 +37,7 @@ export default function PostDetailScreen() {
   const [editedCaption, setEditedCaption] = useState('');
   const [editedPieces, setEditedPieces] = useState<any[]>([]);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
 
   useEffect(() => {
     if (postId) fetchPost();
@@ -183,11 +184,6 @@ export default function PostDetailScreen() {
     }
   };
 
-  const handleSave = async () => {
-    if (!user || !post) return;
-    router.push(`/select-collections/${post.id}`);
-  };
-
   if (loading || !post) {
     return (
       <View style={styles.loadingContainer}>
@@ -199,24 +195,16 @@ export default function PostDetailScreen() {
   return (
     <Container>
       <Header text="Look" left="back" />
+
       <Content>
         <PostCard
           post={post}
           onLikeToggle={handleLike}
-          onSavePress={handleSave}
+          onSavePress={() => setSaveModalVisible(true)}
           showActions
+          isSaved={isSaved}
+          isLiked={isLiked}
         />
-
-        {/* <View style={styles.actions}>
-        {post.user_id === user?.id && !isEditing && (
-          <TouchableOpacity
-            onPress={() => setIsEditing(true)}
-            style={styles.actionButton}
-          >
-            <Pencil color="#000" size={24} />
-          </TouchableOpacity>
-        )}
-      </View> */}
 
         {isEditing && (
           <>
@@ -308,11 +296,26 @@ export default function PostDetailScreen() {
           </>
         )}
 
-        {/* Hide card if no pieces were tagged */}
-        {post.pieces.length > 0 && <PiecesCard pieces={post.pieces} />}
+        {/* Pieces Card */}
+        {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
 
-        <LookbookCarousel collections={collections} />
+        {/* Collections Carousel */}
+        {collections.length > 0 && (
+          <LookbookCarousel collections={collections} />
+        )}
       </Content>
+
+      {/* Save to Lookbooks Modal */}
+      <SaveModal
+        visible={saveModalVisible}
+        onClose={() => setSaveModalVisible(false)}
+        postId={post.id}
+        currentCollectionIds={collections.map((c) => c.id)}
+        onSaved={() => {
+          setSaveModalVisible(false);
+          fetchPost(); // refresh to update green icon + carousel
+        }}
+      />
     </Container>
   );
 }

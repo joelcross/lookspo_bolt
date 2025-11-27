@@ -8,7 +8,7 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { Check, Plus } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 
 export interface Collection {
@@ -32,8 +32,8 @@ export default function SelectCollections({
   userId,
 }: Props) {
   const [collections, setCollections] =
-    useState<Collection[]>(initialCollections);
-  const [selectedIds, setSelectedIds] = useState<string[]>(preSelected);
+    useState<Collection[]>(initialCollections); // all collections belonging to user
+  const [selectedIds, setSelectedIds] = useState<string[]>(preSelected); // checked-off collections
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
 

@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import { Heart, PlusCircle, Check } from 'lucide-react-native';
+import { View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Post } from '@/lib/types';
 import { getTimeAgo } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 import styled from 'styled-components/native';
 import { Avatar } from '../Avatar/Avatar';
 import { typography } from '@/theme/typography';
+import { colors } from '@/theme/colors';
+import {
+  HeartIcon,
+  CheckCircleIcon,
+  PlusCircleIcon,
+} from 'phosphor-react-native';
 
 const width = Dimensions.get('window').width - 20;
 
@@ -23,7 +19,9 @@ interface PostCardProps {
   post: Post;
   onLikeToggle?: () => void;
   onSavePress?: () => void;
-  showActions?: boolean; // new prop
+  showActions?: boolean;
+  isSaved?: boolean;
+  isLiked?: boolean;
 }
 
 export default function PostCard({
@@ -31,10 +29,9 @@ export default function PostCard({
   onLikeToggle,
   onSavePress,
   showActions = true,
+  isSaved,
+  isLiked,
 }: PostCardProps) {
-  const { user } = useAuth();
-  const [isLiked, setIsLiked] = useState(post.is_liked || false);
-  const [isLiking, setIsLiking] = useState(false);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -44,45 +41,6 @@ export default function PostCard({
   }, []);
 
   if (!imageSize.width) return null;
-
-  const handleLike = async () => {
-    if (!user || isLiking) return;
-
-    setIsLiking(true);
-    const newLikedState = !isLiked;
-    setIsLiked(newLikedState);
-
-    try {
-      if (newLikedState) {
-        const { error: likeError } = await supabase.from('likes').insert({
-          user_id: user.id,
-          post_id: post.id,
-        });
-
-        if (likeError) throw likeError;
-
-        await supabase.from('activities').insert({
-          actor_id: user.id,
-          target_user_id: post.user_id,
-          type: 'like',
-          post_id: post.id,
-        });
-      } else {
-        await supabase
-          .from('likes')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('post_id', post.id);
-      }
-
-      if (onLikeToggle) onLikeToggle();
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      setIsLiked(!newLikedState);
-    } finally {
-      setIsLiking(false);
-    }
-  };
 
   const handleUsernamePress = () => {
     if (post.profiles) {
@@ -130,19 +88,25 @@ export default function PostCard({
                   <Caption>{post.caption}</Caption>
                 </LeftWrapper>
                 <RightWrapper>
-                  <LikeButton onPress={handleLike}>
-                    <Heart
-                      color={isLiked ? '#ff3b30' : '#000'}
-                      fill={isLiked ? '#ff3b30' : 'none'}
+                  <LikeButton onPress={onLikeToggle}>
+                    <HeartIcon
+                      color={
+                        isLiked ? colors.feedback.error : colors.primary[900]
+                      }
+                      weight={isLiked ? 'fill' : 'regular'}
                       size={24}
                     />
                   </LikeButton>
 
                   <SaveButton onPress={onSavePress}>
-                    {post.is_saved ? (
-                      <Check color="#000" size={24} />
+                    {isSaved ? (
+                      <CheckCircleIcon
+                        color={colors.feedback.success}
+                        size={24}
+                        weight="fill"
+                      />
                     ) : (
-                      <PlusCircle color="#000" size={24} />
+                      <PlusCircleIcon color={colors.primary[900]} size={24} />
                     )}
                   </SaveButton>
                 </RightWrapper>

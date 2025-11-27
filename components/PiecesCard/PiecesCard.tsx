@@ -1,102 +1,139 @@
-// components/PiecesCard.tsx
+// components/PiecesCard/PiecesCard.tsx
 import React from 'react';
 import { Linking, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
+import { Plus, X } from 'lucide-react-native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 
-interface Article {
+export interface Piece {
+  id?: string;
   name: string;
   brand: string;
   url?: string;
 }
 
 interface PiecesCardProps {
-  pieces: Article[];
+  pieces: Piece[];
+  onAdd?: () => void;
+  onRemove?: (index: number) => void;
+  onEdit?: (index: number, piece: Piece) => void;
+  isMakingPost?: boolean;
 }
 
 const Container = styled.View`
   background-color: white;
-  border-radius: 12px;
-  margin-horizontal: 10px;
-  padding: 16px 16px 0px 16px;
+  border-radius: 16px;
+  padding: 20px;
   shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.05;
-  shadow-radius: 10px;
-  elevation: 4;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.06;
+  shadow-radius: 12px;
+  elevation: 5;
 `;
 
 const Header = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  font-weight: 600;
   color: ${colors.secondary[500]};
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 `;
 
 const Row = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-vertical: 14px;
+  padding-vertical: 10px;
   border-bottom-width: 1px;
   border-bottom-color: ${colors.neutral[200]};
 `;
 
-const PieceName = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  color: ${colors.text.primary};
-  flex: 1;
-  margin-right: 16px;
-  padding-right: 20px; /* prevents text from going under brand */
+const LastRow = styled(Row)`
+  border-bottom-width: 0;
 `;
 
-const BrandContainer = styled.View`
-  /* This is the magic — fixed alignment point */
-  min-width: 120px;
-  align-items: flex-start;
+const PieceName = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: 16px;
+  font-weight: 500;
+  color: ${colors.text.primary};
+  flex: 1;
+  margin-right: 12px;
 `;
 
 const BrandText = styled.Text<{ hasUrl: boolean }>`
   font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  font-weight: ${({ hasUrl }) => (hasUrl ? 500 : 400)};
+  font-size: 16px;
+  font-weight: 500;
   color: ${({ hasUrl }) =>
-    hasUrl ? colors.secondary[500] : colors.text.primary};
+    hasUrl ? colors.secondary[500] : colors.primary[900]};
+  min-width: 100px;
+  text-align: right;
 `;
 
-const BrandLink = styled(TouchableOpacity)``;
+const RemoveButton = styled.TouchableOpacity`
+  padding: 4px;
+  margin-left: 8px;
+`;
 
-const PiecesCard: React.FC<PiecesCardProps> = ({ pieces }) => {
+const AddButton = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  margin-top: 8px;
+`;
+
+const AddText = styled.Text`
+  color: ${colors.neutral[400]};
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  font-weight: 500;
+  margin-left: 4px;
+`;
+
+const PiecesCard: React.FC<PiecesCardProps> = ({
+  pieces,
+  onAdd,
+  onRemove,
+  isMakingPost = false,
+}) => {
   return (
     <Container>
       <Header>Tagged Pieces</Header>
 
-      {pieces.map((piece, index) => {
+      {pieces.map((piece, i) => {
         const hasUrl = !!piece.url;
-        const isLast = index === pieces.length - 1;
+        const RowComponent = i === pieces.length - 1 ? LastRow : Row;
 
         return (
-          <Row
-            key={index}
-            style={isLast ? { borderBottomWidth: 0 } : undefined}
-          >
+          <RowComponent key={i}>
             <PieceName numberOfLines={2}>{piece.name}</PieceName>
 
-            <BrandContainer>
-              {hasUrl ? (
-                <BrandLink onPress={() => Linking.openURL(piece.url!)}>
-                  <BrandText hasUrl>{piece.brand}</BrandText>
-                </BrandLink>
-              ) : (
-                <BrandText hasUrl={false}>{piece.brand}</BrandText>
-              )}
-            </BrandContainer>
-          </Row>
+            {hasUrl ? (
+              <TouchableOpacity onPress={() => Linking.openURL(piece.url!)}>
+                <BrandText hasUrl>{piece.brand}</BrandText>
+              </TouchableOpacity>
+            ) : (
+              <BrandText hasUrl={false}>{piece.brand}</BrandText>
+            )}
+
+            {isMakingPost && (
+              <>
+                <RemoveButton onPress={() => onRemove(i)}>
+                  <X size={18} color="#999" />
+                </RemoveButton>
+              </>
+            )}
+          </RowComponent>
         );
       })}
+      {isMakingPost && (
+        <>
+          <AddButton onPress={onAdd}>
+            <Plus size={20} color={colors.primary[900]} />
+            <AddText>Add new...</AddText>
+          </AddButton>
+        </>
+      )}
     </Container>
   );
 };

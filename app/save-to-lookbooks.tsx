@@ -44,8 +44,12 @@ export default function SaveToLookbooksScreen() {
   const handlePost = async (selectedCollections: string[]) => {
     if (!user || !imageUri) return;
 
+    // ← Declare these outside so finally can see them
+    let postData: { id: string } | null = null;
+    let uploadErrorOccurred = false;
+
     try {
-      // upload image
+      // ── Upload image ───────────────────────
       const response = await fetch(imageUri);
       const blob = await response.blob();
       const fileExt = imageUri.split('.').pop() || 'jpg';
@@ -61,8 +65,8 @@ export default function SaveToLookbooksScreen() {
         data: { publicUrl },
       } = supabase.storage.from('images').getPublicUrl(filePath);
 
-      // create post
-      const { data: postData, error: postError } = await supabase
+      // ── Create post ───────────────────────
+      const { data, error: postError } = await supabase
         .from('posts')
         .insert({
           image_url: publicUrl,
@@ -72,21 +76,33 @@ export default function SaveToLookbooksScreen() {
         })
         .select()
         .single();
+
       if (postError) throw postError;
 
-      // save to collections
+      postData = data; // ← this is now reachable from finally
+
+      // ── Save to collections ───────────────
       if (selectedCollections.length > 0) {
         const inserts = selectedCollections.map((collectionId) => ({
-          post_id: postData.id,
+          post_id: data.id,
           collection_id: collectionId,
           user_id: user.id,
         }));
-        await supabase.from('saves').insert(inserts);
+        const { error: saveError } = await supabase
+          .from('saves')
+          .insert(inserts);
+        if (saveError) throw saveError;
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error creating post:', err);
+      uploadErrorOccurred = true;
     } finally {
-      router.push('/(tabs)');
+      // ← finally can now safely read postData
+      if (postData?.id && !uploadErrorOccurred) {
+        router.replace(`/post/${postData.id}`); // or router.push
+      } else {
+        router.replace('/home'); // fallback
+      }
     }
   };
 
@@ -101,7 +117,7 @@ export default function SaveToLookbooksScreen() {
       </View>
       <SelectCollections
         collections={collections}
-        confirmText="Post" // or "Done"
+        confirmText="Post"
         userId={user.id} // important for creating new collection
         onConfirm={handlePost} // or handleSave
       />

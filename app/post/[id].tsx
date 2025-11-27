@@ -3,11 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
-  FlatList,
-  ScrollView,
-  Linking,
   Dimensions,
   ActivityIndicator,
   TextInput,
@@ -15,7 +11,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Heart, Plus, Check, ArrowLeft, Pencil, X } from 'lucide-react-native';
+import { Plus, X } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
 import Header from '@/components/Header/Header';
@@ -204,7 +200,12 @@ export default function PostDetailScreen() {
     <Container>
       <Header text="Look" left="back" />
       <Content>
-        <PostCard post={post} showActions />
+        <PostCard
+          post={post}
+          onLikeToggle={handleLike}
+          onSavePress={handleSave}
+          showActions
+        />
 
         {/* <View style={styles.actions}>
         {post.user_id === user?.id && !isEditing && (
@@ -307,7 +308,8 @@ export default function PostDetailScreen() {
           </>
         )}
 
-        {post.pieces?.length && <PiecesCard pieces={post.pieces} />}
+        {/* Hide card if no pieces were tagged */}
+        {post.pieces.length > 0 && <PiecesCard pieces={post.pieces} />}
 
         <LookbookCarousel collections={collections} />
       </Content>

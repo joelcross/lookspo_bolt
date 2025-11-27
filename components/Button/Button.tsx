@@ -31,7 +31,9 @@ const ButtonWrapper = styled.TouchableOpacity<{
         return `
           background-color: ${colors.neutral[100]};
           border-width: 1px;
-          border-color: ${disabled ? colors.neutral[200] : colors.primary[500]};
+          border-color: ${
+            disabled ? colors.neutral[200] : colors.secondary[500]
+          };
         `;
       case 'text':
         return `

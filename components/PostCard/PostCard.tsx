@@ -12,6 +12,7 @@ import {
   CheckCircleIcon,
   PlusCircleIcon,
 } from 'phosphor-react-native';
+import SmartImage from '../SmartImage/SmartImage';
 
 const width = Dimensions.get('window').width - 20;
 
@@ -67,16 +68,14 @@ export default function PostCard({
         disabled={showActions}
       >
         <ShadowWrapper>
-          <Image
-            source={{ uri: post.image_url }}
+          <SmartImage
+            uri={post.image_url}
+            resizeMode="contain"
             style={{
-              width: width, // full device width
-              height: (width * imageSize.height) / imageSize.width,
               borderRadius: 10,
               borderBottomLeftRadius: showActions ? 0 : 10,
               borderBottomRightRadius: showActions ? 0 : 10,
             }}
-            resizeMode="contain"
           />
 
           {/* Only show like/save if showActions is true */}

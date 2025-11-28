@@ -1,6 +1,6 @@
 // components/LookbookCarousel.tsx
 import React from 'react';
-import { FlatList, View, Text, Dimensions } from 'react-native';
+import { FlatList, View } from 'react-native';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -12,10 +12,11 @@ const ITEM_SPACING = 12;
 
 interface LookbookCarouselProps {
   collections: Collection[];
+  headerText: string;
 }
 
 const Container = styled.View`
-  margin-horizontal: 16px;
+  margin-horizontal: 10px;
   margin-vertical: 12px;
 `;
 
@@ -39,11 +40,14 @@ const EmptyState = styled.Text`
   text-align: center;
 `;
 
-const LookbookCarousel: React.FC<LookbookCarouselProps> = ({ collections }) => {
+const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
+  collections,
+  headerText,
+}) => {
   if (collections.length === 0) {
     return (
       <Container>
-        <Header>Featured In</Header>
+        <Header>{headerText}</Header>
         <EmptyState>This look is not saved to any lookbooks yet.</EmptyState>
       </Container>
     );
@@ -51,7 +55,7 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({ collections }) => {
 
   return (
     <Container>
-      <Header>Featured In</Header>
+      <Header>{headerText}</Header>
 
       <CarouselWrapper>
         <FlatList
@@ -63,7 +67,6 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({ collections }) => {
           ItemSeparatorComponent={() => (
             <View style={{ width: ITEM_SPACING }} />
           )}
-          contentContainerStyle={{ paddingHorizontal: 4 }}
           snapToInterval={ITEM_WIDTH + ITEM_SPACING}
           snapToAlignment="start"
           decelerationRate="fast"

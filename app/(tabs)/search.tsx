@@ -8,13 +8,14 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import TextInput from '@/components/TextInput/TextInput';
+import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
 import HeaderDropdown, {
   SearchType,
 } from '@/components/HeaderDropdown/HeaderDropdown';
+import PillHeader from '@/components/PillHeader/PillHeader';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -103,10 +104,10 @@ export default function SearchScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TextInput icon="search" value={query} onChangeText={setQuery} />
+        <CustomTextInput icon="search" value={query} onChangeText={setQuery} />
       </View>
 
-      <HeaderDropdown
+      <PillHeader
         options={[
           { label: 'Users', value: 'users' },
           { label: 'Collections', value: 'collections' },

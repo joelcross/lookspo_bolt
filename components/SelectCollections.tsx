@@ -1,15 +1,13 @@
+// components/SelectCollections.tsx
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  Modal,
-  TextInput,
-} from 'react-native';
-import { Check } from 'lucide-react-native';
+import { Modal, FlatList } from 'react-native';
+import { CheckCircleIcon, CircleIcon } from 'phosphor-react-native';
 import { supabase } from '@/lib/supabase';
+import styled from 'styled-components/native';
+import { colors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { Button } from './Button/Button';
+import TextInput from './CustomTextInput/CustomTextInput';
 
 export interface Collection {
   id: string;
@@ -21,7 +19,7 @@ interface Props {
   preSelected?: string[];
   onConfirm: (selected: string[]) => Promise<void>;
   confirmText?: string;
-  userId?: string; // needed for adding new collection
+  userId?: string;
 }
 
 export default function SelectCollections({
@@ -32,20 +30,13 @@ export default function SelectCollections({
   userId,
 }: Props) {
   const [collections, setCollections] =
-    useState<Collection[]>(initialCollections); // all collections belonging to user
-  const [selectedIds, setSelectedIds] = useState<string[]>(preSelected); // checked-off collections
+    useState<Collection[]>(initialCollections);
+  const [selectedIds, setSelectedIds] = useState<string[]>(preSelected);
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
 
-  useEffect(() => {
-    setCollections(initialCollections);
-  }, [initialCollections]);
-
-  useEffect(() => {
-    if (preSelected && preSelected.length > 0) {
-      setSelectedIds(preSelected);
-    }
-  }, [preSelected]);
+  useEffect(() => setCollections(initialCollections), [initialCollections]);
+  useEffect(() => setSelectedIds(preSelected), [preSelected]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -61,174 +52,135 @@ export default function SelectCollections({
         .insert({ name: newCollectionName.trim(), user_id: userId })
         .select()
         .single();
+
       if (error) throw error;
-      setCollections([...collections, data]);
+
+      setCollections((prev) => [...prev, data]);
       setShowModal(false);
       setNewCollectionName('');
     } catch (err) {
-      console.error(err);
+      console.error('Failed to create collection:', err);
     }
   };
 
+  const data = [
+    ...collections,
+    { id: 'new', name: 'Add new collection' } as any,
+  ];
+
   return (
-    <View style={styles.container}>
+    <Wrapper>
       <FlatList
-        data={[...collections, { id: 'new', name: 'Add new collection' }]}
+        data={data}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: 16 }}
         renderItem={({ item }) =>
           item.id === 'new' ? (
-            <TouchableOpacity
-              style={[styles.collectionRow, styles.addNewRow]}
+            <Button
+              title="＋ Add new collection"
+              variant="secondary"
               onPress={() => setShowModal(true)}
-            >
-              <Text style={styles.collectionName}>＋ Add new collection</Text>
-            </TouchableOpacity>
+            />
           ) : (
-            <TouchableOpacity
-              style={styles.collectionRow}
-              onPress={() => toggleSelect(item.id)}
-            >
-              <Text style={styles.collectionName}>{item.name}</Text>
-              <View
-                style={[
-                  styles.circle,
-                  selectedIds.includes(item.id) && styles.circleSelected,
-                ]}
-              >
-                {selectedIds.includes(item.id) && (
-                  <Check size={16} color="#fff" />
-                )}
-              </View>
-            </TouchableOpacity>
+            <CollectionRow onPress={() => toggleSelect(item.id)}>
+              <CollectionName>{item.name}</CollectionName>
+              {selectedIds.includes(item.id) ? (
+                <CheckCircleIcon
+                  size={28}
+                  color={colors.secondary[500]}
+                  weight="fill"
+                />
+              ) : (
+                <CircleIcon size={28} color={colors.secondary[500]} />
+              )}
+            </CollectionRow>
           )
         }
-        contentContainerStyle={{ padding: 16 }}
       />
 
-      <TouchableOpacity
-        style={styles.confirmButton}
-        onPress={() => onConfirm(selectedIds)}
-      >
-        <Text style={styles.confirmText}>{confirmText}</Text>
-      </TouchableOpacity>
+      <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
 
-      {/* Modal */}
-      <Modal
-        visible={showModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>New Collection</Text>
+      <Modal visible={showModal} transparent animationType="fade">
+        <Overlay onPress={() => setShowModal(false)}>
+          <ModalCard onPress={(e) => e.stopPropagation()}>
+            <ModalTitle>New Collection</ModalTitle>
+
             <TextInput
-              style={styles.modalInput}
               placeholder="Enter collection name"
               value={newCollectionName}
               onChangeText={setNewCollectionName}
+              autoFocus
             />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+            <ButtonWrapper>
+              <Button
+                title="Cancel"
+                variant="secondary"
                 onPress={() => setShowModal(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.createButton]}
-                onPress={handleCreateCollection}
-              >
-                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
-                  Create
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+              />
+              <Button title="Create" onPress={handleCreateCollection} />
+            </ButtonWrapper>
+          </ModalCard>
+        </Overlay>
       </Modal>
-    </View>
+    </Wrapper>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  collectionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  addNewRow: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 4,
-  },
-  collectionName: { fontSize: 16 },
-  circle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  circleSelected: { backgroundColor: '#000', borderColor: '#000' },
-  confirmButton: {
-    backgroundColor: '#000',
-    margin: 16,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  confirmText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+// ──────────────────────────────
+// Styled Components (100% working)
+// ──────────────────────────────
 
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 12,
-  },
-  modalInput: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    gap: 8,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: { backgroundColor: '#f5f5f5' },
-  createButton: { backgroundColor: '#000' },
-  modalButtonText: { fontSize: 16, fontWeight: '600', color: '#000' },
-});
+const Wrapper = styled.View`
+  background-color: #fff;
+`;
+
+const CollectionRow = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-vertical: 10px;
+  border-bottom-width: 1px;
+  border-bottom-color: #eee;
+`;
+
+const CollectionName = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.text.primary};
+  flex: 1;
+`;
+
+const ButtonWrapper = styled.View`
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 24px;
+  margin-top: 16px;
+`;
+
+// Modal
+const Overlay = styled.Pressable`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalCard = styled.View`
+  width: 88%;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  shadow-color: #000;
+  shadow-offset: 0px 10px;
+  shadow-opacity: 0.15;
+  shadow-radius: 20px;
+  elevation: 15;
+`;
+
+const ModalTitle = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #000;
+`;

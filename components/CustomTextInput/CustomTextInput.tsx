@@ -1,7 +1,7 @@
 import React from 'react';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { TextInput as RNTextInput, TextInputProps, View } from 'react-native';
+import { TextInput, TextInputProps, View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import {
   MagnifyingGlassIcon,
@@ -41,7 +41,7 @@ const InputContainer = styled.View<{
 `;
 
 // Styled native TextInput
-const StyledTextInput = styled(RNTextInput)<{
+const StyledTextInput = styled(TextInput)<{
   hasValue: boolean;
   disabled?: boolean;
 }>`
@@ -77,13 +77,13 @@ const IconWrapper = styled.View`
   margin-right: 12px;
 `;
 
-interface TextInputCustomProps extends TextInputProps {
+interface CustomTextInputProps extends TextInputProps {
   icon?: 'search' | 'none';
   state?: 'default' | 'error' | 'success' | 'disabled';
   helperText?: string;
 }
 
-const TextInput: React.FC<TextInputCustomProps> = ({
+const CustomTextInput: React.FC<CustomTextInputProps> = ({
   icon = 'none',
   state = 'default',
   helperText,
@@ -171,4 +171,4 @@ const TextInput: React.FC<TextInputCustomProps> = ({
   );
 };
 
-export default TextInput;
+export default CustomTextInput;

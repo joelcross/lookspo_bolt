@@ -1,20 +1,20 @@
 import { StyleSheet, View } from 'react-native';
-import TextInput from './TextInput';
+import CustomTextInput from './CustomTextInput';
 
 export const AllVariants = () => (
   <View style={styles.container}>
     {/* Primary / Default */}
-    <TextInput placeholder="Input placeholder" style={styles.mb} />
+    <CustomTextInput placeholder="Input placeholder" style={styles.mb} />
 
     {/* With Icon */}
-    <TextInput
+    <CustomTextInput
       placeholder="Input placeholder"
       icon="search"
       style={styles.mb}
     />
 
     {/* Focused (simulate with value + focus state) */}
-    <TextInput
+    <CustomTextInput
       placeholder="Input placeholder"
       value="Focused text"
       style={styles.mb}
@@ -22,14 +22,14 @@ export const AllVariants = () => (
     />
 
     {/* Filled */}
-    <TextInput
+    <CustomTextInput
       placeholder="Input placeholder"
       value="Filled text"
       style={styles.mb}
     />
 
     {/* Error */}
-    <TextInput
+    <CustomTextInput
       placeholder="Input placeholder"
       state="error"
       helperText="Error message"
@@ -37,7 +37,7 @@ export const AllVariants = () => (
     />
 
     {/* Success */}
-    <TextInput
+    <CustomTextInput
       placeholder="Input placeholder"
       state="success"
       value="Valid input"
@@ -46,7 +46,7 @@ export const AllVariants = () => (
     />
 
     {/* Disabled */}
-    <TextInput
+    <CustomTextInput
       placeholder="Input placeholder"
       state="disabled"
       style={styles.mb}

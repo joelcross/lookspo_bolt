@@ -12,7 +12,6 @@ export default function TabLayout() {
   // Map tab names to route paths if you want to navigate later
   const handleTabPress = (key: typeof activeTab) => {
     setActiveTab(key);
-    console.log('key', key);
     router.push(`/${key}`);
   };
 

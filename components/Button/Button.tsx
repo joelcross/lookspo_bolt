@@ -52,9 +52,8 @@ const ButtonWrapper = styled.TouchableOpacity<{
 
 // Styled Text with variant support
 const ButtonText = styled.Text<{ variant: ButtonVariant; disabled?: boolean }>`
-  font-family: ${typography.caption.fontFamily};
-  font-weight: ${typography.caption.fontWeight};
-  font-size: ${typography.caption.fontSize}px;
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.body.fontSize}px;
 
   ${({ variant, disabled }) => {
     switch (variant) {

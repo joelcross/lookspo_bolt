@@ -6,14 +6,12 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Post } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
-import HeaderDropdown from '@/components/HeaderDropdown/HeaderDropdown';
 import styled from 'styled-components/native';
 import PillHeader from '@/components/PillHeader/PillHeader';
 

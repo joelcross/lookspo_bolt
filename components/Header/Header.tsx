@@ -36,14 +36,14 @@ export function Header({ text, left }: HeaderProps) {
   );
 }
 
-const Container = styled.Text`
+const Container = styled.View`
   background-color: ${colors.primary[100]};
   height: 44px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 10px 0px;
 `;
 
 const Title = styled.Text`

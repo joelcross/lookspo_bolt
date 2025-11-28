@@ -19,6 +19,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { showConfirmDialog } from '@/lib/showConfirmDialog';
 import { Collection } from '@/lib/types';
 import Header from '@/components/Header/Header';
+import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import { BioCard } from '@/components/BioCard/BioCard';
+import { Button } from '@/components/Button/Button';
 
 export default function ProfileScreen() {
   const { profile, refreshProfile } = useAuth();
@@ -61,7 +64,7 @@ export default function ProfileScreen() {
       setLoading(true);
       const { data } = await supabase
         .from('collections')
-        .select('*')
+        .select('*, user:user_id (username)')
         .eq('user_id', profile.id)
         .order('created_at', { ascending: false });
       setCollections(data || []);
@@ -175,8 +178,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header text={isEditing ? 'Edit Profile' : 'Profile'} />
-
+      <Header text={isEditing ? 'Edit Profile' : `@${profile.username}`} />
       <View style={styles.header}>
         {/* cancel/back */}
         {isEditing ? (
@@ -201,8 +203,13 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 24 }}>
-        <TouchableOpacity onPress={isEditing ? pickAvatar : undefined}>
+      <ScrollView>
+        <BioCard
+          image={form.avatar_url}
+          name={profile.name}
+          bio={profile.bio}
+        />
+        {/* <TouchableOpacity onPress={isEditing ? pickAvatar : undefined}>
           {form.avatar_url ? (
             <Image source={{ uri: form.avatar_url }} style={styles.avatar} />
           ) : (
@@ -242,50 +249,53 @@ export default function ProfileScreen() {
             <Text style={styles.username}>@{profile.username}</Text>
             <Text style={styles.bio}>{profile.bio || 'No bio yet'}</Text>
           </>
-        )}
+        )} */}
 
-        <View style={{ marginTop: 32 }}>
-          <Text style={styles.sectionTitle}>Collections</Text>
+        <View>
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
-            <View style={styles.grid}>
-              {[...collections, { id: 'new', isNew: true }].map((collection) =>
-                collection.isNew ? (
-                  <TouchableOpacity
-                    key="new"
-                    style={[styles.collectionTile, styles.newCollectionTile]}
-                    onPress={() => setShowModal(true)}
-                  >
-                    <Text style={styles.newCollectionPlus}>＋</Text>
-                    <Text style={styles.collectionTileName}>
-                      Add new collection
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <View key={collection.id} style={styles.collectionTile}>
-                    <TouchableOpacity
-                      disabled={isEditing}
-                      onPress={() =>
-                        router.push(`/collection/${collection.id}`)
-                      }
-                    >
-                      <Text style={styles.collectionTileName}>
-                        {collection.name}
-                      </Text>
-                    </TouchableOpacity>
-                    {isEditing && (
-                      <TouchableOpacity
-                        style={styles.deleteButton}
-                        onPress={() => removeCollection(collection.id)}
-                      >
-                        <Trash2 color="red" size={18} />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )
-              )}
-            </View>
+            <LookbookCarousel
+              headerText="Lookbooks"
+              collections={collections}
+            />
+            // <View style={styles.grid}>
+            //   {[...collections, { id: 'new', isNew: true }].map((collection) =>
+            //     collection.isNew ? (
+            //       <TouchableOpacity
+            //         key="new"
+            //         style={[styles.collectionTile, styles.newCollectionTile]}
+            //         onPress={() => setShowModal(true)}
+            //       >
+            //         <Text style={styles.newCollectionPlus}>＋</Text>
+            //         <Text style={styles.collectionTileName}>
+            //           Add new collection
+            //         </Text>
+            //       </TouchableOpacity>
+            //     ) : (
+            //       <View key={collection.id} style={styles.collectionTile}>
+            //         <TouchableOpacity
+            //           disabled={isEditing}
+            //           onPress={() =>
+            //             router.push(`/collection/${collection.id}`)
+            //           }
+            //         >
+            //           <Text style={styles.collectionTileName}>
+            //             {collection.name}
+            //           </Text>
+            //         </TouchableOpacity>
+            //         {isEditing && (
+            //           <TouchableOpacity
+            //             style={styles.deleteButton}
+            //             onPress={() => removeCollection(collection.id)}
+            //           >
+            //             <Trash2 color="red" size={18} />
+            //           </TouchableOpacity>
+            //         )}
+            //       </View>
+            //     )
+            //   )}
+            // </View>
           )}
         </View>
       </ScrollView>

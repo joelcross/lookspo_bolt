@@ -1,16 +1,18 @@
 // app/new-post.tsx
 import React, { useState } from 'react';
-import { Alert, Modal, Image, Platform, View } from 'react-native';
+import { Alert, Modal, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { ChevronLeft, Upload, X } from 'lucide-react-native';
+import { Upload } from 'lucide-react-native';
 import styled from 'styled-components/native';
 import PiecesCard, { Piece } from '@/components/PiecesCard/PiecesCard';
 import { PieceModal } from '@/components/PiecesCard/PieceModal';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
-// import Header from '@/components/Header/Header';
+import SmartImage from '@/components/SmartImage/SmartImage';
+import Header from '@/components/Header/Header';
+import PostCardSimple from '@/components/PostCardSimple/PostCardSimple';
 
 export default function NewPostScreen() {
   const [image, setImage] = useState<string | null>(null);
@@ -113,7 +115,7 @@ export default function NewPostScreen() {
     return (
       <Container>
         <EmptyUpload onPress={pickImage}>
-          <Upload size={56} color={colors.neutral[400]} />
+          <Upload size={48} color={colors.neutral[400]} />
           <EmptyText>Tap to select a photo</EmptyText>
         </EmptyUpload>
       </Container>
@@ -122,51 +124,15 @@ export default function NewPostScreen() {
 
   return (
     <Container>
-      {/* Header */}
-      <Header>
-        <BackButton onPress={handleBack}>
-          <ChevronLeft size={28} color="black" />
-        </BackButton>
-        <HeaderTitle>New Look</HeaderTitle>
-        <View style={{ width: 28 }} />
-      </Header>
-      {/* <Header title="New Look" left="back" /> */}
+      <Header text="New Look" left="back" />
 
       {/* Main Scrollable Content */}
       <ScrollableContent>
         <Content>
-          <View style={{ width: '100%', backgroundColor: '#000' }}>
-            <Image
-              source={{ uri: image }}
-              resizeMode="contain"
-              style={{
-                width: '100%',
-                aspectRatio: aspectRatio || 0.75,
-                backgroundColor: '#000',
-              }}
-              onLoad={() => {
-                // This is the ONLY reliable way that works 100% of the time
-                Image.getSize(
-                  image!,
-                  (width, height) => {
-                    setAspectRatio(width / height);
-                  },
-                  (error) => {
-                    console.log('Image.getSize error:', error);
-                    setAspectRatio(0.75); // fallback
-                  }
-                );
-              }}
-            />
-          </View>
-
-          <CaptionInput
-            placeholder="Write a caption..."
-            placeholderTextColor={colors.neutral[400]}
-            value={caption}
-            onChangeText={setCaption}
-            multiline
-            textAlignVertical="top"
+          <PostCardSimple
+            image={image}
+            caption={caption}
+            setCaption={setCaption}
           />
 
           <PiecesCard
@@ -225,15 +191,6 @@ const Container = styled.SafeAreaView`
   background-color: white;
 `;
 
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${colors.neutral[200]};
-`;
-
 const BackButton = styled.TouchableOpacity``;
 
 const HeaderTitle = styled.Text`
@@ -249,33 +206,6 @@ const ScrollableContent = styled.ScrollView`
 
 const Content = styled.View`
   gap: 16px;
-  margin: 10px;
-`;
-
-const CaptionInput = styled.TextInput`
-  background-color: white;
-  border: 1px solid ${colors.neutral[400]};
-  border-radius: 10px;
-  padding: 10px;
-  min-height: 120px;
-
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize};
-  text-align-vertical: top;
-`;
-
-const NextButton = styled.TouchableOpacity`
-  margin: 20px 16px 40px;
-  background-color: ${colors.neutral[400]};
-  border-radius: 16px;
-  padding: 16px;
-  align-items: center;
-`;
-
-const NextText = styled.Text`
-  color: white;
-  font-size: 17px;
-  font-weight: 600;
 `;
 
 // Empty State
@@ -288,9 +218,9 @@ const EmptyUpload = styled.TouchableOpacity`
 
 const EmptyText = styled.Text`
   margin-top: 16px;
-  font-size: 17px;
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
   color: ${colors.neutral[400]};
-  font-weight: 500;
 `;
 
 // Discard Modal

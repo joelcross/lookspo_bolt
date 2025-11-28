@@ -6,7 +6,7 @@ import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Piece } from './PiecesCard';
 import { Button } from '../Button/Button';
-import TextInput from '../TextInput/TextInput';
+import CustomTextInput from '../CustomTextInput/CustomTextInput';
 
 interface PieceModalProps {
   visible: boolean;
@@ -46,12 +46,6 @@ const ButtonRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
   margin-top: 20px;
-`;
-
-const ButtonText = styled.Text<{ cancel?: boolean }>`
-  color: ${({ cancel }) => (cancel ? '#000' : 'white')};
-  font-weight: 600;
-  font-size: 16px;
 `;
 
 export const PieceModal: React.FC<PieceModalProps> = ({
@@ -100,13 +94,17 @@ export const PieceModal: React.FC<PieceModalProps> = ({
           <Title>{piece ? 'Edit Piece' : 'Add New Piece'}</Title>
 
           <InputContainer>
-            <TextInput placeholder="Name" value={name} onChangeText={setName} />
-            <TextInput
+            <CustomTextInput
+              placeholder="Name"
+              value={name}
+              onChangeText={setName}
+            />
+            <CustomTextInput
               placeholder="Brand"
               value={brand}
               onChangeText={setBrand}
             />
-            <TextInput
+            <CustomTextInput
               placeholder="URL (optional)"
               value={url}
               onChangeText={setUrl}

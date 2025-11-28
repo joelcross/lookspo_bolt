@@ -25,6 +25,7 @@ const Container = styled.View`
   background-color: white;
   border-radius: 16px;
   padding: 20px;
+  margin-horizontal: 10px;
   shadow-color: #000;
   shadow-offset: 0px 4px;
   shadow-opacity: 0.06;
@@ -86,7 +87,6 @@ const AddText = styled.Text`
   color: ${colors.neutral[400]};
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  font-weight: 500;
   margin-left: 4px;
 `;
 
@@ -129,7 +129,7 @@ const PiecesCard: React.FC<PiecesCardProps> = ({
       {isMakingPost && (
         <>
           <AddButton onPress={onAdd}>
-            <Plus size={20} color={colors.primary[900]} />
+            <Plus size={20} color={colors.neutral[400]} />
             <AddText>Add new...</AddText>
           </AddButton>
         </>

@@ -301,7 +301,10 @@ export default function PostDetailScreen() {
 
         {/* Collections Carousel */}
         {collections.length > 0 && (
-          <LookbookCarousel collections={collections} />
+          <LookbookCarousel
+            headerText="Featured In"
+            collections={collections}
+          />
         )}
       </Content>
 

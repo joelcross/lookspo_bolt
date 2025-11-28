@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, View, TouchableOpacity, Text } from 'react-native';
 import styled from 'styled-components/native';
-import { X } from 'lucide-react-native';
+import { XIcon } from 'phosphor-react-native';
 import SelectCollections from '@/components/SelectCollections';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { typography } from '@/theme/typography';
+import { colors } from '@/theme/colors';
 
 interface SaveModalProps {
   visible: boolean;
@@ -74,7 +76,7 @@ export default function SaveModal({
         <ModalContainer onPress={(e) => e.stopPropagation()}>
           <HeaderRow>
             <TouchableOpacity onPress={onClose}>
-              <X size={28} color="black" />
+              <XIcon size={20} color={colors.neutral[400]} />
             </TouchableOpacity>
             <ModalTitle>Save to lookbooks</ModalTitle>
             <View style={{ width: 28 }} />
@@ -96,7 +98,7 @@ export default function SaveModal({
 // Styled Components
 const Overlay = styled.Pressable`
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.2);
   justify-content: flex-end;
 `;
 
@@ -117,6 +119,7 @@ const HeaderRow = styled.View`
 `;
 
 const ModalTitle = styled.Text`
-  font-size: 18px;
-  font-weight: 600;
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  color: ${colors.secondary[500]};
 `;

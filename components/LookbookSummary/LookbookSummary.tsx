@@ -53,6 +53,7 @@ const Author = styled.Text`
 
 const LookbookSummary: React.FC<LookbookSummaryProps> = ({ lookbook }) => {
   const router = useRouter();
+  console.log('lookbook in LookbookSummary:', lookbook);
 
   return (
     <Card onPress={() => router.push(`/collection/${lookbook.id}`)}>

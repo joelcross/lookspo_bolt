@@ -3,69 +3,125 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/theme/colors';
+import { TShirtIcon } from 'phosphor-react-native';
 import { typography } from '@/theme/typography';
 import { Collection } from '@/lib/types';
-
-const CARD_WIDTH = 140;
+import { color } from 'storybook/theming';
 
 interface LookbookSummaryProps {
   lookbook: Collection;
 }
 
-const Card = styled.TouchableOpacity`
-  width: ${CARD_WIDTH}px;
+const Card = styled.TouchableOpacity<{ cardWidth: number }>`
+  width: ${({ cardWidth }) => cardWidth}px;
   background-color: white;
   border-radius: 16px;
   overflow: hidden;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.08;
-  shadow-radius: 12px;
   elevation: 6;
+  border-width: 1px;
+  border-color: ${colors.neutral[200]};
 `;
 
-const Thumbnail = styled.ImageBackground`
-  width: 100%;
-  height: 180px;
-`;
-
-const Overlay = styled.View`
-  background-color: rgba(0, 0, 0, 0.15);
+const TextContainer = styled.View`
   justify-content: flex-end;
   padding: 12px;
 `;
 
 const Title = styled.Text`
   font-family: ${typography.heading3.fontFamily};
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+  font-size: ${typography.heading3.fontSize}px;
+  color: ${colors.text.primary};
 `;
 
 const Author = styled.Text`
   font-family: ${typography.caption.fontFamily};
-  font-size: 13px;
-  color: white;
+  font-size: ${typography.caption.fontSize}px;
+  color: ${colors.neutral[400]};
   opacity: 0.9;
   margin-top: 2px;
 `;
 
-const LookbookSummary: React.FC<LookbookSummaryProps> = ({ lookbook }) => {
+const CollageContainer = styled.View<{ cardWidth: number }>`
+  width: 100%;
+  height: ${({ cardWidth }) => cardWidth}px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: hidden;
+`;
+
+const CollageImage = styled.Image`
+  width: 50%;
+  height: 50%;
+`;
+
+const Placeholder = styled.View`
+  width: 50%;
+  height: 50%;
+  background-color: ${colors.neutral[100]};
+  align-items: center;
+  justify-content: center;
+`;
+
+const CountBadge = styled.View`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: ${colors.primary[200]};
+  align-items: center;
+  justify-content: center;
+`;
+
+const CountText = styled.Text`
+  color: ${colors.secondary[500]};
+  font-size: 12px;
+  font-weight: 600;
+`;
+
+const LookbookSummary: React.FC<LookbookSummaryProps> = ({
+  lookbook,
+  cardWidth,
+}) => {
   const router = useRouter();
+  const slots = [...lookbook.cover_images];
+
+  // Fill with null for placeholders
+  while (slots.length < 4) {
+    slots.push(null);
+  }
 
   return (
-    <Card onPress={() => router.push(`/collection/${lookbook.id}`)}>
-      <Thumbnail
-        source={{
-          uri: lookbook.cover_url || 'https://via.placeholder.com/140',
-        }}
-      >
-        <Overlay>
-          <Title numberOfLines={2}>{lookbook.name}</Title>
-          <Author>by @{lookbook.user.username}</Author>
-        </Overlay>
-      </Thumbnail>
+    <Card
+      cardWidth={cardWidth}
+      onPress={() => router.push(`/collection/${lookbook.id}`)}
+    >
+      <TextContainer>
+        <Title numberOfLines={2}>{lookbook.name}</Title>
+        <Author>by @{lookbook.user.username}</Author>
+      </TextContainer>
+      <CollageContainer cardWidth={cardWidth}>
+        {slots.map((img, index) =>
+          img ? (
+            <CollageImage key={index} source={{ uri: img }} />
+          ) : (
+            <Placeholder key={index}>
+              <TShirtIcon
+                size={36}
+                color={colors.neutral[200]}
+                weight="light"
+              />
+            </Placeholder>
+          )
+        )}
+
+        <CountBadge
+          style={{ transform: [{ translateX: -12 }, { translateY: -12 }] }}
+        >
+          <CountText>{lookbook.post_count}</CountText>
+        </CountBadge>
+      </CollageContainer>
     </Card>
   );
 };

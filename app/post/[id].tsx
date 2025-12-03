@@ -14,7 +14,7 @@ import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
 import Header from '@/components/Header/Header';
 import PiecesCard from '@/components/PiecesCard/PiecesCard';
-import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import LookbookList from '@/components/LookbookList/LookbookList';
 import SaveModal from '@/components/SaveModal/SaveModal';
 import styled from 'styled-components/native';
 
@@ -52,15 +52,16 @@ export default function PostDetailScreen() {
         .from('posts')
         .select(
           `
-          *,
-          profiles:user_id (id, username, avatar_url)
-        `
+        *,
+        profiles:user_id (id, username, avatar_url)
+      `
         )
         .eq('id', postId)
         .single();
 
       if (postError || !postData)
         throw postError || new Error('Post not found');
+
       setPost(postData);
 
       // 2. Is current user liking?
@@ -72,14 +73,22 @@ export default function PostDetailScreen() {
 
       setIsLiked(!!likeCount && likeCount > 0);
 
-      // 3. Get saves + collections in ONE query (thanks to your new index!)
+      // 3. Get saves + collections in ONE query
       const { data: savesData } = await supabase
         .from('saves')
         .select(
-          'collection_id, collections!collection_id (id, name, cover_url, user:user_id (username))'
+          `
+        collection_id,
+        collections!collection_id (
+          id,
+          name,
+          user:user_id (username)
+        )
+      `
         )
         .eq('post_id', postId);
 
+      // 4. Is this post saved by current user?
       const { count: userSaveCount } = await supabase
         .from('saves')
         .select('*', { count: 'exact', head: true })
@@ -88,11 +97,30 @@ export default function PostDetailScreen() {
 
       setIsSaved(!!userSaveCount && userSaveCount > 0);
 
-      const collections = (savesData || [])
+      // 5. Extract base collection objects
+      const baseCollections = (savesData || [])
         .map((s) => s.collections)
-        .filter(Boolean) as Collection[];
+        .filter(Boolean);
 
-      setSavedCollections(collections);
+      // 6. Enrich each collection with collage images + post count
+      const enrichedCollections = await Promise.all(
+        baseCollections.map(async (col) => {
+          const { data: images, count } = await supabase
+            .from('saves')
+            .select('posts(image_url)', { count: 'exact' })
+            .eq('collection_id', col.id)
+            .order('created_at', { ascending: true })
+            .limit(4);
+
+          return {
+            ...col,
+            cover_images: images?.map((i) => i.posts.image_url) || [],
+            post_count: count || 0,
+          };
+        })
+      );
+
+      setSavedCollections(enrichedCollections);
     } catch (err) {
       console.error('Error loading post:', err);
     } finally {
@@ -284,7 +312,8 @@ export default function PostDetailScreen() {
           <>
             {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
             {savedCollections.length > 0 && (
-              <LookbookCarousel
+              <LookbookList
+                display="grid"
                 headerText="Featured In"
                 collections={savedCollections}
               />

@@ -23,7 +23,7 @@ export interface Collection {
   name: string;
   user_id: string;
   created_at: string;
-  cover_url?: string | null;
+  cover_images?: string[];
   post_count?: number;
 
   // For nested queries (like in PostDetail)

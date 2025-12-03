@@ -195,15 +195,6 @@ const Container = styled.SafeAreaView`
   background-color: white;
 `;
 
-const BackButton = styled.TouchableOpacity``;
-
-const HeaderTitle = styled.Text`
-  font-family: ${typography.heading3.fontFamily};
-  font-size: 18px;
-  font-weight: 600;
-  color: ${colors.text.primary};
-`;
-
 const ScrollableContent = styled.ScrollView`
   flex: 1;
 `;

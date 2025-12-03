@@ -4,9 +4,8 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import SelectCollections, { Collection } from '@/components/SelectCollections';
 import { Piece } from '@/lib/types';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft } from 'lucide-react-native';
 import Header from '@/components/Header/Header';
 
 interface Params {
@@ -112,6 +111,7 @@ export default function SaveToLookbooksScreen() {
       <Header text="Save to lookbooks?" left="back" />
       <SelectCollections
         collections={collections}
+        setCollections={setCollections}
         confirmText="Post"
         userId={user.id} // important for creating new collection
         onConfirm={handlePost} // or handleSave

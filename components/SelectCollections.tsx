@@ -16,6 +16,7 @@ export interface Collection {
 
 interface Props {
   collections: Collection[];
+  setCollections: React.Dispatch<React.SetStateAction<Collection[]>>;
   preSelected?: string[];
   onConfirm: (selected: string[]) => Promise<void>;
   confirmText?: string;
@@ -23,20 +24,16 @@ interface Props {
 }
 
 export default function SelectCollections({
-  collections: initialCollections,
+  collections,
+  setCollections,
   preSelected = [],
   onConfirm,
   confirmText = 'Done',
   userId,
 }: Props) {
-  const [collections, setCollections] =
-    useState<Collection[]>(initialCollections);
   const [selectedIds, setSelectedIds] = useState<string[]>(preSelected);
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-
-  useEffect(() => setCollections(initialCollections), [initialCollections]);
-  useEffect(() => setSelectedIds(preSelected), [preSelected]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>

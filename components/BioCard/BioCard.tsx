@@ -38,7 +38,6 @@ const Container = styled.View`
   background-color: ${colors.primary[100]};
   border-radius: 10px;
   overflow: hidden;
-  align-self: flex-start;
   margin-horizontal: 10px;
 
   shadow-color: #000;

@@ -15,6 +15,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
+import Header from '@/components/Header/Header';
 
 export default function CollectionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -117,17 +118,7 @@ export default function CollectionScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft color="#000" size={28} />
-        </TouchableOpacity>
-        <View style={{ alignItems: 'center' }}>
-          <Text style={styles.headerTitle}>{collection.name}</Text>
-          <Text style={styles.headerSubtitle}>@{collection.user.username}</Text>
-        </View>
-        <View style={{ width: 28 }} />
-      </View>
-
+      <Header text={collection.name} left="back" />
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}

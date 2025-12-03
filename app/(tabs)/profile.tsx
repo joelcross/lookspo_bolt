@@ -5,13 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Image,
   ActivityIndicator,
   StyleSheet,
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Trash2, Settings, Check, X } from 'lucide-react-native';
+import { ArrowLeft, Settings, Check, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,9 +18,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { showConfirmDialog } from '@/lib/showConfirmDialog';
 import { Collection } from '@/lib/types';
 import Header from '@/components/Header/Header';
-import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import LookbookList from '@/components/LookbookList/LookbookList';
 import { BioCard } from '@/components/BioCard/BioCard';
-import { Button } from '@/components/Button/Button';
 
 export default function ProfileScreen() {
   const { profile, refreshProfile } = useAuth();
@@ -67,10 +65,30 @@ export default function ProfileScreen() {
         .select('*, user:user_id (username)')
         .eq('user_id', profile.id)
         .order('created_at', { ascending: false });
-      setCollections(data || []);
-      setOriginalCollections(data || []); // snapshot for cancel
+
+      // Enrich each collection with up to 4 image URLs
+      const collectionsWithImages = await Promise.all(
+        (data || []).map(async (col) => {
+          const { data: images, count } = await supabase
+            .from('saves')
+            .select('posts(image_url)', { count: 'exact' })
+            .eq('collection_id', col.id)
+            .order('created_at', { ascending: true })
+            .limit(4);
+
+          return {
+            ...col,
+            cover_images: images?.map((i) => i.posts.image_url) || [],
+            post_count: count || 0,
+          };
+        })
+      );
+
+      setCollections(collectionsWithImages);
+      setOriginalCollections(collectionsWithImages);
       setLoading(false);
     };
+
     fetchCollections();
   }, [profile]);
 
@@ -255,7 +273,8 @@ export default function ProfileScreen() {
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
-            <LookbookCarousel
+            <LookbookList
+              display="carousel"
               headerText="Lookbooks"
               collections={collections}
             />

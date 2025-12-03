@@ -4,18 +4,13 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Activity } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { router } from 'expo-router';
-import HeaderDropdown, {
-  ActivityType,
-} from '@/components/HeaderDropdown/HeaderDropdown';
+import { ActivityType } from '@/components/HeaderDropdown/HeaderDropdown';
 import PillHeader from '@/components/PillHeader/PillHeader';
 import ActivityItem from '@/components/ActivityItem/ActivityItem';
 
@@ -64,7 +59,13 @@ export default function ActivityScreen() {
         .order('created_at', { ascending: false })
         .limit(50);
 
+      // Exclude the current user's own actions from global feeds
+      if (feedType !== 'you') {
+        query = query.neq('actor_id', user.id);
+      }
+
       if (feedType === 'you') {
+        // Only show activities directed towards you, from others
         query = query.eq('target_user_id', user.id).neq('actor_id', user.id);
       } else if (feedType === 'following') {
         const { data: followingData } = await supabase
@@ -82,6 +83,7 @@ export default function ActivityScreen() {
 
         query = query.in('actor_id', followingIds);
       }
+      // 'all' feed: no extra filter needed — just show everything (except own actions)
 
       const { data, error } = await query;
       if (error) throw error;
@@ -114,7 +116,11 @@ export default function ActivityScreen() {
   };
 
   const renderActivity = ({ item }: { item: Activity }) => (
-    <ActivityItem activity={item} feedType={feedType} />
+    <ActivityItem
+      activity={item}
+      feedType={feedType}
+      currentUserId={user?.id}
+    />
   );
 
   return (

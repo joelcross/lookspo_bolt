@@ -145,7 +145,11 @@ export default function NewPostScreen() {
             isMakingPost={true}
           />
 
-          <Button title="Next" onPress={handleNext} />
+          <Button
+            title="Next"
+            onPress={handleNext}
+            style={{ marginHorizontal: 10 }}
+          />
         </Content>
       </ScrollableContent>
 

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
   ActivityIndicator,
   TextInput,
+  TouchableOpacity,
+  View,
+  Text,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Plus, X } from 'lucide-react-native';
@@ -16,88 +14,40 @@ import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
 import Header from '@/components/Header/Header';
 import PiecesCard from '@/components/PiecesCard/PiecesCard';
-import { colors } from '@/theme/colors';
-import styled from 'styled-components/native';
 import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
 import SaveModal from '@/components/SaveModal/SaveModal';
+import styled from 'styled-components/native';
 
 export default function PostDetailScreen() {
-  const params = useLocalSearchParams<{ id: string }>();
+  const { id: postId } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
-  const postId = params.id;
 
   const [post, setPost] = useState<Post | null>(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [savedCollections, setSavedCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [collections, setCollections] = useState<Collection[]>([]);
 
+  // Edit mode
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [editedCaption, setEditedCaption] = useState('');
   const [editedPieces, setEditedPieces] = useState<any[]>([]);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [isSavingEdits, setIsSavingEdits] = useState(false);
+
   const [saveModalVisible, setSaveModalVisible] = useState(false);
 
+  // Fetch post + likes + saves + collections in ONE optimized query
   useEffect(() => {
-    if (postId) fetchPost();
-  }, [postId]);
+    if (!postId || !user) return;
+    fetchEverything();
+  }, [postId, user]);
 
-  useEffect(() => {
-    if (isEditing && post) {
-      setEditedCaption(post.caption || '');
-      setEditedPieces(post.pieces || []);
-    }
-  }, [isEditing, post]);
-
-  const handlePieceChange = (index: number, field: string, value: string) => {
-    const updated = [...editedPieces];
-    updated[index][field] = value;
-    setEditedPieces(updated);
-  };
-
-  const handleSaveEdits = async () => {
-    const trimmedCaption = editedCaption.trim();
-    setShowValidationErrors(true);
-
-    // Validate pieces
-    for (const piece of editedPieces) {
-      if (!piece.name.trim() || !piece.brand.trim()) {
-        alert('Each piece must include both a name and a brand.');
-        return;
-      }
-    }
-
-    try {
-      setIsSaving(true);
-      const { error } = await supabase
-        .from('posts')
-        .update({
-          caption: trimmedCaption,
-          pieces: editedPieces,
-        })
-        .eq('id', post.id);
-
-      if (error) throw error;
-
-      setIsEditing(false);
-      setShowValidationErrors(false); // reset once successful
-      fetchPost();
-    } catch (err) {
-      console.error(err);
-      alert('Error saving post');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancelEdits = () => {
-    setIsEditing(false);
-  };
-
-  const fetchPost = async () => {
+  const fetchEverything = async () => {
     try {
       setLoading(true);
+
+      // 1. Main post + author
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .select(
@@ -107,58 +57,62 @@ export default function PostDetailScreen() {
         `
         )
         .eq('id', postId)
-        .maybeSingle();
+        .single();
 
-      if (postError) throw postError;
-      if (!postData) return;
-
+      if (postError || !postData)
+        throw postError || new Error('Post not found');
       setPost(postData);
 
-      const { data: likeData } = await supabase
+      // 2. Is current user liking?
+      const { count: likeCount } = await supabase
         .from('likes')
-        .select('id')
-        .eq('user_id', user?.id)
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
         .eq('post_id', postId);
 
-      setIsLiked((likeData?.length || 0) > 0);
+      setIsLiked(!!likeCount && likeCount > 0);
 
+      // 3. Get saves + collections in ONE query (thanks to your new index!)
       const { data: savesData } = await supabase
         .from('saves')
-        .select('*')
+        .select(
+          'collection_id, collections!collection_id (id, name, cover_url, user:user_id (username))'
+        )
         .eq('post_id', postId);
 
-      const saved = (savesData || []).some((s: any) => s.user_id === user?.id);
-      setIsSaved(saved);
+      const { count: userSaveCount } = await supabase
+        .from('saves')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('post_id', postId);
 
-      const collectionIds = (savesData || []).map((s: any) => s.collection_id);
+      setIsSaved(!!userSaveCount && userSaveCount > 0);
 
-      if (collectionIds.length > 0) {
-        const { data: collectionsData } = await supabase
-          .from('collections')
-          .select('*, user:user_id (username)')
-          .in('id', collectionIds);
-        setCollections(collectionsData || []);
-      } else {
-        setCollections([]);
-      }
+      const collections = (savesData || [])
+        .map((s) => s.collections)
+        .filter(Boolean) as Collection[];
+
+      setSavedCollections(collections);
     } catch (err) {
-      console.error(err);
+      console.error('Error loading post:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Toggle like
   const handleLike = async () => {
     if (!user || !post) return;
 
-    const newState = !isLiked;
-    setIsLiked(newState);
+    const willLike = !isLiked;
+    setIsLiked(willLike);
 
     try {
-      if (newState) {
-        await supabase
-          .from('likes')
-          .insert({ user_id: user.id, post_id: post.id });
+      if (willLike) {
+        await supabase.from('likes').insert({
+          user_id: user.id,
+          post_id: post.id,
+        });
         await supabase.from('activities').insert({
           actor_id: user.id,
           type: 'like',
@@ -171,24 +125,58 @@ export default function PostDetailScreen() {
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.id);
-        await supabase
-          .from('activities')
-          .delete()
-          .eq('actor_id', user.id)
-          .eq('post_id', post.id)
-          .eq('type', 'like');
       }
     } catch (err) {
-      console.error(err);
-      setIsLiked(!newState);
+      setIsLiked(!willLike);
+      console.error('Like failed:', err);
+    }
+  };
+
+  // Edit mode setup
+  useEffect(() => {
+    if (isEditing && post) {
+      setEditedCaption(post.caption || '');
+      setEditedPieces(post.pieces || []);
+    }
+  }, [isEditing, post]);
+
+  const handleSaveEdits = async () => {
+    if (!post) return;
+
+    const trimmed = editedCaption.trim();
+    const validPieces = editedPieces.every(
+      (p) => p.name.trim() && p.brand.trim()
+    );
+
+    if (!validPieces) {
+      setShowValidationErrors(true);
+      return;
+    }
+
+    try {
+      setIsSavingEdits(true);
+      const { error } = await supabase
+        .from('posts')
+        .update({ caption: trimmed, pieces: editedPieces })
+        .eq('id', post.id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      setShowValidationErrors(false);
+      fetchEverything(); // refresh
+    } catch (err) {
+      alert('Failed to save changes');
+    } finally {
+      setIsSavingEdits(false);
     }
   };
 
   if (loading || !post) {
     return (
-      <View style={styles.loadingContainer}>
+      <Container>
         <ActivityIndicator size="large" color="#000" />
-      </View>
+      </Container>
     );
   }
 
@@ -202,54 +190,52 @@ export default function PostDetailScreen() {
           onLikeToggle={handleLike}
           onSavePress={() => setSaveModalVisible(true)}
           showActions
-          isSaved={isSaved}
           isLiked={isLiked}
+          isSaved={isSaved}
         />
 
-        {isEditing && (
+        {/* Edit Mode */}
+        {isEditing ? (
           <>
             <TextInput
-              style={styles.editCaptionInput}
               multiline
               value={editedCaption}
               onChangeText={setEditedCaption}
               placeholder="Write a caption..."
+              style={styles.editInput}
             />
 
-            <Text>Pieces</Text>
-
             {editedPieces.map((piece, i) => (
-              <View key={i} style={styles.tableRow}>
+              <View key={i} style={styles.pieceRow}>
                 <TextInput
-                  style={[
-                    styles.cellInput,
-                    { flex: 2 },
-                    showValidationErrors && !piece.name.trim()
-                      ? styles.invalidInput
-                      : null,
-                  ]}
                   placeholder="Name"
                   value={piece.name}
-                  onChangeText={(t) => handlePieceChange(i, 'name', t)}
-                />
-
-                <TextInput
+                  onChangeText={(t) => {
+                    const updated = [...editedPieces];
+                    updated[i].name = t;
+                    setEditedPieces(updated);
+                  }}
                   style={[
-                    styles.cellInput,
-                    { flex: 2 },
-                    showValidationErrors && !piece.brand.trim()
-                      ? styles.invalidInput
-                      : null,
+                    styles.pieceInput,
+                    showValidationErrors &&
+                      !piece.name.trim() &&
+                      styles.invalid,
                   ]}
+                />
+                <TextInput
                   placeholder="Brand"
                   value={piece.brand}
-                  onChangeText={(t) => handlePieceChange(i, 'brand', t)}
-                />
-                <TextInput
-                  style={[styles.cellInput, { flex: 3 }]}
-                  placeholder="URL (optional)"
-                  value={piece.url}
-                  onChangeText={(t) => handlePieceChange(i, 'url', t)}
+                  onChangeText={(t) => {
+                    const updated = [...editedPieces];
+                    updated[i].brand = t;
+                    setEditedPieces(updated);
+                  }}
+                  style={[
+                    styles.pieceInput,
+                    showValidationErrors &&
+                      !piece.brand.trim() &&
+                      styles.invalid,
+                  ]}
                 />
                 <TouchableOpacity
                   onPress={() =>
@@ -258,13 +244,13 @@ export default function PostDetailScreen() {
                     )
                   }
                 >
-                  <X color="#000" size={20} />
+                  <X size={20} color="#999" />
                 </TouchableOpacity>
               </View>
             ))}
 
             <TouchableOpacity
-              style={styles.addPieceButton}
+              style={styles.addPieceBtn}
               onPress={() =>
                 setEditedPieces((prev) => [
                   ...prev,
@@ -272,167 +258,115 @@ export default function PostDetailScreen() {
                 ])
               }
             >
-              <Plus color="#000" size={18} />
+              <Plus size={18} color="#000" />
               <Text style={styles.addPieceText}>Add piece</Text>
             </TouchableOpacity>
 
             <View style={styles.editActions}>
               <TouchableOpacity
-                onPress={handleCancelEdits}
-                style={[styles.editButton, { backgroundColor: '#eee' }]}
+                onPress={() => setIsEditing(false)}
+                style={styles.cancelBtn}
               >
-                <Text style={{ color: '#000' }}>Cancel</Text>
+                <Text>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                disabled={isSaving}
                 onPress={handleSaveEdits}
-                style={[styles.editButton, { backgroundColor: '#000' }]}
+                disabled={isSavingEdits}
+                style={styles.saveBtn}
               >
                 <Text style={{ color: '#fff' }}>
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  {isSavingEdits ? 'Saving...' : 'Save Changes'}
                 </Text>
               </TouchableOpacity>
             </View>
           </>
-        )}
-
-        {/* Pieces Card */}
-        {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
-
-        {/* Collections Carousel */}
-        {collections.length > 0 && (
-          <LookbookCarousel
-            headerText="Featured In"
-            collections={collections}
-          />
+        ) : (
+          <>
+            {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
+            {savedCollections.length > 0 && (
+              <LookbookCarousel
+                headerText="Featured In"
+                collections={savedCollections}
+              />
+            )}
+          </>
         )}
       </Content>
 
-      {/* Save to Lookbooks Modal */}
       <SaveModal
         visible={saveModalVisible}
         onClose={() => setSaveModalVisible(false)}
         postId={post.id}
-        currentCollectionIds={collections.map((c) => c.id)}
+        currentCollectionIds={savedCollections.map((c) => c.id)}
         onSaved={() => {
           setSaveModalVisible(false);
-          fetchPost(); // refresh to update green icon + carousel
+          fetchEverything();
         }}
       />
     </Container>
   );
 }
 
-const { width } = Dimensions.get('window');
-const columnMargin = 8;
-const numColumns = 3;
-const columnWidth =
-  (width - 16 * 2 - columnMargin * 2 * numColumns) / numColumns;
-
+// Styled Components
 const Container = styled.ScrollView`
   flex: 1;
-  background-color: ${colors.primary[100]};
+  background-color: #fafafa;
 `;
 
 const Content = styled.View`
-  row-gap: 16px;
+  gap: 16px;
+  padding-bottom: 40px;
 `;
 
-const styles = StyleSheet.create({
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  topBarTitle: { fontSize: 20, fontWeight: '700' },
-  postImage: { width: width, height: width, backgroundColor: '#f5f5f5' },
-  actions: { flexDirection: 'row', padding: 16, gap: 16 },
-  actionButton: { padding: 4 },
-  caption: { paddingHorizontal: 16, fontSize: 16, marginBottom: 12 },
-  authorHeading: {
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 12,
-  },
-  table: { paddingHorizontal: 16, marginBottom: 16 },
-  tableRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  tableCell: { flex: 1 },
-  tableText: { fontSize: 14 },
-  lookbooksHeading: {
-    paddingHorizontal: 16,
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  collectionItem: {
-    width: columnWidth,
-    margin: columnMargin,
-    alignItems: 'center',
-  },
-  collectionThumbnail: {
-    width: columnWidth,
-    height: columnWidth,
-    backgroundColor: '#f5f5f5',
-    marginBottom: 4,
-  },
-  collectionImage: { width: '100%', height: '100%', borderRadius: 8 },
-  collectionName: { fontSize: 14, fontWeight: '600' },
-  collectionUser: { fontSize: 12, color: '#666' },
-  columnWrapper: {
-    justifyContent: 'flex-start',
-  },
-  editCaptionInput: {
+const styles = {
+  editInput: {
+    marginHorizontal: 16,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 12,
-    padding: 12,
     fontSize: 16,
-    marginHorizontal: 16,
-    marginBottom: 12,
   },
-  cellInput: {
+  pieceRow: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    gap: 8,
+    alignItems: 'center',
+  },
+  pieceInput: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    padding: 8,
+    padding: 10,
     fontSize: 14,
-    color: '#000',
-    marginRight: 4,
   },
-  invalidInput: {
-    borderColor: 'red',
+  invalid: { borderColor: 'red' },
+  addPieceBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 16,
+    marginTop: 8,
   },
+  addPieceText: { marginLeft: 8, fontWeight: '500' },
   editActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    marginTop: 16,
+    marginHorizontal: 16,
+    gap: 12,
+    marginTop: 20,
   },
-  editButton: {
+  cancelBtn: {
     flex: 1,
-    padding: 12,
+    padding: 14,
+    backgroundColor: '#eee',
+    borderRadius: 12,
     alignItems: 'center',
-    borderRadius: 8,
-    marginHorizontal: 4,
   },
-  addPieceButton: {
-    flexDirection: 'row',
+  saveBtn: {
+    flex: 1,
+    padding: 14,
+    backgroundColor: '#000',
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 8,
-    marginLeft: 16,
   },
-  addPieceText: {
-    marginLeft: 6,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-});
+};

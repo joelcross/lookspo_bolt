@@ -7,6 +7,7 @@ import { Piece } from '@/lib/types';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
+import Header from '@/components/Header/Header';
 
 interface Params {
   imageUri: string;
@@ -108,13 +109,7 @@ export default function SaveToLookbooksScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft color="#000" size={28} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Save to lookbooks?</Text>
-        <View style={{ width: 28 }} />
-      </View>
+      <Header text="Save to lookbooks?" left="back" />
       <SelectCollections
         collections={collections}
         confirmText="Post"

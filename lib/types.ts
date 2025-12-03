@@ -1,3 +1,4 @@
+// lib/types.ts
 export interface Profile {
   id: string;
   username: string;
@@ -14,20 +15,7 @@ export interface Post {
   user_id: string;
   created_at: string;
   profiles?: Profile;
-  is_liked?: boolean;
-  is_saved?: boolean;
-  pieces?: {
-    name: string;
-    brand: string;
-    url?: string;
-  }[];
-}
-
-export interface Like {
-  id: string;
-  user_id: string;
-  post_id: string;
-  created_at: string;
+  pieces?: Piece[];
 }
 
 export interface Collection {
@@ -35,8 +23,13 @@ export interface Collection {
   name: string;
   user_id: string;
   created_at: string;
+  cover_url?: string | null;
   post_count?: number;
-  cover_url?: string;
+
+  // For nested queries (like in PostDetail)
+  user?: {
+    username: string;
+  };
 }
 
 export interface Save {
@@ -47,27 +40,17 @@ export interface Save {
   created_at: string;
 }
 
-export interface Follow {
-  id: string;
-  follower_id: string;
-  following_id: string;
-  created_at: string;
-}
 export interface Activity {
   id: string;
   actor_id: string;
-  target_user_id?: string | null; // keep optional in case not all activities have a target user
+  target_user_id?: string | null;
   type: 'like' | 'save' | 'follow';
   post_id?: string | null;
   collection_id?: string | null;
   created_at: string;
 
-  // expanded relations
   actor?: Profile;
-  target_user?: {
-    id: string;
-    username: string;
-  };
+  target_user?: { id: string; username: string };
   post?: Post;
   collection?: Collection;
 }

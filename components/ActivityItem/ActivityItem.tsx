@@ -1,4 +1,3 @@
-// components/ActivityItem.tsx
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
@@ -42,6 +41,7 @@ export interface Activity {
 interface ActivityItemProps {
   activity: Activity;
   feedType: 'you' | 'following' | 'all';
+  currentUserId?: string;
 }
 
 const Container = styled.View`
@@ -128,28 +128,37 @@ const formatTimeAgo = (dateString: string) => {
   return `${Math.floor(seconds / 604800)}w`;
 };
 
-const ActivityItem: React.FC<ActivityItemProps> = ({ activity, feedType }) => {
+const ActivityItem: React.FC<ActivityItemProps> = ({
+  activity,
+  feedType,
+  currentUserId,
+}) => {
   const router = useRouter();
 
   const actor = activity.actor.username;
   const collection = activity.collection;
-  const postOwner = activity.post?.profiles?.username;
-  const targetUser = activity.target_user?.username;
 
   const getBaseText = () => {
+    const isMyPost = currentUserId && activity.post?.user_id === currentUserId;
+    const isFollowingMe =
+      currentUserId && activity.target_user_id === currentUserId;
+
     switch (activity.type) {
       case 'like':
-        return feedType === 'you'
+        return isMyPost
           ? 'liked your post'
-          : `liked @${postOwner || 'someone'}'s post`;
+          : `liked @${activity.post?.profiles?.username || 'someone'}'s post`;
+
       case 'save':
-        return feedType === 'you'
+        return isMyPost
           ? 'saved your post'
-          : `saved @${postOwner || 'someone'}'s post`;
+          : `saved @${activity.post?.profiles?.username || 'someone'}'s post`;
+
       case 'follow':
-        return feedType === 'you'
+        return isFollowingMe
           ? 'started following you'
-          : `followed ${targetUser ? `@${targetUser}` : 'someone'}`;
+          : `followed @${activity.target_user?.username || 'someone'}`;
+
       default:
         return '';
     }

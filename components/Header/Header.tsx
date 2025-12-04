@@ -8,30 +8,51 @@ import { Button } from '../Button/Button';
 type HeaderProps = {
   text: string;
   left?: 'back' | 'cancel';
+  right?: 'settings';
 };
 
-export function Header({ text, left }: HeaderProps) {
-  const handleButtonPress = async () => {
+export function Header({ text, left, right }: HeaderProps) {
+  const handleLeftButtonPress = async () => {
     router.back();
   };
 
-  const renderButton = () => {
+  const handleRightButtonPress = async () => {
+    router.push('/settings');
+  };
+
+  const renderLeftButton = () => {
     if (left === 'back') {
       return (
-        <Button title={left} variant={'text'} onPress={handleButtonPress} />
+        <Button title={left} variant={'text'} onPress={handleLeftButtonPress} />
       );
     } else if (left === 'cancel') {
       return (
-        <Button title={'Cancel'} variant={'text'} onPress={handleButtonPress} />
+        <Button
+          title={'Cancel'}
+          variant={'text'}
+          onPress={handleLeftButtonPress}
+        />
+      );
+    }
+  };
+
+  const renderRightButton = () => {
+    if (right === 'settings') {
+      return (
+        <Button
+          title={right}
+          variant={'text'}
+          onPress={handleRightButtonPress}
+        />
       );
     }
   };
 
   return (
     <Container>
-      {renderButton() || <Placeholder />}
+      {renderLeftButton() || <Placeholder />}
       <Title>{text}</Title>
-      <Placeholder />
+      {renderRightButton() || <Placeholder />}
     </Container>
   );
 }

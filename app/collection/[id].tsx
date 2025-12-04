@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
 import Header from '@/components/Header/Header';
+import styled from 'styled-components/native';
 
 export default function CollectionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -95,6 +96,7 @@ export default function CollectionScreen() {
   const renderPost = ({ item }: { item: Post }) => (
     <PostCard
       post={item}
+      showActions={false}
       onLikeToggle={fetchCollection}
       onSavePress={() => handleSavePress(item)}
     />
@@ -102,28 +104,29 @@ export default function CollectionScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <Container style={styles.container}>
         <ActivityIndicator size="large" color="#000" />
-      </SafeAreaView>
+      </Container>
     );
   }
 
   if (!collection) {
     return (
-      <SafeAreaView style={styles.container}>
+      <Container style={styles.container}>
         <Text style={styles.errorText}>Collection not found</Text>
-      </SafeAreaView>
+      </Container>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <Container style={styles.container} edges={['top']}>
       <Header text={collection.name} left="back" />
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={renderPost}
         showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No posts in this collection</Text>
@@ -140,9 +143,13 @@ export default function CollectionScreen() {
           onSaved={fetchCollection}
         />
       )}
-    </SafeAreaView>
+    </Container>
   );
 }
+
+const Container = styled.SafeAreaView`
+  gap: 10px;
+`;
 
 const styles = StyleSheet.create({
   container: {

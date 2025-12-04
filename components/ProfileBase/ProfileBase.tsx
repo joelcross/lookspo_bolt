@@ -306,39 +306,15 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
       <Header
         text={isEditing ? 'Edit Profile' : `@${targetProfile.username}`}
         left="back"
+        right={isOwnProfile ? 'settings' : undefined}
       />
-      <View style={styles.header}>
-        {/* cancel/back */}
-        {isEditing ? (
-          <TouchableOpacity onPress={handleCancel}>
-            <X color="#000" size={24} />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => router.back()}>
-            <ArrowLeft color="#000" size={24} />
-          </TouchableOpacity>
-        )}
-
-        {/* save/settings */}
-        {isEditing ? (
-          <TouchableOpacity onPress={handleSave} disabled={saving}>
-            <Check color="#000" size={24} />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => router.push('/settings')}>
-            <Settings color="#000" size={24} />
-          </TouchableOpacity>
-        )}
-      </View>
 
       <ScrollView>
-        <BioCardWrapper>
-          <BioCard
-            image={targetProfile.avatar_url}
-            name={targetProfile.name}
-            bio={targetProfile.bio}
-          />
-        </BioCardWrapper>
+        <BioCard
+          image={targetProfile.avatar_url}
+          name={targetProfile.name}
+          bio={targetProfile.bio}
+        />
         {!isOwnProfile && (
           <ButtonWrapper>
             <Button
@@ -516,21 +492,8 @@ const ButtonWrapper = styled.View`
   margin: 10px;
 `;
 
-const BioCardWrapper = styled.View`
-  margin-top: 10px;
-`;
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
   avatar: {
     width: 150,
     height: 150,

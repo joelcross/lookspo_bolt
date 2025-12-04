@@ -95,7 +95,9 @@ export default function SelectCollections({
         }
       />
 
-      <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
+      <ConfirmButtonWrapper>
+        <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
+      </ConfirmButtonWrapper>
 
       <Modal visible={showModal} transparent animationType="fade">
         <Overlay onPress={() => setShowModal(false)}>
@@ -145,6 +147,10 @@ const CollectionName = styled.Text`
   font-size: ${typography.body.fontSize}px;
   color: ${colors.text.primary};
   flex: 1;
+`;
+
+const ConfirmButtonWrapper = styled.View`
+  margin-horizontal: 10px;
 `;
 
 const ButtonWrapper = styled.View`

@@ -2,7 +2,7 @@ import { colors } from '@/theme/colors';
 import React from 'react';
 import { TouchableOpacityProps } from 'react-native';
 import styled from 'styled-components/native';
-import { ArrowLeftIcon } from 'phosphor-react-native';
+import { ArrowLeftIcon, GearIcon } from 'phosphor-react-native';
 import { typography } from '@/theme/typography';
 
 type ButtonVariant = 'default' | 'secondary' | 'text';
@@ -97,18 +97,36 @@ export function Button({
       activeOpacity={disabled ? 1 : 0.7}
       {...props}
     >
-      {title.toLowerCase() === 'back' ? (
-        <ArrowLeftIcon
-          size={16}
-          weight="bold"
-          color={color}
-          style={{ marginRight: 6 }}
-        />
-      ) : (
-        <ButtonText variant={variant} disabled={disabled}>
-          {title}
-        </ButtonText>
-      )}
+      {(() => {
+        switch (title.toLowerCase()) {
+          case 'back':
+            return (
+              <ArrowLeftIcon
+                size={18}
+                weight="bold"
+                color={color}
+                style={{ marginRight: 6 }}
+              />
+            );
+
+          case 'settings':
+            return (
+              <GearIcon
+                size={18}
+                weight="bold"
+                color={color}
+                style={{ marginRight: 6 }}
+              />
+            );
+
+          default:
+            return (
+              <ButtonText variant={variant} disabled={disabled}>
+                {title}
+              </ButtonText>
+            );
+        }
+      })()}
     </ButtonWrapper>
   );
 }

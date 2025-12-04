@@ -21,6 +21,7 @@ interface LookbookListProps {
   collections: Collection[];
   headerText: string;
   display: 'carousel' | 'grid';
+  hideAuthor: Boolean;
 }
 
 const Container = styled.View`
@@ -52,10 +53,11 @@ const LookbookList: React.FC<LookbookListProps> = ({
   collections,
   headerText,
   display = 'carousel', // default behavior unchanged
+  hideAuthor = false,
 }) => {
   const flatListRef = useRef<FlatList>(null);
   const [showLeftGradient, setShowLeftGradient] = useState(false);
-  const [showRightGradient, setShowRightGradient] = useState(false);
+  const [showRightGradient, setShowRightGradient] = useState(true);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
@@ -124,7 +126,11 @@ const LookbookList: React.FC<LookbookListProps> = ({
             scrollEventThrottle={16} // ensures frequent updates
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <LookbookItem lookbook={item} cardWidth={CARD_WIDTH} />
+              <LookbookItem
+                lookbook={item}
+                cardWidth={CARD_WIDTH}
+                hideAuthor={hideAuthor}
+              />
             )}
             ItemSeparatorComponent={() => <View style={{ width: GRID_GAP }} />}
           />

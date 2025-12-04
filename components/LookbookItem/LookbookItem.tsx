@@ -10,6 +10,8 @@ import { color } from 'storybook/theming';
 
 interface LookbookItemProps {
   lookbook: Collection;
+  cardWidth: number;
+  hideAuthor: Boolean;
 }
 
 const Card = styled.TouchableOpacity<{ cardWidth: number }>`
@@ -80,7 +82,11 @@ const CountText = styled.Text`
   font-weight: 600;
 `;
 
-const LookbookItem: React.FC<LookbookItemProps> = ({ lookbook, cardWidth }) => {
+const LookbookItem: React.FC<LookbookItemProps> = ({
+  lookbook,
+  cardWidth,
+  hideAuthor,
+}) => {
   const router = useRouter();
   const slots = [...lookbook.cover_images];
 
@@ -96,7 +102,7 @@ const LookbookItem: React.FC<LookbookItemProps> = ({ lookbook, cardWidth }) => {
     >
       <TextContainer>
         <Title numberOfLines={2}>{lookbook.name}</Title>
-        <Author>by @{lookbook.user.username}</Author>
+        {!hideAuthor && <Author>by @{lookbook.user.username}</Author>}
       </TextContainer>
       <CollageContainer cardWidth={cardWidth}>
         {slots.map((img, index) =>

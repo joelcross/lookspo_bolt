@@ -1,4 +1,4 @@
-// components/LookbookSummary.tsx
+// components/LookbookItem.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import { useRouter } from 'expo-router';
@@ -8,7 +8,7 @@ import { typography } from '@/theme/typography';
 import { Collection } from '@/lib/types';
 import { color } from 'storybook/theming';
 
-interface LookbookSummaryProps {
+interface LookbookItemProps {
   lookbook: Collection;
 }
 
@@ -80,10 +80,7 @@ const CountText = styled.Text`
   font-weight: 600;
 `;
 
-const LookbookSummary: React.FC<LookbookSummaryProps> = ({
-  lookbook,
-  cardWidth,
-}) => {
+const LookbookItem: React.FC<LookbookItemProps> = ({ lookbook, cardWidth }) => {
   const router = useRouter();
   const slots = [...lookbook.cover_images];
 
@@ -126,4 +123,4 @@ const LookbookSummary: React.FC<LookbookSummaryProps> = ({
   );
 };
 
-export default LookbookSummary;
+export default LookbookItem;

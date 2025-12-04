@@ -9,7 +9,7 @@ import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Collection } from '@/lib/types';
-import LookbookSummary from '../LookbookSummary/LookbookSummary';
+import LookbookItem from '../LookbookItem/LookbookItem';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Dimensions } from 'react-native';
 
@@ -90,7 +90,7 @@ const LookbookList: React.FC<LookbookListProps> = ({
           }}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <LookbookSummary lookbook={item} cardWidth={CARD_WIDTH} />
+            <LookbookItem lookbook={item} cardWidth={CARD_WIDTH} />
           )}
           showsVerticalScrollIndicator={false}
         />
@@ -124,7 +124,7 @@ const LookbookList: React.FC<LookbookListProps> = ({
             scrollEventThrottle={16} // ensures frequent updates
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <LookbookSummary lookbook={item} cardWidth={CARD_WIDTH} />
+              <LookbookItem lookbook={item} cardWidth={CARD_WIDTH} />
             )}
             ItemSeparatorComponent={() => <View style={{ width: GRID_GAP }} />}
           />

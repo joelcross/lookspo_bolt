@@ -129,13 +129,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     setLoading(false);
   };
 
-  // Fetch required data
-  //   useEffect(() => {
-  //     fetchCollections();
-  //     fetchOtherProfile();
-  //   }, [otherUsername]);
-
-  // Load profile when switching to a different username
+  // Load data for other user's profile
   useEffect(() => {
     if (!isOwnProfile) {
       fetchOtherProfile();

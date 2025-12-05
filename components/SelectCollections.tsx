@@ -1,13 +1,14 @@
 // components/SelectCollections.tsx
 import React, { useState, useEffect } from 'react';
-import { Modal, FlatList } from 'react-native';
-import { CheckCircleIcon, CircleIcon } from 'phosphor-react-native';
+import { Modal, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { CheckCircleIcon, CircleIcon, TShirtIcon } from 'phosphor-react-native';
 import { supabase } from '@/lib/supabase';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from './Button/Button';
 import TextInput from './CustomTextInput/CustomTextInput';
+import SmartImage from './SmartImage/SmartImage';
 
 export interface Collection {
   id: string;
@@ -60,86 +61,117 @@ export default function SelectCollections({
     }
   };
 
-  const data = [
-    ...collections,
-    { id: 'new', name: 'Add new collection' } as any,
-  ];
-
   return (
-    <Wrapper>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }) =>
-          item.id === 'new' ? (
-            <Button
-              title="＋ Add new collection"
-              variant="secondary"
-              onPress={() => setShowModal(true)}
-            />
-          ) : (
-            <CollectionRow onPress={() => toggleSelect(item.id)}>
-              <CollectionName>{item.name}</CollectionName>
-              {selectedIds.includes(item.id) ? (
-                <CheckCircleIcon
-                  size={28}
-                  color={colors.secondary[500]}
-                  weight="fill"
-                />
-              ) : (
-                <CircleIcon size={28} color={colors.secondary[500]} />
-              )}
-            </CollectionRow>
-          )
-        }
-      />
+    <Container>
+      <ScrollableContent>
+        <FlatList
+          data={collections}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+          style={{ maxHeight: 300 }} // <- set your max height here
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => {
+            const isLast = index === collections.length - 1;
+            return (
+              <CollectionRow
+                onPress={() => toggleSelect(item.id)}
+                isLast={isLast}
+              >
+                <ImageWrapper>
+                  {item.cover_image ? (
+                    <SmartImage uri={item.cover_image} resizeMode="cover" />
+                  ) : (
+                    <GreyBackground>
+                      <TShirtIcon
+                        size={24}
+                        color={colors.neutral[400]}
+                        weight="light"
+                      />
+                    </GreyBackground>
+                  )}
+                </ImageWrapper>
+                <CollectionName>{item.name}</CollectionName>
+                {selectedIds.includes(item.id) ? (
+                  <CheckCircleIcon
+                    size={28}
+                    color={colors.secondary[500]}
+                    weight="fill"
+                  />
+                ) : (
+                  <CircleIcon size={28} color={colors.secondary[500]} />
+                )}
+              </CollectionRow>
+            );
+          }}
+        />
 
-      <ConfirmButtonWrapper>
-        <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
-      </ConfirmButtonWrapper>
+        <ButtonWrapper>
+          <Button
+            title="＋ Add new collection"
+            variant="secondary"
+            onPress={() => setShowModal(true)}
+          />
+          <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
+        </ButtonWrapper>
+      </ScrollableContent>
 
       <Modal visible={showModal} transparent animationType="fade">
-        <Overlay onPress={() => setShowModal(false)}>
-          <ModalCard onPress={(e) => e.stopPropagation()}>
-            <ModalTitle>New Collection</ModalTitle>
+        <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+          <Overlay>
+            <TouchableWithoutFeedback>
+              <ModalCard>
+                <ModalTitle>New Collection</ModalTitle>
 
-            <TextInput
-              placeholder="Enter collection name"
-              value={newCollectionName}
-              onChangeText={setNewCollectionName}
-              autoFocus
-            />
-            <ButtonWrapper>
-              <Button
-                title="Cancel"
-                variant="secondary"
-                onPress={() => setShowModal(false)}
-              />
-              <Button title="Create" onPress={handleCreateCollection} />
-            </ButtonWrapper>
-          </ModalCard>
-        </Overlay>
+                <TextInput
+                  placeholder="Enter collection name"
+                  value={newCollectionName}
+                  onChangeText={setNewCollectionName}
+                  autoFocus
+                />
+
+                <NewCollectionButtonWrapper>
+                  <Button
+                    title="Cancel"
+                    variant="secondary"
+                    onPress={() => setShowModal(false)}
+                  />
+                  <Button title="Create" onPress={handleCreateCollection} />
+                </NewCollectionButtonWrapper>
+              </ModalCard>
+            </TouchableWithoutFeedback>
+          </Overlay>
+        </TouchableWithoutFeedback>
       </Modal>
-    </Wrapper>
+    </Container>
   );
 }
 
-// ──────────────────────────────
-// Styled Components (100% working)
-// ──────────────────────────────
+const Container = styled.View``;
+const ScrollableContent = styled.View``;
 
-const Wrapper = styled.View`
-  background-color: #fff;
-`;
-
-const CollectionRow = styled.TouchableOpacity`
+const CollectionRow = styled.TouchableOpacity<{ isLast: boolean }>`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding-vertical: 10px;
-  border-bottom-width: 1px;
+  border-bottom-width: ${(props) => (props.isLast ? '0px' : '1px')};
   border-bottom-color: #eee;
+`;
+
+const ImageWrapper = styled.View`
+  width: 40px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-right: 16px;
+`;
+
+const GreyBackground = styled.View`
+  height: 100%;
+  width: 100%;
+  background-color: ${colors.neutral[200]};
+  justify-content: center;
+  align-items: center;
 `;
 
 const CollectionName = styled.Text`
@@ -149,14 +181,15 @@ const CollectionName = styled.Text`
   flex: 1;
 `;
 
-const ConfirmButtonWrapper = styled.View`
-  margin-horizontal: 10px;
-`;
-
 const ButtonWrapper = styled.View`
   flex-direction: row;
-  justify-content: space-evenly;
-  gap: 24px;
+  justify-content: space-between;
+  margin: 16px;
+`;
+
+const NewCollectionButtonWrapper = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
   margin-top: 16px;
 `;
 

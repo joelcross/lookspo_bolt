@@ -26,13 +26,35 @@ export default function SaveToLookbooksScreen() {
 
     const fetchCollections = async () => {
       try {
-        const { data, error } = await supabase
+        // 1. Fetch collections (id + name)
+        const { data: collectionsData, error } = await supabase
           .from('collections')
-          .select('id,name')
+          .select('id, name')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
+
         if (error) throw error;
-        setCollections(data || []);
+
+        // 2. Fetch FIRST image for each collection
+        const enriched = await Promise.all(
+          (collectionsData || []).map(async (col) => {
+            const { data: imageData } = await supabase
+              .from('saves')
+              .select('posts(image_url)')
+              .eq('collection_id', col.id)
+              .order('created_at', { ascending: true })
+              .limit(1)
+              .single();
+
+            return {
+              ...col,
+              cover_image: imageData?.posts?.image_url || null,
+            };
+          })
+        );
+
+        // 3. Save enriched collections
+        setCollections(enriched);
       } catch (err) {
         console.error(err);
       }

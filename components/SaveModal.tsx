@@ -49,19 +49,41 @@ export default function SaveModal({
 
     setLoading(true);
     try {
+      // 1. Fetch collections
       const { data: collectionsData } = await supabase
         .from('collections')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
+      // 2. Fetch saves for THIS post (which collections it belongs to)
       const { data: savesData } = await supabase
         .from('saves')
         .select('collection_id')
         .eq('post_id', postId)
         .eq('user_id', user.id);
 
-      if (collectionsData) setCollections(collectionsData);
+      // 3. Fetch FIRST image for each collection
+      const enriched = await Promise.all(
+        (collectionsData || []).map(async (col) => {
+          const { data: imageData } = await supabase
+            .from('saves')
+            .select('posts(image_url)')
+            .eq('collection_id', col.id)
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .single(); // because we only get one row
+
+          return {
+            ...col,
+            cover_image: imageData?.posts?.image_url || null,
+          };
+        })
+      );
+
+      // 4. Update state
+      setCollections(enriched);
+
       if (savesData) {
         setSavedCollectionIds(new Set(savesData.map((s) => s.collection_id)));
       }

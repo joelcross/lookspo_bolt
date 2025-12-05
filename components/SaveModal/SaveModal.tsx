@@ -28,12 +28,43 @@ export default function SaveModal({
 
   useEffect(() => {
     if (visible && user) {
-      supabase
-        .from('collections')
-        .select('id, name')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .then(({ data }) => setCollections(data || []));
+      const fetchCollections = async () => {
+        try {
+          // Fetch collections
+          const { data: collectionsData, error } = await supabase
+            .from('collections')
+            .select('id, name')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          // Fetch first image for each collection
+          const enriched = await Promise.all(
+            (collectionsData || []).map(async (col) => {
+              const { data: imageData } = await supabase
+                .from('saves')
+                .select('posts(image_url)')
+                .eq('collection_id', col.id)
+                .order('created_at', { ascending: true })
+                .limit(1)
+                .maybeSingle();
+
+              return {
+                ...col,
+                cover_image: imageData?.posts?.image_url || null,
+              };
+            })
+          );
+
+          // 3. Save enriched list
+          setCollections(enriched);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchCollections();
     }
   }, [visible, user]);
 
@@ -81,9 +112,9 @@ export default function SaveModal({
             <ModalTitle>Save to lookbooks</ModalTitle>
             <View style={{ width: 28 }} />
           </HeaderRow>
-
           <SelectCollections
             collections={collections}
+            setCollections={setCollections}
             preSelected={currentCollectionIds}
             confirmText="Done"
             userId={user?.id}
@@ -95,7 +126,6 @@ export default function SaveModal({
   );
 }
 
-// Styled Components
 const Overlay = styled.Pressable`
   flex: 1;
   background-color: rgba(0, 0, 0, 0.2);
@@ -106,7 +136,6 @@ const ModalContainer = styled.View`
   background-color: white;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  max-height: 90%;
 `;
 
 const HeaderRow = styled.View`

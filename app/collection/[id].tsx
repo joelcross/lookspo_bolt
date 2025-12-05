@@ -4,11 +4,8 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft } from 'lucide-react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Post, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
@@ -47,15 +44,7 @@ export default function CollectionScreen() {
 
         const { data: savesData } = await supabase
           .from('saves')
-          .select(
-            `
-            post_id,
-            posts (
-              *,
-              profiles:user_id (*)
-            )
-          `
-          )
+          .select(`post_id, posts(*, profiles:user_id (*))`)
           .eq('collection_id', id)
           .order('created_at', { ascending: false });
 
@@ -155,25 +144,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#939393ff',
   },
   errorText: {
     fontSize: 16,

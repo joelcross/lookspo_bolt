@@ -1,6 +1,6 @@
 // screens/FeedbackScreen.tsx or wherever you keep it
 import React, { useState } from 'react';
-import { Alert, Linking } from 'react-native';
+import { Alert, Linking, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import styled from 'styled-components/native';
 import Header from '@/components/Header/Header';
@@ -11,6 +11,7 @@ import { Button } from '@/components/Button/Button';
 export default function FeedbackScreen() {
   const router = useRouter();
   const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async () => {
     if (!message.trim()) {
@@ -18,7 +19,7 @@ export default function FeedbackScreen() {
       return;
     }
 
-    const subject = encodeURIComponent('App Feedback');
+    const subject = encodeURIComponent('Lookspo Feedback');
     const body = encodeURIComponent(message.trim());
     const email = 'joeldcross+support@gmail.com';
     const mailtoUrl = `mailto:${email}?subject=${subject}&body=${body}`;
@@ -27,6 +28,7 @@ export default function FeedbackScreen() {
       const canOpen = await Linking.canOpenURL(mailtoUrl);
       if (canOpen) {
         await Linking.openURL(mailtoUrl);
+        setSubmitted(true);
       } else {
         Alert.alert('Error', 'Unable to open email client.');
       }
@@ -42,28 +44,35 @@ export default function FeedbackScreen() {
 
       <Content>
         <Heading>Have a question or a comment?</Heading>
-        <Subheading>We'd love to hear from you!</Subheading>
+        <BodyText>We'd love to hear from you!</BodyText>
 
-        <MessageInput
-          placeholder="Type your feedback here..."
-          placeholderTextColor={colors.neutral[400]}
-          multiline
-          value={message}
-          onChangeText={setMessage}
-          textAlignVertical="top"
-        />
+        {!submitted ? (
+          <>
+            <MessageInput
+              placeholder="Type your feedback here..."
+              placeholderTextColor={colors.neutral[400]}
+              multiline
+              value={message}
+              onChangeText={setMessage}
+              textAlignVertical="top"
+            />
 
-        <Button
-          title="Submit"
-          onPress={handleSubmit}
-          activeOpacity={0.8}
-        ></Button>
+            <Button
+              title="Submit"
+              onPress={handleSubmit}
+              activeOpacity={0.8}
+            ></Button>
+          </>
+        ) : (
+          <TextWrapper>
+            <BodyText>Thank you for your feedback!</BodyText>
+          </TextWrapper>
+        )}
       </Content>
     </Container>
   );
 }
 
-// Styled Components
 const Container = styled.SafeAreaView`
   flex: 1;
   background-color: ${colors.primary[100]};
@@ -82,9 +91,9 @@ const Heading = styled.Text`
   margin-bottom: 4px;
 `;
 
-const Subheading = styled.Text`
+const BodyText = styled.Text`
   font-family: ${typography.body.fontFamily};
-  font-size: 16px;
+  font-size: ${typography.body.fontSize}px;
   color: ${colors.text.primary};
   margin-bottom: 24px;
 `;
@@ -99,19 +108,10 @@ const MessageInput = styled.TextInput`
   color: ${colors.text.primary};
   background-color: white;
   margin-bottom: 24px;
+
+  outline-width: 0;
+  outline-color: transparent;
+  outline-style: none;
 `;
 
-const SubmitButton = styled.TouchableOpacity`
-  background-color: ${colors.primary[900]};
-  border-radius: 12px;
-  padding-vertical: 14px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const SubmitButtonText = styled.Text`
-  color: white;
-  font-family: ${typography.body.fontFamily};
-  font-size: 16px;
-  font-weight: 700;
-`;
+const TextWrapper = styled.View``;

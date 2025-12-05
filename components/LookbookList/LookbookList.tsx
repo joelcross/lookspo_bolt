@@ -21,7 +21,7 @@ interface LookbookListProps {
   collections: Collection[];
   headerText: string;
   display: 'carousel' | 'grid';
-  hideAuthor: Boolean;
+  hideAuthor?: Boolean;
 }
 
 const Container = styled.View`

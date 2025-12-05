@@ -1,4 +1,3 @@
-// app/new-post.tsx
 import React, { useState } from 'react';
 import { Alert, Modal, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,7 +9,6 @@ import { PieceModal } from '@/components/PiecesCard/PieceModal';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
-import SmartImage from '@/components/SmartImage/SmartImage';
 import Header from '@/components/Header/Header';
 import PostCardSimple from '@/components/PostCardSimple/PostCardSimple';
 
@@ -21,7 +19,6 @@ export default function NewPostScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState<number>(1);
 
   // Image Picker
   const pickImage = async () => {
@@ -185,10 +182,6 @@ export default function NewPostScreen() {
     </Container>
   );
 }
-
-// ──────────────────────────────────────────────
-// Styled Components
-// ──────────────────────────────────────────────
 
 const Container = styled.SafeAreaView`
   flex: 1;

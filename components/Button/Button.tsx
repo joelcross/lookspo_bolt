@@ -2,7 +2,12 @@ import { colors } from '@/theme/colors';
 import React from 'react';
 import { TouchableOpacityProps } from 'react-native';
 import styled from 'styled-components/native';
-import { ArrowLeftIcon, GearIcon } from 'phosphor-react-native';
+import {
+  ArrowLeftIcon,
+  DotsThreeOutlineVerticalIcon,
+  DotsThreeVerticalIcon,
+  GearIcon,
+} from 'phosphor-react-native';
 import { typography } from '@/theme/typography';
 
 type ButtonVariant = 'default' | 'secondary' | 'text';
@@ -114,6 +119,16 @@ export function Button({
               <GearIcon
                 size={18}
                 weight="bold"
+                color={color}
+                style={{ marginRight: 6 }}
+              />
+            );
+
+          case 'more':
+            return (
+              <DotsThreeOutlineVerticalIcon
+                size={18}
+                weight="fill"
                 color={color}
                 style={{ marginRight: 6 }}
               />

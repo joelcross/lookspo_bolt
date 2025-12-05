@@ -5,8 +5,10 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  Modal,
+  Pressable,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Post, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,15 +16,49 @@ import PostCard from '@/components/PostCard/PostCard';
 import SaveModal from '@/components/SaveModal';
 import Header from '@/components/Header/Header';
 import styled from 'styled-components/native';
+import { typography } from '@/theme/typography';
+import { Button } from '@/components/Button/Button';
+import { colors } from '@/theme/colors';
+import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
 
 export default function CollectionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
+  const router = useRouter();
   const [collection, setCollection] = useState<Collection | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [deleteModalVisible, setdeleteModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState('');
+
+  const isOwnCollection = collection?.user_id === user.id;
+
+  const handleCustomPress = () => setMenuVisible(true);
+
+  const handleDelete = () => setdeleteModalVisible(true);
+
+  const handleRename = async () => {
+    if (!newCollectionName.trim()) return;
+
+    try {
+      await supabase
+        .from('collections')
+        .update({ name: newCollectionName.trim() })
+        .eq('id', collection.id);
+
+      setCollection(
+        (prev) => prev && { ...prev, name: newCollectionName.trim() }
+      );
+    } catch (err) {
+      console.error('Failed to rename collection', err);
+    } finally {
+      setRenameModalVisible(false);
+    }
+  };
 
   useEffect(() => {
     fetchCollection();
@@ -82,6 +118,18 @@ export default function CollectionScreen() {
     setSaveModalVisible(true);
   };
 
+  const handleDeleteCollection = async () => {
+    try {
+      await supabase.from('collections').delete().eq('id', collection.id);
+
+      router.push('/profile');
+    } catch (err) {
+      console.error('Failed to delete collection:', err);
+    } finally {
+      setdeleteModalVisible(false);
+    }
+  };
+
   const renderPost = ({ item }: { item: Post }) => (
     <PostCard
       post={item}
@@ -109,7 +157,88 @@ export default function CollectionScreen() {
 
   return (
     <Container style={styles.container} edges={['top']}>
-      <Header text={collection.name} left="back" />
+      <Header
+        text={collection.name}
+        left="back"
+        right={isOwnCollection ? 'more' : undefined}
+        onCustomPress={handleCustomPress}
+      />
+
+      {/* Three vertical dots dropdown */}
+      {menuVisible && (
+        <Modal transparent animationType="none" visible={menuVisible}>
+          <DropdownOverlay onPress={() => setMenuVisible(false)}>
+            <Pressable onPress={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <MenuItem
+                  onPress={() => {
+                    setRenameModalVisible(true);
+                    setMenuVisible(false);
+                  }}
+                >
+                  <Text>Rename</Text>
+                </MenuItem>
+                <MenuItem
+                  onPress={() => {
+                    handleDelete();
+                    setMenuVisible(false);
+                  }}
+                >
+                  <DeleteText>Delete</DeleteText>
+                </MenuItem>
+              </DropdownMenu>
+            </Pressable>
+          </DropdownOverlay>
+        </Modal>
+      )}
+
+      {/* Rename modal */}
+      {renameModalVisible && (
+        <Modal transparent animationType="fade" visible={renameModalVisible}>
+          <Overlay onPress={() => setRenameModalVisible(false)}>
+            <Pressable onPress={(e) => e.stopPropagation()}>
+              <ModalCard>
+                <ModalTitle>Rename Collection</ModalTitle>
+                <CustomTextInput
+                  placeholder="Enter new collection name"
+                  value={newCollectionName}
+                  onChangeText={setNewCollectionName}
+                  autoFocus
+                />
+                <ButtonRow>
+                  <Button
+                    title="Cancel"
+                    variant="secondary"
+                    onPress={() => setRenameModalVisible(false)}
+                  />
+                  <Button title="Done" onPress={handleRename} />
+                </ButtonRow>
+              </ModalCard>
+            </Pressable>
+          </Overlay>
+        </Modal>
+      )}
+
+      {/* Delete modal */}
+      {deleteModalVisible && (
+        <Modal transparent animationType="fade" visible={deleteModalVisible}>
+          <Overlay onPress={() => setdeleteModalVisible(false)}>
+            <ModalCard onPress={(e) => e.stopPropagation()}>
+              <ModalTitle>
+                Are you sure you want to delete this collection?
+              </ModalTitle>
+              <ButtonRow>
+                <Button
+                  title="Cancel"
+                  variant="secondary"
+                  onPress={() => setdeleteModalVisible(false)}
+                />
+                <Button title="Delete" onPress={handleDeleteCollection} />
+              </ButtonRow>
+            </ModalCard>
+          </Overlay>
+        </Modal>
+      )}
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
@@ -117,9 +246,11 @@ export default function CollectionScreen() {
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No posts in this collection</Text>
-          </View>
+          <TextWrapper>
+            <StyledText style={styles.emptyText}>
+              No posts in this collection
+            </StyledText>
+          </TextWrapper>
         }
       />
 
@@ -140,6 +271,81 @@ const Container = styled.SafeAreaView`
   gap: 10px;
 `;
 
+// Modal components
+const DropdownOverlay = styled.Pressable`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.2);
+  justify-content: flex-start;
+  align-items: flex-end;
+`;
+
+const DropdownMenu = styled.View`
+  margin-top: 44px;
+  margin-right: 10px;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 140px;
+  elevation: 10;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.15;
+  shadow-radius: 4px;
+`;
+
+const MenuItem = styled.TouchableOpacity`
+  padding: 12px 16px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const DeleteText = styled.Text`
+  color: ${colors.feedback.error};
+`;
+
+const Overlay = styled.Pressable`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+`;
+
+const TextWrapper = styled.View`
+  padding-top: 60;
+  align-items: center;
+`;
+
+const StyledText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.secondary[400]};
+`;
+
+const ModalCard = styled.View`
+  width: 80vw;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  shadow-color: #000;
+  shadow-offset: 0px 10px;
+  shadow-opacity: 0.15;
+  shadow-radius: 20px;
+  elevation: 15;
+`;
+
+const ModalTitle = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const ButtonRow = styled.View`
+  margin-top: 12px;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -150,10 +356,6 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     marginTop: 40,
-  },
-  emptyContainer: {
-    paddingTop: 60,
-    alignItems: 'center',
   },
   emptyText: {
     fontSize: 16,

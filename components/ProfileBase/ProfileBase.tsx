@@ -45,7 +45,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     []
   );
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: '',
     username: '',
@@ -249,7 +248,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   // Save all changes
   const handleSave = async () => {
     if (!ownProfile) return;
-    setSaving(true);
     try {
       // Update profile
       const { error: updateProfileError } = await supabase
@@ -282,8 +280,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     } catch (err) {
       console.error(err);
       alert('Failed to save profile');
-    } finally {
-      setSaving(false);
     }
   };
 

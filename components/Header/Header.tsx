@@ -8,16 +8,17 @@ import { Button } from '../Button/Button';
 type HeaderProps = {
   text: string;
   left?: 'back' | 'cancel';
-  right?: 'settings';
+  right?: 'settings' | 'more';
+  onCustomPress?: () => void;
 };
 
-export function Header({ text, left, right }: HeaderProps) {
-  const handleLeftButtonPress = async () => {
-    router.back();
-  };
+export function Header({ text, left, right, onCustomPress }: HeaderProps) {
+  const handleLeftButtonPress = () => router.back();
 
-  const handleRightButtonPress = async () => {
-    router.push('/settings');
+  const handleSettingsButtonPress = () => router.push('/settings');
+
+  const handleCustomPress = () => {
+    if (onCustomPress) onCustomPress();
   };
 
   const renderLeftButton = () => {
@@ -42,8 +43,12 @@ export function Header({ text, left, right }: HeaderProps) {
         <Button
           title={right}
           variant={'text'}
-          onPress={handleRightButtonPress}
+          onPress={handleSettingsButtonPress}
         />
+      );
+    } else if (right === 'more') {
+      return (
+        <Button title={right} variant={'text'} onPress={handleCustomPress} />
       );
     }
   };

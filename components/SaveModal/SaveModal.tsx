@@ -7,11 +7,12 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { typography } from '@/theme/typography';
 import { colors } from '@/theme/colors';
+import { Post } from '@/lib/types';
 
 interface SaveModalProps {
   visible: boolean;
   onClose: () => void;
-  postId: string;
+  post: Post;
   currentCollectionIds: string[];
   onSaved: () => void;
 }
@@ -19,7 +20,7 @@ interface SaveModalProps {
 export default function SaveModal({
   visible,
   onClose,
-  postId,
+  post,
   currentCollectionIds,
   onSaved,
 }: SaveModalProps) {
@@ -87,12 +88,21 @@ export default function SaveModal({
         (id) => !currentCollectionIds.includes(id)
       );
       if (toAdd.length > 0) {
-        const inserts = toAdd.map((collectionId) => ({
-          post_id: postId,
+        const saveInserts = toAdd.map((collectionId) => ({
+          post_id: post.id,
           collection_id: collectionId,
           user_id: user!.id,
         }));
-        await supabase.from('saves').insert(inserts);
+        await supabase.from('saves').insert(saveInserts);
+
+        const activityInserts = toAdd.map((collectionId) => ({
+          actor_id: user!.id,
+          target_user_id: post.user_id,
+          type: 'save',
+          post_id: post.id,
+          collection_id: collectionId,
+        }));
+        await supabase.from('activities').insert(activityInserts);
       }
 
       onSaved();

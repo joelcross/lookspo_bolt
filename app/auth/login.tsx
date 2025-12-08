@@ -31,7 +31,7 @@ export default function LoginScreen() {
 
     try {
       await signIn(email, password);
-      router.replace('/'); // only runs on success
+      router.replace('/home'); // only runs on success
     } catch (err: any) {
       console.log('Caught in handleLogin:', err);
       setError(err.message || 'Invalid email or password');

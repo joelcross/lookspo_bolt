@@ -5,8 +5,10 @@ import {
   TouchableOpacity,
   View,
   Text,
+  Modal,
+  Pressable,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Plus, X } from 'lucide-react-native';
@@ -27,6 +29,8 @@ export default function PostDetailScreen() {
   const [isSaved, setIsSaved] = useState(false);
   const [savedCollections, setSavedCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   // Edit mode
   const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +39,8 @@ export default function PostDetailScreen() {
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [isSavingEdits, setIsSavingEdits] = useState(false);
 
-  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const isOwnPost = post?.user_id === user.id;
+  const router = useRouter();
 
   // Fetch post + likes + saves + collections in ONE optimized query
   useEffect(() => {
@@ -50,12 +55,7 @@ export default function PostDetailScreen() {
       // 1. Main post + author
       const { data: postData, error: postError } = await supabase
         .from('posts')
-        .select(
-          `
-        *,
-        profiles:user_id (id, username, avatar_url)
-      `
-        )
+        .select(`*, profiles:user_id (id, username, avatar_url)`)
         .eq('id', postId)
         .single();
 
@@ -78,13 +78,12 @@ export default function PostDetailScreen() {
         .from('saves')
         .select(
           `
-        collection_id,
-        collections!collection_id (
-          id,
-          name,
-          user:user_id (username)
-        )
-      `
+          collection_id,
+          collections!collection_id (
+            id,
+            name,
+            user:user_id (username)
+          )`
         )
         .eq('post_id', postId);
 
@@ -125,6 +124,24 @@ export default function PostDetailScreen() {
       console.error('Error loading post:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!post) return;
+
+    try {
+      await supabase.from('posts').delete().eq('id', post.id);
+
+      // Delete related saves + likes automatically handled if your DB has cascade rules.
+      // If not, delete them manually here.
+
+      setDeleteModalVisible(false);
+
+      // Go back to feed / profile
+      router.back();
+    } catch (err) {
+      console.error('Failed to delete post', err);
     }
   };
 
@@ -208,9 +225,16 @@ export default function PostDetailScreen() {
     );
   }
 
+  console.log('post', post);
+
   return (
     <Container>
-      <Header text="Look" left="back" />
+      <Header
+        text="Look"
+        left="back"
+        right={isOwnPost ? 'trash' : undefined}
+        onCustomPress={() => setDeleteModalVisible(true)}
+      />
 
       <Content>
         <PostCard
@@ -325,13 +349,52 @@ export default function PostDetailScreen() {
       <SaveModal
         visible={saveModalVisible}
         onClose={() => setSaveModalVisible(false)}
-        postId={post.id}
+        post={post}
         currentCollectionIds={savedCollections.map((c) => c.id)}
         onSaved={() => {
           setSaveModalVisible(false);
           fetchEverything();
         }}
       />
+      {deleteModalVisible && (
+        <Modal transparent animationType="fade" visible={deleteModalVisible}>
+          <Overlay onPress={() => setDeleteModalVisible(false)}>
+            <Pressable onPress={(e) => e.stopPropagation()}>
+              <ModalCard>
+                <ModalTitle>Delete this post?</ModalTitle>
+
+                <ButtonRow>
+                  <TouchableOpacity
+                    onPress={() => setDeleteModalVisible(false)}
+                    style={{
+                      flex: 1,
+                      padding: 14,
+                      backgroundColor: '#eee',
+                      borderRadius: 12,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text>Cancel</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={handleDeletePost}
+                    style={{
+                      flex: 1,
+                      padding: 14,
+                      backgroundColor: '#000',
+                      borderRadius: 12,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ color: '#fff' }}>Delete</Text>
+                  </TouchableOpacity>
+                </ButtonRow>
+              </ModalCard>
+            </Pressable>
+          </Overlay>
+        </Modal>
+      )}
     </Container>
   );
 }
@@ -345,6 +408,40 @@ const Container = styled.ScrollView`
 const Content = styled.View`
   gap: 16px;
   padding-bottom: 40px;
+`;
+
+// Delete modal
+const Overlay = styled.Pressable`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalCard = styled.View`
+  width: 80vw;
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  shadow-color: #000;
+  shadow-offset: 0px 10px;
+  shadow-opacity: 0.15;
+  shadow-radius: 20px;
+  elevation: 15;
+`;
+
+const ModalTitle = styled.Text`
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const ButtonRow = styled.View`
+  margin-top: 12px;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 12px;
 `;
 
 const styles = {

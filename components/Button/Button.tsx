@@ -5,8 +5,8 @@ import styled from 'styled-components/native';
 import {
   ArrowLeftIcon,
   DotsThreeOutlineVerticalIcon,
-  DotsThreeVerticalIcon,
   GearIcon,
+  TrashIcon,
 } from 'phosphor-react-native';
 import { typography } from '@/theme/typography';
 
@@ -129,6 +129,16 @@ export function Button({
               <DotsThreeOutlineVerticalIcon
                 size={18}
                 weight="fill"
+                color={color}
+                style={{ marginRight: 6 }}
+              />
+            );
+
+          case 'trash':
+            return (
+              <TrashIcon
+                size={18}
+                weight="bold"
                 color={color}
                 style={{ marginRight: 6 }}
               />

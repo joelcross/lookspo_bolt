@@ -11,7 +11,6 @@ import { supabase } from '@/lib/supabase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
-import SaveModal from '@/components/SaveModal';
 import styled from 'styled-components/native';
 import PillHeader from '@/components/PillHeader/PillHeader';
 
@@ -27,8 +26,6 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [saveModalVisible, setSaveModalVisible] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   const POSTS_PER_PAGE = 10;
 
@@ -132,17 +129,10 @@ export default function HomeScreen() {
     }
   };
 
-  const handleSavePress = (post: Post) => {
-    setSelectedPost(post);
-    setSaveModalVisible(true);
-  };
-
   const renderPost = ({ item }: { item: Post }) => (
     <PostCard
       post={item}
       showActions={false} // hide Like/Save buttons in feed
-      onLikeToggle={() => fetchPosts(true)}
-      onSavePress={() => handleSavePress(item)}
     />
   );
 
@@ -193,16 +183,6 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       />
-
-      {selectedPost && (
-        <SaveModal
-          visible={saveModalVisible}
-          postId={selectedPost.id}
-          postUserId={selectedPost.user_id}
-          onClose={() => setSaveModalVisible(false)}
-          onSaved={() => fetchPosts(true)}
-        />
-      )}
     </Container>
   );
 }

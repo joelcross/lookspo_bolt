@@ -28,9 +28,7 @@ export default function CollectionScreen() {
   const [collection, setCollection] = useState<Collection | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [deleteModalVisible, setdeleteModalVisible] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
@@ -113,11 +111,6 @@ export default function CollectionScreen() {
     }
   };
 
-  const handleSavePress = (post: Post) => {
-    setSelectedPost(post);
-    setSaveModalVisible(true);
-  };
-
   const handleDeleteCollection = async () => {
     try {
       await supabase.from('collections').delete().eq('id', collection.id);
@@ -131,12 +124,7 @@ export default function CollectionScreen() {
   };
 
   const renderPost = ({ item }: { item: Post }) => (
-    <PostCard
-      post={item}
-      showActions={false}
-      onLikeToggle={fetchCollection}
-      onSavePress={() => handleSavePress(item)}
-    />
+    <PostCard post={item} showActions={false} />
   );
 
   if (loading) {
@@ -253,16 +241,6 @@ export default function CollectionScreen() {
           </TextWrapper>
         }
       />
-
-      {selectedPost && (
-        <SaveModal
-          visible={saveModalVisible}
-          postId={selectedPost.id}
-          postUserId={selectedPost.user_id}
-          onClose={() => setSaveModalVisible(false)}
-          onSaved={fetchCollection}
-        />
-      )}
     </Container>
   );
 }

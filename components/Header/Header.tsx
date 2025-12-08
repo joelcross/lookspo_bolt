@@ -8,7 +8,7 @@ import { Button } from '../Button/Button';
 type HeaderProps = {
   text: string;
   left?: 'back' | 'cancel';
-  right?: 'settings' | 'more';
+  right?: 'settings' | 'more' | 'trash';
   onCustomPress?: () => void;
 };
 
@@ -46,7 +46,7 @@ export function Header({ text, left, right, onCustomPress }: HeaderProps) {
           onPress={handleSettingsButtonPress}
         />
       );
-    } else if (right === 'more') {
+    } else if (right === 'more' || right === 'trash') {
       return (
         <Button title={right} variant={'text'} onPress={handleCustomPress} />
       );

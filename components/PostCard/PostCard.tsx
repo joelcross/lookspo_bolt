@@ -21,6 +21,7 @@ interface PostCardProps {
   onLikeToggle?: () => void;
   onSavePress?: () => void;
   showActions?: boolean;
+  showTimeAgo?: boolean;
   isSaved?: boolean;
   isLiked?: boolean;
 }
@@ -30,6 +31,7 @@ export default function PostCard({
   onLikeToggle,
   onSavePress,
   showActions = true,
+  showTimeAgo = true,
   isSaved,
   isLiked,
 }: PostCardProps) {
@@ -59,7 +61,7 @@ export default function PostCard({
         <TouchableOpacity onPress={handleUsernamePress}>
           <Username>@{post.profiles?.username}</Username>
         </TouchableOpacity>
-        <Timestamp>{getTimeAgo(post.created_at)}</Timestamp>
+        {showTimeAgo && <Timestamp>{getTimeAgo(post.created_at)}</Timestamp>}
       </TopBanner>
 
       <TouchableOpacity
@@ -119,7 +121,6 @@ export default function PostCard({
 }
 
 const PostContainer = styled.View`
-  margin-horizontal: 10px;
   display: flex;
   flex-direction: column;
 `;
@@ -129,7 +130,6 @@ const TopBanner = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
 `;
 
 const Username = styled.Text`

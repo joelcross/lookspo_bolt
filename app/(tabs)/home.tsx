@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { Post } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
@@ -13,6 +14,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
 import styled from 'styled-components/native';
 import PillHeader from '@/components/PillHeader/PillHeader';
+import { FlashList } from '@shopify/flash-list';
+import PostList from '@/components/PostList/PostList';
 
 type FeedType = 'following' | 'explore';
 
@@ -116,47 +119,17 @@ export default function HomeScreen() {
     }
   };
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setPage(0);
-    setHasMore(true);
-    fetchPosts(true);
-  };
-
   const handleLoadMore = () => {
     if (!loading && hasMore) {
       fetchPosts(false);
     }
   };
 
-  const renderPost = ({ item }: { item: Post }) => (
-    <PostCard
-      post={item}
-      showActions={false} // hide Like/Save buttons in feed
-    />
-  );
-
-  const renderFooter = () => {
-    if (!loading) return null;
-    return (
-      <View style={styles.footer}>
-        <ActivityIndicator size="small" color="#000" />
-      </View>
-    );
-  };
-
-  const renderEmpty = () => {
-    if (loading) return null;
-
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>
-          {feedType === 'following'
-            ? 'Follow users to see their posts here'
-            : 'No posts yet'}
-        </Text>
-      </View>
-    );
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setPage(0);
+    setHasMore(true);
+    fetchPosts(true);
   };
 
   return (
@@ -170,18 +143,17 @@ export default function HomeScreen() {
         onChange={setFeedType}
       />
 
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderPost}
-        onRefresh={handleRefresh}
+      <PostList
+        posts={posts}
+        handleLoadMore={handleLoadMore}
+        handleRefresh={handleRefresh}
         refreshing={refreshing}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-        ListEmptyComponent={renderEmpty}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+        loading={loading}
+        emptyText={
+          feedType === 'following'
+            ? 'Follow users to see their posts here'
+            : 'No posts yet'
+        }
       />
     </Container>
   );
@@ -190,18 +162,3 @@ export default function HomeScreen() {
 const Container = styled.SafeAreaView`
   flex: 1;
 `;
-
-const styles = StyleSheet.create({
-  footer: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    paddingTop: 60,
-    alignItems: 'center',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-  },
-});

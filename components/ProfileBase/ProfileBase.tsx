@@ -295,7 +295,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     <SafeAreaView style={styles.container}>
       <Header
         text={isEditing ? 'Edit Profile' : `@${targetProfile.username}`}
-        left="back"
+        left={isOwnProfile ? undefined : 'back'}
         right={isOwnProfile ? 'settings' : undefined}
       />
 

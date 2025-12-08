@@ -139,25 +139,26 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
   const collection = activity.collection;
 
   const getBaseText = () => {
-    const isMyPost = currentUserId && activity.post?.user_id === currentUserId;
+    console.log('activity', activity);
+    const isMyPost = currentUserId && activity.target_user.id === currentUserId;
     const isFollowingMe =
-      currentUserId && activity.target_user_id === currentUserId;
+      currentUserId && activity.target_user.id === currentUserId;
 
     switch (activity.type) {
       case 'like':
         return isMyPost
           ? 'liked your post'
-          : `liked @${activity.post?.profiles?.username || 'someone'}'s post`;
+          : `liked @${activity.target_user.username}'s post`;
 
       case 'save':
         return isMyPost
           ? 'saved your post'
-          : `saved @${activity.post?.profiles?.username || 'someone'}'s post`;
+          : `saved @${activity.target_user.username}'s post`;
 
       case 'follow':
         return isFollowingMe
           ? 'started following you'
-          : `followed @${activity.target_user?.username || 'someone'}`;
+          : `followed @${activity.target_user.username}`;
 
       default:
         return '';

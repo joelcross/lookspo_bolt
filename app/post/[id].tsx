@@ -228,7 +228,7 @@ export default function PostDetailScreen() {
   console.log('post', post);
 
   return (
-    <Container>
+    <Container showsVerticalScrollIndicator={false}>
       <Header
         text="Look"
         left="back"

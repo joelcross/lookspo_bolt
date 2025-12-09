@@ -14,8 +14,6 @@ import {
 } from 'phosphor-react-native';
 import SmartImage from '../SmartImage/SmartImage';
 
-const width = Dimensions.get('window').width - 20;
-
 interface PostCardProps {
   post: Post;
   onLikeToggle?: () => void;

@@ -13,7 +13,6 @@ import { Post, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
-import SaveModal from '@/components/SaveModal';
 import Header from '@/components/Header/Header';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';

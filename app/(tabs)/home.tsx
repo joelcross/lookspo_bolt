@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  ScrollView,
-} from 'react-native';
 import { Post } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useAuth } from '@/contexts/AuthContext';
-import PostCard from '@/components/PostCard/PostCard';
 import styled from 'styled-components/native';
 import PillHeader from '@/components/PillHeader/PillHeader';
-import { FlashList } from '@shopify/flash-list';
 import PostList from '@/components/PostList/PostList';
 
 type FeedType = 'following' | 'explore';

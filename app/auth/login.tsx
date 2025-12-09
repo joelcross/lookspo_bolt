@@ -48,6 +48,7 @@ export default function LoginScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
           <Text style={styles.title}>Lookspo</Text>
@@ -132,6 +133,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     color: '#000',
+    outlineWidth: 0,
+    outlineColor: 'transparent',
   },
   button: {
     backgroundColor: '#000',

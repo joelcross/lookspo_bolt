@@ -124,7 +124,7 @@ export default function NewPostScreen() {
       <Header text="New Look" left="back" />
 
       {/* Main Scrollable Content */}
-      <ScrollableContent>
+      <ScrollableContent showsVerticalScrollIndicator={false}>
         <Content>
           <PostCardSimple
             image={image}

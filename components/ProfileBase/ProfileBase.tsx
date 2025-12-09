@@ -10,7 +10,6 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Settings, Check, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -299,7 +298,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         right={isOwnProfile ? 'settings' : undefined}
       />
 
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <BioCard
           image={targetProfile.avatar_url}
           name={targetProfile.name}

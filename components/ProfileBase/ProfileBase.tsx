@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,10 @@ import LookbookList from '@/components/LookbookList/LookbookList';
 import { BioCard } from '@/components/BioCard/BioCard';
 import { Button } from '../Button/Button';
 import styled from 'styled-components/native';
+import PostList from '../PostList/PostList';
+import { usePosts } from '@/hooks/usePosts';
+import { colors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 
 interface ProfileBaseProps {
   isOwnProfile: boolean;
@@ -52,6 +56,18 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   });
   const [isFollowing, setIsFollowing] = useState(false);
   const targetProfile = isOwnProfile ? ownProfile : otherProfile;
+
+  const mode = useMemo(() => {
+    return { type: 'user' as const, userId: targetProfile?.id };
+  }, [targetProfile]);
+
+  const {
+    posts,
+    loading: postsLoading,
+    refreshing,
+    handleLoadMore,
+    handleRefresh,
+  } = usePosts(mode);
 
   // Initialize form state
   //   useEffect(() => {
@@ -404,6 +420,16 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             // </View>
           )}
         </View>
+        <Heading>Looks</Heading>
+        <PostList
+          posts={posts}
+          loading={postsLoading}
+          refreshing={refreshing}
+          emptyText={'No looks to display yet!'}
+          handleLoadMore={handleLoadMore}
+          handleRefresh={handleRefresh}
+          hideTopBar
+        />
       </ScrollView>
       <Modal
         visible={showModal}
@@ -479,6 +505,14 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
 const ButtonWrapper = styled.View`
   margin: 10px;
+`;
+
+const Heading = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  color: ${colors.secondary[500]};
+  margin-bottom: 12px;
+  margin-horizontal: 10px;
 `;
 
 const styles = StyleSheet.create({

@@ -225,8 +225,6 @@ export default function PostDetailScreen() {
     );
   }
 
-  console.log('post', post);
-
   return (
     <Container showsVerticalScrollIndicator={false}>
       <Header
@@ -237,14 +235,16 @@ export default function PostDetailScreen() {
       />
 
       <Content>
-        <PostCard
-          post={post}
-          onLikeToggle={handleLike}
-          onSavePress={() => setSaveModalVisible(true)}
-          showActions
-          isLiked={isLiked}
-          isSaved={isSaved}
-        />
+        <PostCardWrapper>
+          <PostCard
+            post={post}
+            onLikeToggle={handleLike}
+            onSavePress={() => setSaveModalVisible(true)}
+            showActions
+            isLiked={isLiked}
+            isSaved={isSaved}
+          />
+        </PostCardWrapper>
 
         {/* Edit Mode */}
         {isEditing ? (
@@ -408,6 +408,10 @@ const Container = styled.ScrollView`
 const Content = styled.View`
   gap: 16px;
   padding-bottom: 40px;
+`;
+
+const PostCardWrapper = styled.View`
+  margin-horizontal: 10px;
 `;
 
 // Delete modal

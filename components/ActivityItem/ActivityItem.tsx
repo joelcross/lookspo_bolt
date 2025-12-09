@@ -139,7 +139,6 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
   const collection = activity.collection;
 
   const getBaseText = () => {
-    console.log('activity', activity);
     const isMyPost = currentUserId && activity.target_user.id === currentUserId;
     const isFollowingMe =
       currentUserId && activity.target_user.id === currentUserId;

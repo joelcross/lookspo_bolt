@@ -19,7 +19,7 @@ interface PostCardProps {
   onLikeToggle?: () => void;
   onSavePress?: () => void;
   showActions?: boolean;
-  showTimeAgo?: boolean;
+  hideTopBar?: boolean;
   isSaved?: boolean;
   isLiked?: boolean;
 }
@@ -29,7 +29,7 @@ export default function PostCard({
   onLikeToggle,
   onSavePress,
   showActions = true,
-  showTimeAgo = true,
+  hideTopBar = false,
   isSaved,
   isLiked,
 }: PostCardProps) {
@@ -55,12 +55,14 @@ export default function PostCard({
 
   return (
     <PostContainer>
-      <TopBanner>
-        <TouchableOpacity onPress={handleUsernamePress}>
-          <Username>@{post.profiles?.username}</Username>
-        </TouchableOpacity>
-        {showTimeAgo && <Timestamp>{getTimeAgo(post.created_at)}</Timestamp>}
-      </TopBanner>
+      {!hideTopBar && (
+        <TopBanner>
+          <TouchableOpacity onPress={handleUsernamePress}>
+            <Username>@{post.profiles?.username}</Username>
+          </TouchableOpacity>
+          <Timestamp>{getTimeAgo(post.created_at)}</Timestamp>
+        </TopBanner>
+      )}
 
       <TouchableOpacity
         onPress={handleCardPress}

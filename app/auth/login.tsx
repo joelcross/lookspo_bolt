@@ -8,10 +8,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
+WebBrowser.maybeCompleteAuthSession();
+
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
+
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/Button/Button';
+import { GoogleButton } from '@/components/GoogleButton/GoogleButton';
+import styled from 'styled-components/native';
+import { colors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -20,7 +30,7 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const { signIn } = useAuth();
 
-  const handleLogin = async () => {
+  const handleEmailLogin = async () => {
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
@@ -31,12 +41,28 @@ export default function LoginScreen() {
 
     try {
       await signIn(email, password);
-      router.replace('/home'); // only runs on success
     } catch (err: any) {
-      console.log('Caught in handleLogin:', err);
       setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const redirectUri =
+        Platform.OS === 'web'
+          ? window.location.origin // localhost for web
+          : AuthSession.makeRedirectUri({ scheme: 'lookspo' });
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: redirectUri },
+      });
+
+      if (error) console.error('Google login error:', error.message);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -75,17 +101,17 @@ export default function LoginScreen() {
             secureTextEntry
           />
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleLogin}
+          <Button
+            title="Sign In"
+            onPress={handleEmailLogin}
             disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
+          />
+
+          <View style={{ margin: 10, alignItems: 'center' }}>
+            <BodyText>or</BodyText>
+          </View>
+
+          <GoogleButton onPress={handleGoogleLogin} />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account? </Text>
@@ -98,6 +124,12 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+const BodyText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.text.primary};
+`;
 
 const styles = StyleSheet.create({
   container: {
@@ -156,7 +188,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: 48,
   },
   footerText: {
     color: '#666',

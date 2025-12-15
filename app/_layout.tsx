@@ -4,28 +4,19 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { useFonts } from 'expo-font';
 
 function RootLayoutInner() {
-  const { session, loading } = useAuth();
+  const { loading } = useAuth();
 
-  if (loading) return null; // or show a splash screen
+  if (loading) return null;
 
   return (
     <>
-      {session ? (
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-      ) : (
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="auth" />
-        </Stack>
-      )}
+      <Stack screenOptions={{ headerShown: false }} />
       <StatusBar style="auto" />
     </>
   );
 }
 
 export default function RootLayout() {
-  // Load your font
   const [fontsLoaded] = useFonts({
     Outfit: require('../assets/fonts/Outfit-Variable.ttf'),
   });

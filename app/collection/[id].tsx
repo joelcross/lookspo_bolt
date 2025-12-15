@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,20 +19,27 @@ import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
 import { colors } from '@/theme/colors';
 import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
+import { usePosts } from '@/hooks/usePosts';
+import PostList from '@/components/PostList/PostList';
 
 export default function CollectionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const router = useRouter();
   const [collection, setCollection] = useState<Collection | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteModalVisible, setdeleteModalVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
 
   const isOwnCollection = collection?.user_id === user.id;
+
+  const mode = useMemo(() => {
+    return { type: 'collection', collectionId: collection?.id };
+  }, [collection?.id]);
+
+  const { posts, loading, refreshing, handleLoadMore, handleRefresh } =
+    usePosts(mode);
 
   const handleCustomPress = () => setMenuVisible(true);
 
@@ -64,7 +71,7 @@ export default function CollectionScreen() {
   const fetchCollection = async () => {
     if (!id || !user) return;
 
-    setLoading(true);
+    //setLoading(true);
     try {
       const { data: collectionData } = await supabase
         .from('collections')
@@ -101,12 +108,12 @@ export default function CollectionScreen() {
           })
         );
 
-        setPosts(postsWithStatus.filter(Boolean) as Post[]);
+        //setPosts(postsWithStatus.filter(Boolean) as Post[]);
       }
     } catch (error) {
       console.error('Error fetching collection:', error);
     } finally {
-      setLoading(false);
+      //setLoading(false);
     }
   };
 
@@ -226,7 +233,7 @@ export default function CollectionScreen() {
           </Overlay>
         </Modal>
       )}
-      <FlatList
+      {/* <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={renderPost}
@@ -239,6 +246,14 @@ export default function CollectionScreen() {
             </StyledText>
           </TextWrapper>
         }
+      /> */}
+      <PostList
+        posts={posts}
+        loading={loading}
+        refreshing={refreshing}
+        emptyText={'This lookbook is empty.'}
+        handleLoadMore={handleLoadMore}
+        handleRefresh={handleRefresh}
       />
     </Container>
   );

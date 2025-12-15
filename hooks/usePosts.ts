@@ -58,16 +58,12 @@ export function usePosts(mode: PostsMode) {
 
       // Posts in a specific collection
       if (mode.type === 'collection') {
+        if (!mode.collectionId) return null;
+
         query = supabase
-          .from('posts')
-          .select(
-            `
-            *,
-            profiles:user_id (*),
-            collection_posts!inner(collection_id)
-          `
-          )
-          .eq('collection_posts.collection_id', mode.collectionId)
+          .from('saves')
+          .select('post_id, posts(*, profiles:user_id (*))')
+          .eq('collection_id', mode.collectionId)
           .order('created_at', { ascending: false })
           .range(
             pageNum * POSTS_PER_PAGE,
@@ -95,8 +91,11 @@ export function usePosts(mode: PostsMode) {
         const { data, error } = await query;
         if (error) throw error;
 
-        const newPosts = data ?? [];
+        let newPosts = data ?? [];
 
+        if (mode.type === 'collection') {
+          newPosts = newPosts.map((row: any) => row.posts).filter(Boolean); // remove nulls
+        }
         setPosts((prev) => (reset ? newPosts : [...prev, ...newPosts]));
         setHasMore(newPosts.length === POSTS_PER_PAGE);
         setPage(reset ? 1 : targetPage + 1);

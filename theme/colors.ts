@@ -8,6 +8,7 @@ export const colors = {
   secondary: {
     400: '#BFA6A0', // Dusty Mauve
     500: '#A58D86', // Rose Clay
+    600: '#a98a81ff', // Rose Clay
   },
   accent: {
     500: '#D8D89F', // Chartreuse

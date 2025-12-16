@@ -300,14 +300,14 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
   if (!targetProfile) {
     return (
-      <SafeAreaView style={styles.container}>
+      <Container>
         <ActivityIndicator size="large" color="#000" />
-      </SafeAreaView>
+      </Container>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Container>
       <Header
         text={isEditing ? 'Edit Profile' : `@${targetProfile.username}`}
         left={isOwnProfile ? undefined : 'back'}
@@ -499,9 +499,13 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </Container>
   );
 };
+
+const Container = styled.SafeAreaView`
+  flex: 1;
+`;
 
 const ButtonWrapper = styled.View`
   margin: 10px;
@@ -516,7 +520,6 @@ const Heading = styled.Text`
 `;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
   avatar: {
     width: 150,
     height: 150,

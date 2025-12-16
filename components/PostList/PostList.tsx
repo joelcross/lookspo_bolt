@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -29,13 +29,13 @@ const PostList: React.FC<PostListProps> = ({
   hideTopBar = false,
 }) => {
   const renderPost = ({ item }: { item: Post }) => (
-    <ScrollableContainer>
+    <PostWrapper>
       <PostCard post={item} showActions={false} hideTopBar={hideTopBar} />
-    </ScrollableContainer>
+    </PostWrapper>
   );
 
   return (
-    <Wrapper showsVerticalScrollIndicator={false}>
+    <PostsContainer showsVerticalScrollIndicator={false}>
       <FlashList
         showsVerticalScrollIndicator={false}
         masonry
@@ -53,18 +53,22 @@ const PostList: React.FC<PostListProps> = ({
           ) : null
         }
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
+        ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
       />
-    </Wrapper>
+    </PostsContainer>
   );
 };
 
-const ScrollableContainer = styled.ScrollView`
+const PostWrapper = styled.View`
   margin: 5px;
   margin-bottom: 0px;
 `;
 
-const Wrapper = styled.ScrollView`
-  margin-horizontal: 5px;
+const PostsContainer = styled.ScrollView`
+  margin: 5px;
+  padding: 5px;
+  background-color: #fff;
+  border-radius: 20px;
 `;
 
 const EmptyContainer = styled.View`

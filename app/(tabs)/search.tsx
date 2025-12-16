@@ -16,12 +16,17 @@ import HeaderDropdown, {
   SearchType,
 } from '@/components/HeaderDropdown/HeaderDropdown';
 import PillHeader from '@/components/PillHeader/PillHeader';
+import styled from 'styled-components/native';
+import { typography } from '@/theme/typography';
+import { colors } from '@/theme/colors';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState<SearchType>('users');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const hasSearched = query.trim().length > 0;
 
   useEffect(() => {
     if (query.trim().length === 0) {
@@ -62,12 +67,9 @@ export default function SearchScreen() {
   };
 
   const renderUserItem = ({ item }: any) => (
-    <TouchableOpacity
-      style={styles.userItem}
-      onPress={() => router.push(`/user/${item.username}`)}
-    >
+    <UserItem onPress={() => router.push(`/user/${item.username}`)}>
       {item.avatar_url ? (
-        <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+        <AvatarImage source={{ uri: item.avatar_url }} />
       ) : (
         <View style={[styles.avatar, styles.avatarPlaceholder]}>
           <Text style={styles.avatarText}>
@@ -76,10 +78,10 @@ export default function SearchScreen() {
         </View>
       )}
       <View style={{ marginLeft: 12 }}>
-        <Text style={styles.userName}>{item.name}</Text>
-        <Text style={styles.userUsername}>@{item.username}</Text>
+        <NameText>{item.name}</NameText>
+        <UsernameText>@{item.username}</UsernameText>
       </View>
-    </TouchableOpacity>
+    </UserItem>
   );
 
   const renderCollectionItem = ({ item }: any) => (
@@ -102,11 +104,7 @@ export default function SearchScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <CustomTextInput icon="search" value={query} onChangeText={setQuery} />
-      </View>
-
+    <Container>
       <PillHeader
         options={[
           { label: 'Users', value: 'users' },
@@ -114,46 +112,98 @@ export default function SearchScreen() {
         ]}
         value={tab}
         onChange={setTab}
-      />
+      >
+        <SearchBarWrapper>
+          <CustomTextInput
+            icon="search"
+            value={query}
+            onChangeText={setQuery}
+          />
+        </SearchBarWrapper>
+      </PillHeader>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 20 }} color="#000" />
-      ) : results.length === 0 && query.length > 0 ? (
-        <Text style={styles.noResults}>No results found</Text>
-      ) : tab === 'users' ? (
-        <FlatList
-          key="users" // ✅ force new render when switching
-          data={results}
-          keyExtractor={(item) => item.id}
-          renderItem={renderUserItem}
-          contentContainerStyle={{ padding: 16 }}
-        />
-      ) : (
-        <FlatList
-          key="collections" // ✅ force new render when switching
-          data={results}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          renderItem={renderCollectionItem}
-          contentContainerStyle={styles.gridContainer}
-        />
-      )}
-    </SafeAreaView>
+      {hasSearched &&
+        (loading ? (
+          <ActivityIndicator style={{ marginTop: 20 }} color="#000" />
+        ) : results.length === 0 ? (
+          <Results>
+            <NoResultsText>No results found</NoResultsText>
+          </Results>
+        ) : tab === 'users' ? (
+          <Results>
+            <FlatList
+              key="users"
+              data={results}
+              keyExtractor={(item) => item.id}
+              renderItem={renderUserItem}
+              contentContainerStyle={{ padding: 16 }}
+              ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+            />
+          </Results>
+        ) : (
+          <Results>
+            <FlatList
+              key="collections"
+              data={results}
+              keyExtractor={(item) => item.id}
+              numColumns={3}
+              renderItem={renderCollectionItem}
+              contentContainerStyle={styles.gridContainer}
+            />
+          </Results>
+        ))}
+    </Container>
   );
 }
 
+const Container = styled.SafeAreaView`
+  flex: 1;
+`;
+
+const SearchBarWrapper = styled.View`
+  padding: 16px;
+`;
+
+const Results = styled.View`
+  background-color: #fff;
+  display: flex;
+  flex: 1;
+  border-radius: 20px;
+  margin: 5px;
+`;
+
+const UserItem = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const AvatarImage = styled.Image`
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+`;
+
+const NameText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.primary[900]};
+`;
+
+const UsernameText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.neutral[400]};
+`;
+
+const NoResultsText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.neutral[400]};
+  padding: 16px;
+`;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  userItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+  container: { flex: 1 },
   avatar: {
     width: 48,
     height: 48,

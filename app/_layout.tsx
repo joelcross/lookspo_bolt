@@ -19,6 +19,7 @@ function RootLayoutInner() {
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Outfit: require('../assets/fonts/Outfit-Variable.ttf'),
+    Playfair: require('../assets/fonts/Playfair-Variable.ttf'),
   });
 
   if (!fontsLoaded) return null;

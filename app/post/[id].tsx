@@ -19,6 +19,8 @@ import PiecesCard from '@/components/PiecesCard/PiecesCard';
 import LookbookList from '@/components/LookbookList/LookbookList';
 import SaveModal from '@/components/SaveModal/SaveModal';
 import styled from 'styled-components/native';
+import { typography } from '@/theme/typography';
+import { Button } from '@/components/Button/Button';
 
 export default function PostDetailScreen() {
   const { id: postId } = useLocalSearchParams<{ id: string }>();
@@ -364,31 +366,12 @@ export default function PostDetailScreen() {
                 <ModalTitle>Delete this post?</ModalTitle>
 
                 <ButtonRow>
-                  <TouchableOpacity
+                  <Button
+                    title="Cancel"
                     onPress={() => setDeleteModalVisible(false)}
-                    style={{
-                      flex: 1,
-                      padding: 14,
-                      backgroundColor: '#eee',
-                      borderRadius: 12,
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text>Cancel</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={handleDeletePost}
-                    style={{
-                      flex: 1,
-                      padding: 14,
-                      backgroundColor: '#000',
-                      borderRadius: 12,
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Text style={{ color: '#fff' }}>Delete</Text>
-                  </TouchableOpacity>
+                    variant="text"
+                  />
+                  <Button title="Delete" onPress={handleDeletePost} />
                 </ButtonRow>
               </ModalCard>
             </Pressable>
@@ -435,8 +418,8 @@ const ModalCard = styled.View`
 `;
 
 const ModalTitle = styled.Text`
-  font-size: 18px;
-  font-weight: 600;
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
   text-align: center;
   margin-bottom: 20px;
 `;

@@ -36,9 +36,9 @@ export function BioCard({ image, name, bio }: BioCardProps) {
 const Container = styled.View`
   flex-direction: row;
   background-color: ${colors.primary[100]};
-  border-radius: 10px;
+  border-radius: 20px;
   overflow: hidden;
-  margin-horizontal: 10px;
+  margin-horizontal: 5px;
 
   shadow-color: #000;
   shadow-opacity: 0.15;

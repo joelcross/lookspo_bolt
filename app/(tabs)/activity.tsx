@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ActivityType } from '@/components/HeaderDropdown/HeaderDropdown';
 import PillHeader from '@/components/PillHeader/PillHeader';
 import ActivityItem from '@/components/ActivityItem/ActivityItem';
+import styled from 'styled-components/native';
 
 export default function ActivityScreen() {
   const { user } = useAuth();
@@ -124,7 +125,7 @@ export default function ActivityScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <Container edges={['top']}>
       {/* <HeaderDropdown
         options={[
           { label: 'You', value: 'you' },
@@ -143,24 +144,37 @@ export default function ActivityScreen() {
         onChange={setFeedType}
       />
 
-      {loading && !refreshing ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#000" />
-        </View>
-      ) : (
-        <FlatList
-          data={activities}
-          keyExtractor={(item) => item.id}
-          renderItem={renderActivity}
-          onRefresh={handleRefresh}
-          refreshing={refreshing}
-          ListEmptyComponent={renderEmpty}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-    </SafeAreaView>
+      <Content>
+        {loading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        ) : (
+          <FlatList
+            data={activities}
+            keyExtractor={(item) => item.id}
+            renderItem={renderActivity}
+            onRefresh={handleRefresh}
+            refreshing={refreshing}
+            ListEmptyComponent={renderEmpty}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </Content>
+    </Container>
   );
 }
+
+const Container = styled.SafeAreaView`
+  flex: 1;
+`;
+
+const Content = styled.View`
+  flex: 1;
+  margin: 5px;
+  border-radius: 20px;
+  overflow: hidden;
+`;
 
 const styles = StyleSheet.create({
   container: { flex: 1 },

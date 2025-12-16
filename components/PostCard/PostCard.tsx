@@ -69,52 +69,50 @@ export default function PostCard({
         activeOpacity={0.9}
         disabled={showActions}
       >
-        <ShadowWrapper>
-          <SmartImage
-            uri={post.image_url}
-            resizeMode="contain"
-            style={{
-              borderRadius: 10,
-              borderBottomLeftRadius: showActions ? 0 : 10,
-              borderBottomRightRadius: showActions ? 0 : 10,
-            }}
-          />
+        <SmartImage
+          uri={post.image_url}
+          resizeMode="contain"
+          style={{
+            borderRadius: 10,
+            borderBottomLeftRadius: showActions ? 0 : 10,
+            borderBottomRightRadius: showActions ? 0 : 10,
+          }}
+        />
 
-          {/* Only show like/save if showActions is true */}
-          {showActions && (
-            <View>
-              <BottomContainer>
-                <LeftWrapper>
-                  <Avatar uri={post.profiles?.avatar_url} />
-                  <Caption>{post.caption}</Caption>
-                </LeftWrapper>
-                <RightWrapper>
-                  <LikeButton onPress={onLikeToggle}>
-                    <HeartIcon
-                      color={
-                        isLiked ? colors.feedback.error : colors.primary[900]
-                      }
-                      weight={isLiked ? 'fill' : 'regular'}
+        {/* Only show like/save if showActions is true */}
+        {showActions && (
+          <View>
+            <BottomContainer>
+              <LeftWrapper>
+                <Avatar uri={post.profiles?.avatar_url} />
+                <Caption>{post.caption}</Caption>
+              </LeftWrapper>
+              <RightWrapper>
+                <LikeButton onPress={onLikeToggle}>
+                  <HeartIcon
+                    color={
+                      isLiked ? colors.feedback.error : colors.primary[900]
+                    }
+                    weight={isLiked ? 'fill' : 'regular'}
+                    size={24}
+                  />
+                </LikeButton>
+
+                <SaveButton onPress={onSavePress}>
+                  {isSaved ? (
+                    <CheckCircleIcon
+                      color={colors.feedback.success}
                       size={24}
+                      weight="fill"
                     />
-                  </LikeButton>
-
-                  <SaveButton onPress={onSavePress}>
-                    {isSaved ? (
-                      <CheckCircleIcon
-                        color={colors.feedback.success}
-                        size={24}
-                        weight="fill"
-                      />
-                    ) : (
-                      <PlusCircleIcon color={colors.primary[900]} size={24} />
-                    )}
-                  </SaveButton>
-                </RightWrapper>
-              </BottomContainer>
-            </View>
-          )}
-        </ShadowWrapper>
+                  ) : (
+                    <PlusCircleIcon color={colors.primary[900]} size={24} />
+                  )}
+                </SaveButton>
+              </RightWrapper>
+            </BottomContainer>
+          </View>
+        )}
       </TouchableOpacity>
     </PostContainer>
   );
@@ -156,14 +154,6 @@ const BottomContainer = styled.View`
   font-size: 16px;
   padding: 8px;
   border-radius: 10px;
-`;
-
-const ShadowWrapper = styled.View`
-  border-radius: 10px;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.1;
-  shadow-radius: 10px;
 `;
 
 const LeftWrapper = styled.View`

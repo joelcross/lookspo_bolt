@@ -26,8 +26,8 @@ const CustomText = styled.Text`
 `;
 const styles = StyleSheet.create({
   button: {
-    height: 48,
-    borderRadius: 8,
+    height: 36,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#dadce0',
     backgroundColor: '#fff',

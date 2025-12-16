@@ -22,6 +22,7 @@ import { GoogleButton } from '@/components/GoogleButton/GoogleButton';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
+import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -67,39 +68,35 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView
+    <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollableContainer
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.content}>
-          <Text style={styles.title}>Lookspo</Text>
-          <Text style={styles.subtitle}>Welcome back</Text>
+        <Content>
+          <TitleWrapper>
+            <Title>Lookspo</Title>
+            <Subtitle>Discover | Create | Inspire</Subtitle>
+          </TitleWrapper>
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error && <ErrorText>{error}</ErrorText>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="#999"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
+          <InputContainer>
+            <CustomTextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#999"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+            <CustomTextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </InputContainer>
 
           <Button
             title="Sign In"
@@ -107,23 +104,61 @@ export default function LoginScreen() {
             disabled={loading}
           />
 
-          <View style={{ margin: 10, alignItems: 'center' }}>
+          <View style={{ margin: 5, alignItems: 'center' }}>
             <BodyText>or</BodyText>
           </View>
 
           <GoogleButton onPress={handleGoogleLogin} />
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
+          <Footer>
+            <BodyText>Don't have an account? </BodyText>
             <TouchableOpacity onPress={() => router.replace('/auth/signup')}>
-              <Text style={styles.footerLink}>Sign Up</Text>
+              <LinkText>Sign Up</LinkText>
             </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </Footer>
+        </Content>
+      </ScrollableContainer>
+    </Container>
   );
 }
+
+const Container = styled.KeyboardAvoidingView`
+  flex: 1;
+`;
+
+const ScrollableContainer = styled.ScrollView`
+  flex-grow: 1;
+`;
+
+const Content = styled.View`
+  flex: 1;
+  padding: 24px;
+  justify-content: center;
+`;
+
+const TitleWrapper = styled.View`
+  align-items: center;
+`;
+
+const Title = styled.Text`
+  font-family: ${typography.heading1.fontFamily};
+  font-size: ${typography.heading1.fontSize}px;
+  color: ${colors.primary[900]};
+  margin-bottom: 10px;
+`;
+
+const Subtitle = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.secondary[400]};
+  margin-bottom: 48px;
+`;
+
+const InputContainer = styled.View`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+`;
 
 const BodyText = styled.Text`
   font-family: ${typography.body.fontFamily};
@@ -131,72 +166,27 @@ const BodyText = styled.Text`
   color: ${colors.text.primary};
 `;
 
+const ErrorText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.feedback.error};
+`;
+
+const LinkText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.secondary[500]};
+  text-decoration-line: underline;
+`;
+
+const Footer = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 48px;
+`;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   scrollContent: {
     flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 48,
-    textAlign: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    fontSize: 16,
-    color: '#000',
-    outlineWidth: 0,
-    outlineColor: 'transparent',
-  },
-  button: {
-    backgroundColor: '#000',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  error: {
-    color: '#ff3b30',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 48,
-  },
-  footerText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  footerLink: {
-    color: '#000',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

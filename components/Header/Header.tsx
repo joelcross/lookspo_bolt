@@ -63,13 +63,14 @@ export function Header({ text, left, right, onCustomPress }: HeaderProps) {
 }
 
 const Container = styled.View`
-  background-color: ${colors.primary[100]};
-  height: 44px;
+  background-color: #fff;
+  height: 10vh;
+  border-radius: 20px;
+  margin: 5px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0px;
 `;
 
 const Title = styled.Text`

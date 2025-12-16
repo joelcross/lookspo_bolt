@@ -66,16 +66,17 @@ export function NavBar({ activeKey, onTabPress }: NavBarProps) {
               style={[
                 {
                   transform: [{ scale }],
-                  backgroundColor: isActive ? '#D8D89F' : 'transparent',
-                  borderRadius: 10,
+                  backgroundColor: isActive ? '#484848ff' : 'transparent',
+                  borderRadius: 100,
                   overflow: 'hidden',
+                  padding: 10,
                 },
               ]}
             >
               {' '}
               <Icon
-                color={isActive ? '#ffffffff' : '#b9b9b9ff'}
-                size={28}
+                color={isActive ? '#e1f0f6ff' : '#484848ff'}
+                size={20}
                 weight={isActive ? 'fill' : 'regular'}
               />
             </Item>
@@ -92,15 +93,12 @@ const Container = styled.View`
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  border-top-width: 1px;
-  border-top-color: #eee;
-  background-color: #fff;
-  padding-vertical: 10px;
-  border-radius: 20px 20px 0px 0px;
-  shadow-color: #000;
-  shadow-offset: 0px 0px;
-  shadow-opacity: 0.15;
-  shadow-radius: 16px;
+  background-color: #e1f0f6ff;
+  height: 10vh;
+  border-radius: 20px;
+  padding-horizontal: 20px;
+  margin: 5px;
+  margin-top: 0;
 `;
 
 const Item = styled(Animated.View)`

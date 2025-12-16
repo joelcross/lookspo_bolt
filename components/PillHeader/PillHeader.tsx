@@ -1,4 +1,3 @@
-// components/PillHeader.tsx
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import React from 'react';
@@ -17,15 +16,53 @@ interface PillHeaderProps<T extends PillTabValue> {
   options: readonly PillOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  children?: React.ReactNode;
 }
 
-// Reusable styled components
+const PillHeader = <T extends PillTabValue>({
+  options,
+  value,
+  onChange,
+  children,
+}: PillHeaderProps<T>) => {
+  return (
+    <Container>
+      <Buttons>
+        {options.map((option) => {
+          const isActive = value === option.value;
+
+          return (
+            <PillButton
+              key={String(option.value)}
+              isActive={isActive}
+              onPress={() => onChange(option.value)}
+              activeOpacity={0.7}
+            >
+              <PillText isActive={isActive}>{option.label}</PillText>
+            </PillButton>
+          );
+        })}
+      </Buttons>
+      {children}
+    </Container>
+  );
+};
+
 const Container = styled.View`
+  justify-content: center;
+  margin: 5px;
+  margin-bottom: 0;
+  min-height: 10vh;
+  background-color: #fff;
+  border-radius: 20px;
+`;
+
+const Buttons = styled.View`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 8px 20px;
   gap: 32px;
+  padding-vertical: 8px;
 `;
 
 const PillButton = styled(TouchableOpacity)<{ isActive: boolean }>`
@@ -45,30 +82,5 @@ const PillText = styled.Text<{ isActive: boolean }>`
   color: ${({ isActive }) => (isActive ? '#fff' : colors.secondary[400])};
   font-weight: 600;
 `;
-
-const PillHeader = <T extends PillTabValue>({
-  options,
-  value,
-  onChange,
-}: PillHeaderProps<T>) => {
-  return (
-    <Container>
-      {options.map((option) => {
-        const isActive = value === option.value;
-
-        return (
-          <PillButton
-            key={String(option.value)}
-            isActive={isActive}
-            onPress={() => onChange(option.value)}
-            activeOpacity={0.7}
-          >
-            <PillText isActive={isActive}>{option.label}</PillText>
-          </PillButton>
-        );
-      })}
-    </Container>
-  );
-};
 
 export default PillHeader;

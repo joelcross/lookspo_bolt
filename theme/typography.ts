@@ -1,7 +1,7 @@
 export const typography = {
   heading1: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 24,
+    fontFamily: 'Playfair',
+    fontSize: 48,
     lineHeight: 32,
   },
   heading2: {

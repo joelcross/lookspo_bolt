@@ -9,74 +9,6 @@ import {
   CheckCircleIcon,
 } from 'phosphor-react-native'; // or use your own icons
 
-// Base container with dynamic border and background
-const InputContainer = styled.View<{
-  focused: boolean;
-  error?: boolean;
-  success?: boolean;
-  disabled?: boolean;
-}>`
-  flex-direction: row;
-  align-items: center;
-  height: 36px;
-  border-radius: 6px;
-  padding-horizontal: 16px;
-  background-color: #ffffff;
-  border-width: 1px;
-  border-color: ${(props) =>
-    props.error
-      ? colors.feedback.error
-      : props.success
-      ? colors.feedback.success
-      : props.focused
-      ? colors.secondary[400]
-      : '#E0E0E0'};
-
-  ${(props) =>
-    props.disabled &&
-    css`
-      background-color: #f5f5f5;
-      border-color: #e0e0e0;
-    `}
-`;
-
-// Styled native TextInput
-const StyledTextInput = styled(TextInput)<{
-  hasValue: boolean;
-  disabled?: boolean;
-}>`
-  flex: 1;
-  color: ${(props) => (props.disabled ? '#9E9E9E' : '#212121')};
-  padding-vertical: 16px;
-
-  outline-width: 0;
-  outline-color: transparent;
-  outline-style: none;
-
-  font-family: ${typography.body.fontFamily};
-  font-weight: ${typography.body.fontWeight};
-  font-size: ${typography.body.fontSize}px;
-`;
-
-// Helper message (error/success)
-const HelperText = styled.Text<{ error?: boolean; success?: boolean }>`
-  font-family: ${typography.caption.fontFamily};
-  font-weight: ${typography.caption.fontWeight};
-  font-size: ${typography.caption.fontSize}px;
-
-  color: ${(props) =>
-    props.error
-      ? colors.feedback.error
-      : props.success
-      ? colors.feedback.success
-      : '#757575'};
-`;
-
-// Icon wrapper
-const IconWrapper = styled.View`
-  margin-right: 12px;
-`;
-
 interface CustomTextInputProps extends TextInputProps {
   icon?: 'search' | 'none';
   state?: 'default' | 'error' | 'success' | 'disabled';
@@ -141,7 +73,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   };
 
   return (
-    <View style={style}>
+    <View>
       <InputContainer
         focused={focused}
         error={isError}
@@ -153,7 +85,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
           {...rest}
           value={value}
           placeholder={placeholder}
-          placeholderTextColor="#9E9E9E"
+          placeholderTextColor={colors.neutral[400]}
           onFocus={handleFocus}
           onBlur={handleBlur}
           editable={!isDisabled}
@@ -170,5 +102,72 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
     </View>
   );
 };
+
+const InputContainer = styled.View<{
+  focused: boolean;
+  error?: boolean;
+  success?: boolean;
+  disabled?: boolean;
+}>`
+  flex-direction: row;
+  align-items: center;
+  height: 36px;
+  border-radius: 10px;
+  padding-horizontal: 16px;
+  background-color: #ffffff;
+  border-width: 1px;
+  border-color: ${(props) =>
+    props.error
+      ? colors.feedback.error
+      : props.success
+      ? colors.feedback.success
+      : props.focused
+      ? colors.secondary[400]
+      : '#E0E0E0'};
+
+  ${(props) =>
+    props.disabled &&
+    css`
+      background-color: #f5f5f5;
+      border-color: #e0e0e0;
+    `}
+`;
+
+// Styled native TextInput
+const StyledTextInput = styled(TextInput)<{
+  hasValue: boolean;
+  disabled?: boolean;
+}>`
+  flex: 1;
+  color: ${(props) => (props.disabled ? '#9E9E9E' : '#212121')};
+  padding-vertical: 16px;
+
+  outline-width: 0;
+  outline-color: transparent;
+  outline-style: none;
+
+  font-family: ${typography.body.fontFamily};
+  font-weight: ${typography.body.fontWeight};
+  font-size: ${typography.body.fontSize}px;
+`;
+
+// Helper message (error/success)
+const HelperText = styled.Text<{ error?: boolean; success?: boolean }>`
+  font-family: ${typography.caption.fontFamily};
+  font-weight: ${typography.caption.fontWeight};
+  font-size: ${typography.caption.fontSize}px;
+
+  color: ${(props) =>
+    props.error
+      ? colors.feedback.error
+      : props.success
+      ? colors.feedback.success
+      : '#757575'};
+`;
+
+// Icon wrapper
+const IconWrapper = styled.View`
+  margin-right: 12px;
+`;
 
 export default CustomTextInput;

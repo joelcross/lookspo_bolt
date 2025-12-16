@@ -24,8 +24,8 @@ const ButtonWrapper = styled.TouchableOpacity<{
   disabled?: boolean;
 }>`
   padding: 10px;
-  height: 32px;
-  border-radius: 6px;
+  height: 36px;
+  border-radius: 10px;
   align-items: center;
   justify-content: center;
   flex-direction: row;

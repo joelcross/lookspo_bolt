@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Slot, useRouter } from 'expo-router';
-import BottomNavBar from '@/components/NavBar';
+import NavBar from '@/components/NavBar';
 
 export default function TabLayout() {
   const [activeTab, setActiveTab] = useState<
@@ -9,7 +9,6 @@ export default function TabLayout() {
   >('home');
   const router = useRouter();
 
-  // Map tab names to route paths if you want to navigate later
   const handleTabPress = (key: typeof activeTab) => {
     setActiveTab(key);
     router.push(`/${key}`);
@@ -22,8 +21,7 @@ export default function TabLayout() {
         <Slot />
       </View>
 
-      {/* Your custom Phosphor-icon navbar */}
-      <BottomNavBar activeKey={activeTab} onTabPress={handleTabPress} />
+      <NavBar activeKey={activeTab} onTabPress={handleTabPress} />
     </View>
   );
 }
@@ -31,7 +29,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#333333ff',
   },
   content: {
     flex: 1,

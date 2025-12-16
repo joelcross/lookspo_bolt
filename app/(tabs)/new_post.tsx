@@ -111,6 +111,7 @@ export default function NewPostScreen() {
   if (!image) {
     return (
       <Container>
+        <Header text="New Look" />
         <EmptyUpload onPress={pickImage}>
           <Upload size={48} color={colors.neutral[400]} />
           <EmptyText>Tap to select a photo</EmptyText>
@@ -185,7 +186,8 @@ export default function NewPostScreen() {
 
 const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
 `;
 
 const ScrollableContent = styled.ScrollView`
@@ -199,6 +201,9 @@ const Content = styled.View`
 // Empty State
 const EmptyUpload = styled.TouchableOpacity`
   flex: 1;
+  border-radius: 20px;
+  margin-horizontal: 5px;
+  margin-bottom: 5px;
   justify-content: center;
   align-items: center;
   background-color: white;

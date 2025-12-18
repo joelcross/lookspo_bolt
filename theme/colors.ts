@@ -6,9 +6,14 @@ export const colors = {
     900: '#2E2E32', // Graphite
   },
   secondary: {
-    400: '#BFA6A0', // Dusty Mauve
-    500: '#A58D86', // Rose Clay
-    600: '#a98a81ff', // Rose Clay
+    light: '#BFA6A0', // Dusty Mauve
+    medium: '#A58D86', // Rose Clay
+    dark: '#a98a81ff', // Rose Clay
+  },
+  tertiary: {
+    light: '#D8D89F',
+    medium: '#D8D89F',
+    dark: '#D8D89F',
   },
   accent: {
     500: '#D8D89F', // Chartreuse

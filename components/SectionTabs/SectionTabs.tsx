@@ -5,21 +5,21 @@ import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
 // Generic tab value (string literal union)
-export type PillTabValue = string;
+export type TabValue = string;
 
-interface PillOption<T extends PillTabValue> {
+interface SectionOption<T extends TabValue> {
   label: string;
   value: T;
 }
 
-interface SectionTabsProps<T extends PillTabValue> {
-  options: readonly PillOption<T>[];
+interface SectionTabsProps<T extends TabValue> {
+  options: readonly SectionOption<T>[];
   value: T;
   onChange: (value: T) => void;
   children?: React.ReactNode;
 }
 
-const SectionTabs = <T extends PillTabValue>({
+const SectionTabs = <T extends TabValue>({
   options,
   value,
   onChange,

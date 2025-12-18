@@ -36,7 +36,7 @@ const Container = styled.View`
 const Head = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   margin-bottom: 16px;
 `;
 
@@ -67,7 +67,7 @@ const BrandText = styled.Text<{ hasUrl: boolean }>`
   font-size: 16px;
   font-weight: 500;
   color: ${({ hasUrl }) =>
-    hasUrl ? colors.secondary[500] : colors.primary[900]};
+    hasUrl ? colors.secondary.medium : colors.primary[900]};
   min-width: 100px;
   text-align: right;
 `;

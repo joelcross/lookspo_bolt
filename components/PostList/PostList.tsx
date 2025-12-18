@@ -77,7 +77,7 @@ const PostsContainer = styled.ScrollView`
 const Heading = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   margin: 10px;
   margin-bottom: 5px;
 `;

@@ -122,7 +122,7 @@ const InputContainer = styled.View<{
       : props.success
       ? colors.feedback.success
       : props.focused
-      ? colors.secondary[400]
+      ? colors.secondary.light
       : '#E0E0E0'};
 
   ${(props) =>

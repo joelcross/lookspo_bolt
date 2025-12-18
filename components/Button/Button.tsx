@@ -25,7 +25,7 @@ const ButtonWrapper = styled.TouchableOpacity<{
 }>`
   padding: 10px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 100px;
   align-items: center;
   justify-content: center;
   flex-direction: row;
@@ -37,7 +37,7 @@ const ButtonWrapper = styled.TouchableOpacity<{
           background-color: ${colors.neutral[100]};
           border-width: 1px;
           border-color: ${
-            disabled ? colors.neutral[200] : colors.secondary[500]
+            disabled ? colors.neutral[200] : colors.secondary.medium
           };
         `;
       case 'text':
@@ -48,7 +48,7 @@ const ButtonWrapper = styled.TouchableOpacity<{
       default:
         return `
           background-color: ${
-            disabled ? colors.neutral[200] : colors.secondary[500]
+            disabled ? colors.neutral[200] : colors.secondary.medium
           };
         `;
     }
@@ -59,16 +59,17 @@ const ButtonWrapper = styled.TouchableOpacity<{
 const ButtonText = styled.Text<{ variant: ButtonVariant; disabled?: boolean }>`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.body.fontSize}px;
+  font-weight: 600;
 
   ${({ variant, disabled }) => {
     switch (variant) {
       case 'secondary':
         return `color: ${
-          disabled ? colors.neutral[400] : colors.secondary[500]
+          disabled ? colors.neutral[400] : colors.secondary.medium
         };`;
       case 'text':
         return `color: ${
-          disabled ? colors.neutral[400] : colors.secondary[500]
+          disabled ? colors.neutral[400] : colors.secondary.medium
         };`;
       case 'default':
       default:
@@ -93,7 +94,7 @@ export function Button({
         : colors.primary[100]
       : disabled
       ? colors.neutral[400]
-      : colors.secondary[500];
+      : colors.secondary.medium;
 
   return (
     <ButtonWrapper

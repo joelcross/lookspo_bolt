@@ -77,7 +77,7 @@ const CountBadge = styled.View`
 `;
 
 const CountText = styled.Text`
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   font-size: 12px;
   font-weight: 600;
 `;
@@ -102,7 +102,7 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
     >
       <TextContainer>
         <Title numberOfLines={2}>{lookbook.name}</Title>
-        {!hideAuthor && <Author>by @{lookbook.user.username}</Author>}
+        {!hideAuthor && <Author>@{lookbook.user.username}</Author>}
       </TextContainer>
       <CollageContainer cardWidth={cardWidth}>
         {slots.map((img, index) =>

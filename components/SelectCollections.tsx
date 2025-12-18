@@ -94,11 +94,11 @@ export default function SelectCollections({
                 {selectedIds.includes(item.id) ? (
                   <CheckCircleIcon
                     size={28}
-                    color={colors.secondary[500]}
+                    color={colors.secondary.medium}
                     weight="fill"
                   />
                 ) : (
-                  <CircleIcon size={28} color={colors.secondary[500]} />
+                  <CircleIcon size={28} color={colors.secondary.medium} />
                 )}
               </CollectionRow>
             );

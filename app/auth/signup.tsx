@@ -140,7 +140,7 @@ const Title = styled.Text`
 const Subtitle = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.secondary[400]};
+  color: ${colors.secondary.light};
   margin-bottom: 48px;
   text-align: center;
 `;
@@ -166,7 +166,7 @@ const BodyText = styled.Text`
 const LinkText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   margin-left: 4px;
   text-decoration-line: underline;
 `;

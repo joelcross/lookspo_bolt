@@ -15,7 +15,11 @@ interface SmartImageProps {
   resizeMode?: 'contain' | 'cover' | 'stretch' | 'center';
   borderRadius?: number;
   showLoader?: boolean;
+  shape?: 'default' | 'circle';
 }
+
+const flattenStyle = (style?: StyleProp<ViewStyle>) =>
+  style ? StyleSheet.flatten(style) : {};
 
 export default function SmartImage({
   uri,
@@ -23,12 +27,24 @@ export default function SmartImage({
   resizeMode = 'cover',
   borderRadius = 0,
   showLoader = true,
+  shape = 'default',
 }: SmartImageProps) {
   const [aspectRatio, setAspectRatio] = useState<number>(1);
   const [loading, setLoading] = useState(true);
 
+  const flatStyle = flattenStyle(style);
+  const size =
+    typeof flatStyle?.width === 'number'
+      ? flatStyle.width
+      : typeof flatStyle?.height === 'number'
+      ? flatStyle.height
+      : undefined;
+
+  const isCircle = shape === 'circle' && typeof size === 'number';
+  const radius = isCircle ? size / 2 : borderRadius;
+
   useEffect(() => {
-    if (!uri) return;
+    if (!uri || isCircle) return;
 
     Image.getSize(
       uri,
@@ -37,25 +53,36 @@ export default function SmartImage({
         setLoading(false);
       },
       () => {
-        setAspectRatio(1); // fallback square
+        setAspectRatio(1);
         setLoading(false);
       }
     );
-  }, [uri]);
+  }, [uri, isCircle]);
 
   if (!uri) {
-    return <Placeholder style={style} borderRadius={borderRadius} />;
+    return <Placeholder style={style} borderRadius={radius} />;
   }
 
   return (
     <Container style={style}>
-      <ImageWrapper style={{ aspectRatio }}>
+      <ImageWrapper
+        style={
+          isCircle
+            ? {
+                width: size,
+                height: size,
+                borderRadius: radius,
+                overflow: 'hidden',
+              }
+            : { aspectRatio }
+        }
+      >
         <StyledImage
           source={{ uri }}
           resizeMode={resizeMode}
           style={StyleSheet.absoluteFillObject}
+          borderRadius={radius}
           onLoadEnd={() => setLoading(false)}
-          borderRadius={borderRadius}
         />
 
         {loading && showLoader && (
@@ -67,10 +94,6 @@ export default function SmartImage({
     </Container>
   );
 }
-
-// ──────────────────────────────
-// Styled Components — BULLETPROOF
-// ──────────────────────────────
 
 const Container = styled.View`
   width: 100%;
@@ -93,6 +116,7 @@ const Placeholder = styled.View<{ borderRadius: number }>`
 `;
 
 const LoaderOverlay = styled.View`
+  ${StyleSheet.absoluteFillObject as any};
   background-color: rgba(0, 0, 0, 0.4);
   justify-content: center;
   align-items: center;

@@ -87,7 +87,7 @@ const Heading = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: 600;
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   margin-bottom: 4px;
 `;
 

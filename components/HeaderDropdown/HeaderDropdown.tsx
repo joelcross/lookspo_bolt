@@ -49,7 +49,7 @@ const HeaderButton = styled(TouchableOpacity)`
 `;
 
 const HeaderText = styled.Text`
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   font-family: ${typography.heading2.fontFamily};
   font-size: ${typography.heading2.fontSize}px;
   text-transform: ${typography.heading2.textTransform};
@@ -68,7 +68,7 @@ const DropdownItem = styled(TouchableOpacity)`
 `;
 
 const ItemText = styled.Text`
-  color: ${colors.secondary[400]};
+  color: ${colors.secondary.light};
   font-family: ${typography.heading2.fontFamily};
   font-size: ${typography.caption.fontSize}px;
   text-transform: ${typography.heading2.textTransform};
@@ -104,7 +104,7 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({
         <HeaderText>{selectedOption.label}</HeaderText>
         <CaretCircleDownIcon
           size={20}
-          color={colors.secondary[500]}
+          color={colors.secondary.medium}
           weight="bold"
           style={{
             transform: [{ rotate: isOpen ? '180deg' : '0deg' }],

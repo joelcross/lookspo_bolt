@@ -310,7 +310,7 @@ const TextWrapper = styled.View`
 const StyledText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.secondary[400]};
+  color: ${colors.secondary.light};
 `;
 
 const ModalCard = styled.View`

@@ -238,7 +238,7 @@ const ModalContainer = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
 
   text-align: center;
   margin-bottom: 8px;

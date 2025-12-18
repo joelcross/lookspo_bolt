@@ -318,16 +318,17 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           image={targetProfile.avatar_url}
           name={targetProfile.name}
           bio={targetProfile.bio}
-        />
-        {!isOwnProfile && (
-          <ButtonWrapper>
-            <Button
-              title={isFollowing ? 'Following' : 'Follow'}
-              variant={isFollowing ? 'secondary' : 'default'}
-              onPress={handleFollowToggle}
-            />
-          </ButtonWrapper>
-        )}
+        >
+          {!isOwnProfile && (
+            <ButtonWrapper>
+              <Button
+                title={isFollowing ? 'Following' : 'Follow'}
+                variant={isFollowing ? 'secondary' : 'default'}
+                onPress={handleFollowToggle}
+              />
+            </ButtonWrapper>
+          )}
+        </BioCard>
         {/* <TouchableOpacity onPress={isEditing ? pickAvatar : undefined}>
           {form.avatar_url ? (
             <Image source={{ uri: form.avatar_url }} style={styles.avatar} />
@@ -507,7 +508,8 @@ const Container = styled.SafeAreaView`
 `;
 
 const ButtonWrapper = styled.View`
-  margin: 10px;
+  margin-top: 12px;
+  width: 100%;
 `;
 
 const styles = StyleSheet.create({

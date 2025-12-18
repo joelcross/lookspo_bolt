@@ -3,70 +3,76 @@ import { typography } from '@/theme/typography';
 import React from 'react';
 import styled from 'styled-components/native';
 import SmartImage from '../SmartImage/SmartImage';
+import { useWindowDimensions } from 'react-native';
 
 type BioCardProps = {
   image: string;
   name: string;
   bio: string;
+  children?: React.ReactNode;
 };
 
-export function BioCard({ image, name, bio }: BioCardProps) {
+export function BioCard({ image, name, bio, children }: BioCardProps) {
+  const { width } = useWindowDimensions();
+
   return (
     <Container>
-      <ImageWrapper>
-        <SmartImage uri={image} resizeMode="cover" />
-      </ImageWrapper>
+      <RowContent>
+        <SmartImage
+          uri={image}
+          shape="circle"
+          style={{
+            width: width * 0.25,
+            height: width * 0.25,
+          }}
+          resizeMode="cover"
+        />
 
-      <TextContent>
-        <Name numberOfLines={1}>{name}</Name>
-        <BioWrapper>
+        <TextContent>
+          <Name numberOfLines={1}>{name}</Name>
           <Bio numberOfLines={7} ellipsizeMode="tail">
             {bio}
           </Bio>
-        </BioWrapper>
-      </TextContent>
+        </TextContent>
+      </RowContent>
+
+      {children}
     </Container>
   );
 }
 
-// ──────────────────────────────
-// Styled Components — 3:4 RATIO LOCKED
-// ──────────────────────────────
-
 const Container = styled.View`
-  flex-direction: row;
   background-color: ${colors.primary[100]};
   border-radius: 20px;
-  overflow: hidden;
   margin-horizontal: 5px;
+  padding: 10px;
+  overflow: hidden; /* 🔑 prevents leaks */
 
   shadow-color: #000;
   shadow-opacity: 0.15;
   shadow-radius: 20px;
 `;
 
-const ImageWrapper = styled.View`
-  width: 150px;
-  aspect-ratio: 3 / 4;
+const RowContent = styled.View`
+  flex-direction: row;
+  width: 100%;
+  gap: 10px;
+  align-items: flex-start;
 `;
 
 const TextContent = styled.View`
   flex: 1;
-  padding: 14px;
-  gap: 4px;
-`;
-
-const BioWrapper = styled.View`
-  flex: 1;
-  justify-content: center;
-  gap: 4px;
+  flex-shrink: 1; /* 🔑 allow shrinking */
+  padding-horizontal: 12px;
+  gap: 8px;
 `;
 
 const Name = styled.Text`
-  color: ${colors.secondary[500]};
+  color: ${colors.secondary.medium};
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: 600;
+  flex-shrink: 1; /* 🔑 */
 `;
 
 const Bio = styled.Text`
@@ -74,4 +80,5 @@ const Bio = styled.Text`
   font-family: ${typography.caption.fontFamily};
   font-size: ${typography.caption.fontSize}px;
   line-height: 19px;
+  flex-shrink: 1; /* 🔑 */
 `;

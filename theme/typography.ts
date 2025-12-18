@@ -12,14 +12,14 @@ export const typography = {
     letterSpacing: 1,
   },
   heading3: {
-    fontFamily: 'Satoshi-Bold',
-    fontSize: 16,
+    fontFamily: 'Outfit',
+    fontSize: 14,
     lineHeight: 24,
   },
   body: {
     fontFamily: 'Outfit',
     fontWeight: '400',
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 24,
   },
   caption: {

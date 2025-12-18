@@ -8,7 +8,7 @@ import {
 } from 'phosphor-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 
@@ -31,7 +31,7 @@ export default function SettingsScreen() {
 
   return (
     <Container>
-      <Header text="Settings" left="back" />
+      <PageHeader text="Settings" left="back" />
 
       <ItemContainer onPress={handlePressEditProfile}>
         <ItemWrapper>

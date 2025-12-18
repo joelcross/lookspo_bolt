@@ -6,7 +6,7 @@ import SelectCollections, { Collection } from '@/components/SelectCollections';
 import { Piece } from '@/lib/types';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 
 interface Params {
   imageUri: string;
@@ -130,7 +130,7 @@ export default function SaveToLookbooksScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Header text="Save to lookbooks?" left="back" />
+      <PageHeader text="Save to lookbooks?" left="back" />
       <SelectCollections
         collections={collections}
         setCollections={setCollections}

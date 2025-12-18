@@ -9,7 +9,7 @@ import { PieceModal } from '@/components/PiecesCard/PieceModal';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 import PostCardSimple from '@/components/PostCardSimple/PostCardSimple';
 
 export default function NewPostScreen() {
@@ -111,7 +111,7 @@ export default function NewPostScreen() {
   if (!image) {
     return (
       <Container>
-        <Header text="New Look" />
+        <PageHeader text="New Look" />
         <EmptyUpload onPress={pickImage}>
           <Upload size={48} color={colors.neutral[400]} />
           <EmptyText>Tap to select a photo</EmptyText>
@@ -122,7 +122,7 @@ export default function NewPostScreen() {
 
   return (
     <Container>
-      <Header text="New Look" left="back" />
+      <PageHeader text="New Look" left="back" />
 
       {/* Main Scrollable Content */}
       <ScrollableContent showsVerticalScrollIndicator={false}>

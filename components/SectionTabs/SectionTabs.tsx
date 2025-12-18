@@ -12,19 +12,19 @@ interface PillOption<T extends PillTabValue> {
   value: T;
 }
 
-interface PillHeaderProps<T extends PillTabValue> {
+interface SectionTabsProps<T extends PillTabValue> {
   options: readonly PillOption<T>[];
   value: T;
   onChange: (value: T) => void;
   children?: React.ReactNode;
 }
 
-const PillHeader = <T extends PillTabValue>({
+const SectionTabs = <T extends PillTabValue>({
   options,
   value,
   onChange,
   children,
-}: PillHeaderProps<T>) => {
+}: SectionTabsProps<T>) => {
   return (
     <Container>
       <Buttons>
@@ -52,12 +52,10 @@ const Container = styled.View`
   justify-content: center;
   margin: 5px;
   margin-bottom: 0;
-  min-height: 10vh;
+  min-height: 8vh;
 
   background-color: #e1f0f6ff;
   border-radius: 20px;
-  border-color: #c8e1eaff;
-  border-width: 3px;
 `;
 
 const Buttons = styled.View`
@@ -86,4 +84,4 @@ const TabText = styled.Text<{ isActive: boolean }>`
   font-weight: 600;
 `;
 
-export default PillHeader;
+export default SectionTabs;

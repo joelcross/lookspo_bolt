@@ -33,7 +33,7 @@ const Container = styled.View`
   elevation: 5;
 `;
 
-const Header = styled.Text`
+const Head = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   color: ${colors.secondary[500]};
@@ -98,7 +98,7 @@ const PiecesCard: React.FC<PiecesCardProps> = ({
 }) => {
   return (
     <Container>
-      <Header>Tagged Pieces</Header>
+      <Head>Tagged Pieces</Head>
 
       {pieces.map((piece, i) => {
         const hasUrl = !!piece.url;

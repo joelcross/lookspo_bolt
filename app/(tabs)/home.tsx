@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { usePosts } from '@/hooks/usePosts';
 import styled from 'styled-components/native';
-import PillHeader from '@/components/PillHeader/PillHeader';
+import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import PostList from '@/components/PostList/PostList';
 
 type FeedType = 'following' | 'explore';
@@ -22,7 +22,7 @@ export default function HomeScreen() {
 
   return (
     <Container>
-      <PillHeader
+      <SectionTabs
         options={[
           { label: 'Following', value: 'following' },
           { label: 'Explore', value: 'explore' },

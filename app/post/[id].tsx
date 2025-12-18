@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Plus, X } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 import PiecesCard from '@/components/PiecesCard/PiecesCard';
 import LookbookList from '@/components/LookbookList/LookbookList';
 import SaveModal from '@/components/SaveModal/SaveModal';
@@ -229,7 +229,7 @@ export default function PostDetailScreen() {
 
   return (
     <Container showsVerticalScrollIndicator={false}>
-      <Header
+      <PageHeader
         text="Look"
         left="back"
         right={isOwnPost ? 'trash' : undefined}

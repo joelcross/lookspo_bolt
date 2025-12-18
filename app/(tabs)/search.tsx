@@ -12,10 +12,10 @@ import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
-import HeaderDropdown, {
+import PageHeaderDropdown, {
   SearchType,
 } from '@/components/HeaderDropdown/HeaderDropdown';
-import PillHeader from '@/components/PillHeader/PillHeader';
+import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 import { colors } from '@/theme/colors';
@@ -105,7 +105,7 @@ export default function SearchScreen() {
 
   return (
     <Container>
-      <PillHeader
+      <SectionTabs
         options={[
           { label: 'Users', value: 'users' },
           { label: 'Collections', value: 'collections' },
@@ -120,7 +120,7 @@ export default function SearchScreen() {
             onChangeText={setQuery}
           />
         </SearchBarWrapper>
-      </PillHeader>
+      </SectionTabs>
 
       {hasSearched &&
         (loading ? (

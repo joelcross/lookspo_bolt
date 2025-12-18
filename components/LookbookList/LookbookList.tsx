@@ -29,7 +29,7 @@ const Container = styled.View`
   margin-vertical: 12px;
 `;
 
-const Heading = styled.Text`
+const HeadingText = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   color: ${colors.secondary[500]};
@@ -70,7 +70,7 @@ const LookbookList: React.FC<LookbookListProps> = ({
   if (collections.length === 0) {
     return (
       <Container>
-        <Heading>{headerText}</Heading>
+        <HeadingText>{headerText}</HeadingText>
         <EmptyState>This look is not saved to any lookbooks yet.</EmptyState>
       </Container>
     );
@@ -78,7 +78,7 @@ const LookbookList: React.FC<LookbookListProps> = ({
 
   return (
     <Container>
-      <Heading>{headerText}</Heading>
+      <HeadingText>{headerText}</HeadingText>
       {/* GRID VIEW */}
       {display === 'grid' && (
         <FlatList

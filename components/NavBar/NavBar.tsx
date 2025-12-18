@@ -93,15 +93,13 @@ const Container = styled.View`
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  height: 10vh;
+  height: 12vh;
   padding-horizontal: 20px;
   margin: 5px;
   margin-top: 0;
 
   background-color: #e1f0f6ff;
   border-radius: 20px;
-  border-color: #c8e1eaff;
-  border-width: 3px;
 `;
 
 const Item = styled(Animated.View)`

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Alert, Linking, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import styled from 'styled-components/native';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
@@ -40,7 +40,7 @@ export default function FeedbackScreen() {
 
   return (
     <Container>
-      <Header text="Feedback" left="back" />
+      <PageHeader text="Feedback" left="back" />
 
       <Content>
         <Heading>Have a question or a comment?</Heading>

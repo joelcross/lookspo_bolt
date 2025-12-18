@@ -63,7 +63,7 @@ export function Header({ text, left, right, onCustomPress }: HeaderProps) {
 }
 
 const Container = styled.View`
-  height: 10vh;
+  height: 8vh;
   margin: 5px;
   display: flex;
   flex-direction: row;
@@ -72,8 +72,6 @@ const Container = styled.View`
 
   background-color: #e1f0f6ff;
   border-radius: 20px;
-  border-color: #c8e1eaff;
-  border-width: 3px;
 `;
 
 const Title = styled.Text`

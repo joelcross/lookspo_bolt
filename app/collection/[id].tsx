@@ -13,7 +13,7 @@ import { Post, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import PostCard from '@/components/PostCard/PostCard';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
@@ -151,7 +151,7 @@ export default function CollectionScreen() {
 
   return (
     <Container style={styles.container} edges={['top']}>
-      <Header
+      <PageHeader
         text={collection.name}
         left="back"
         right={isOwnCollection ? 'more' : undefined}

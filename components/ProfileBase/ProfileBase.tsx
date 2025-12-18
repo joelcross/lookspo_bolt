@@ -9,14 +9,13 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { showConfirmDialog } from '@/lib/showConfirmDialog';
 import { Collection, Profile } from '@/lib/types';
-import Header from '@/components/Header/Header';
+import PageHeader from '@/components/PageHeader/PageHeader';
 import LookbookList from '@/components/LookbookList/LookbookList';
 import { BioCard } from '@/components/BioCard/BioCard';
 import { Button } from '../Button/Button';
@@ -308,7 +307,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
   return (
     <Container>
-      <Header
+      <PageHeader
         text={isEditing ? 'Edit Profile' : `@${targetProfile.username}`}
         left={isOwnProfile ? undefined : 'back'}
         right={isOwnProfile ? 'settings' : undefined}

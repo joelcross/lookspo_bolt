@@ -11,7 +11,7 @@ import { Activity } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { ActivityType } from '@/components/HeaderDropdown/HeaderDropdown';
-import PillHeader from '@/components/PillHeader/PillHeader';
+import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import ActivityItem from '@/components/ActivityItem/ActivityItem';
 import styled from 'styled-components/native';
 
@@ -134,7 +134,7 @@ export default function ActivityScreen() {
         ]}
       /> */}
 
-      <PillHeader
+      <SectionTabs
         options={[
           { label: 'You', value: 'you' },
           { label: 'Following', value: 'following' },

@@ -63,18 +63,21 @@ export function Header({ text, left, right, onCustomPress }: HeaderProps) {
 }
 
 const Container = styled.View`
-  background-color: #fff;
   height: 10vh;
-  border-radius: 20px;
   margin: 5px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
+  background-color: #e1f0f6ff;
+  border-radius: 20px;
+  border-color: #c8e1eaff;
+  border-width: 3px;
 `;
 
 const Title = styled.Text`
-  color: ${colors.primary[900]};
+  color: '${colors.primary[900]}';
   font-family: ${typography.heading2.fontFamily};
   font-size: ${typography.heading2.fontSize}px;
   text-transform: ${typography.heading2.textTransform};

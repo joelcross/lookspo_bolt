@@ -44,67 +44,6 @@ interface ActivityItemProps {
   currentUserId?: string;
 }
 
-const Container = styled.View`
-  flex-direction: row;
-  padding: 10px 10px;
-  background-color: white;
-`;
-
-const IconWrapper = styled.View<{ type: ActivityType }>`
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  background-color: ${({ type }) =>
-    type === 'like' ? '#fef2f2' : type === 'follow' ? '#f0f9ff' : '#f0fdf4'};
-  align-items: center;
-  justify-content: center;
-`;
-
-const Content = styled.View`
-  flex: 1;
-  justify-content: center;
-  padding-left: 10px;
-`;
-
-const MessageRow = styled.View`
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const Message = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  color: ${colors.text.primary};
-`;
-
-const Username = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  font-weight: 600;
-  color: ${colors.primary[900]};
-`;
-
-const CollectionName = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  font-weight: 600;
-  color: ${colors.primary[900]};
-`;
-
-const Time = styled.Text`
-  font-family: ${typography.caption.fontFamily};
-  font-size: ${typography.caption.fontSize}px;
-  color: ${colors.neutral[400]};
-  margin-top: 4px;
-`;
-
-const Thumbnail = styled.Image`
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-`;
-
 const ActivityIcon = ({ type }: { type: ActivityType }) => {
   switch (type) {
     case 'like':
@@ -213,5 +152,66 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
     </Container>
   );
 };
+
+const Container = styled.View`
+  flex-direction: row;
+  padding: 10px 10px;
+  background-color: #fff;
+`;
+
+const IconWrapper = styled.View<{ type: ActivityType }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: ${({ type }) =>
+    type === 'like' ? '#fef2f2' : type === 'follow' ? '#f0f9ff' : '#f0fdf4'};
+  align-items: center;
+  justify-content: center;
+`;
+
+const Content = styled.View`
+  flex: 1;
+  justify-content: center;
+  padding-left: 10px;
+`;
+
+const MessageRow = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+`;
+
+const Message = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.text.primary};
+`;
+
+const Username = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  font-weight: 600;
+  color: ${colors.primary[900]};
+`;
+
+const CollectionName = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  font-weight: 600;
+  color: ${colors.primary[900]};
+`;
+
+const Time = styled.Text`
+  font-family: ${typography.caption.fontFamily};
+  font-size: ${typography.caption.fontSize}px;
+  color: ${colors.neutral[400]};
+  margin-top: 4px;
+`;
+
+const Thumbnail = styled.Image`
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+`;
 
 export default ActivityItem;

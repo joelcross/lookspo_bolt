@@ -16,6 +16,7 @@ interface PostListProps {
   emptyText?: string;
   numColumns?: number;
   hideTopBar?: boolean;
+  headerText?: string;
 }
 
 const PostList: React.FC<PostListProps> = ({
@@ -27,6 +28,7 @@ const PostList: React.FC<PostListProps> = ({
   emptyText = 'No posts',
   numColumns = 2,
   hideTopBar = false,
+  headerText,
 }) => {
   const renderPost = ({ item }: { item: Post }) => (
     <PostWrapper>
@@ -36,6 +38,7 @@ const PostList: React.FC<PostListProps> = ({
 
   return (
     <PostsContainer showsVerticalScrollIndicator={false}>
+      <Heading>{headerText}</Heading>
       <FlashList
         showsVerticalScrollIndicator={false}
         masonry
@@ -69,6 +72,14 @@ const PostsContainer = styled.ScrollView`
   padding: 5px;
   background-color: #fff;
   border-radius: 20px;
+`;
+
+const Heading = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  color: ${colors.secondary[500]};
+  margin: 10px;
+  margin-bottom: 5px;
 `;
 
 const EmptyContainer = styled.View`

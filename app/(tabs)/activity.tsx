@@ -180,26 +180,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   title: { fontSize: 24, fontWeight: '700', color: '#000', marginBottom: 12 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  activityItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
-  activityContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  activityText: { flex: 1, paddingRight: 12 },
-  activityDescription: { fontSize: 14, color: '#000', marginBottom: 4 },
-  activityTime: { fontSize: 12, color: '#999' },
-  activityThumbnail: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-  },
   emptyContainer: { paddingTop: 60, alignItems: 'center' },
   emptyText: { fontSize: 16, color: '#999' },
 });

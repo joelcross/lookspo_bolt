@@ -165,7 +165,7 @@ const SearchBarWrapper = styled.View`
 `;
 
 const Results = styled.View`
-  background-color: #fff;
+  background-color: #ffffffff;
   display: flex;
   flex: 1;
   border-radius: 20px;

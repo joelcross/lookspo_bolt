@@ -32,14 +32,14 @@ const PillHeader = <T extends PillTabValue>({
           const isActive = value === option.value;
 
           return (
-            <PillButton
+            <TabButton
               key={String(option.value)}
               isActive={isActive}
               onPress={() => onChange(option.value)}
               activeOpacity={0.7}
             >
-              <PillText isActive={isActive}>{option.label}</PillText>
-            </PillButton>
+              <TabText isActive={isActive}>{option.label}</TabText>
+            </TabButton>
           );
         })}
       </Buttons>
@@ -53,8 +53,11 @@ const Container = styled.View`
   margin: 5px;
   margin-bottom: 0;
   min-height: 10vh;
-  background-color: #fff;
+
+  background-color: #e1f0f6ff;
   border-radius: 20px;
+  border-color: #c8e1eaff;
+  border-width: 3px;
 `;
 
 const Buttons = styled.View`
@@ -65,21 +68,21 @@ const Buttons = styled.View`
   padding-vertical: 8px;
 `;
 
-const PillButton = styled(TouchableOpacity)<{ isActive: boolean }>`
+const TabButton = styled(TouchableOpacity)<{ isActive: boolean }>`
   padding: 4px 16px;
-  border-radius: 99px;
-  background-color: ${({ isActive }) =>
-    isActive ? colors.secondary[500] : 'transparent'};
   align-items: center;
   min-width: 60px;
+  border-bottom-width: ${({ isActive }) => (isActive ? '2px' : '0px')};
+  border-bottom-color: ${({ isActive }) =>
+    isActive ? '#c8e1eaff' : 'transparent'};
 `;
 
-const PillText = styled.Text<{ isActive: boolean }>`
+const TabText = styled.Text<{ isActive: boolean }>`
   font-family: ${typography.heading2.fontFamily};
   font-size: ${typography.heading2.fontSize}px;
   text-transform: ${typography.heading2.textTransform};
   letter-spacing: ${typography.heading2.letterSpacing}px;
-  color: ${({ isActive }) => (isActive ? '#fff' : colors.secondary[400])};
+  color: ${({ isActive }) => (isActive ? '#484848ff' : '#747474ff')};
   font-weight: 600;
 `;
 

@@ -420,7 +420,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             // </View>
           )}
         </View>
-        <Heading>Looks</Heading>
         <PostList
           posts={posts}
           loading={postsLoading}
@@ -429,6 +428,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           handleLoadMore={handleLoadMore}
           handleRefresh={handleRefresh}
           hideTopBar
+          headerText={'Looks'}
         />
       </ScrollView>
       <Modal
@@ -509,14 +509,6 @@ const Container = styled.SafeAreaView`
 
 const ButtonWrapper = styled.View`
   margin: 10px;
-`;
-
-const Heading = styled.Text`
-  font-family: ${typography.heading3.fontFamily};
-  font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary[500]};
-  margin-bottom: 12px;
-  margin-horizontal: 10px;
 `;
 
 const styles = StyleSheet.create({

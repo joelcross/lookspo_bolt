@@ -55,9 +55,9 @@ export function Header({ text, left, right, onCustomPress }: HeaderProps) {
 
   return (
     <Container>
-      {renderLeftButton() || <Placeholder />}
+      <LeftWrapper>{renderLeftButton()}</LeftWrapper>
       <Title>{text}</Title>
-      {renderRightButton() || <Placeholder />}
+      <RightWrapper>{renderRightButton()}</RightWrapper>
     </Container>
   );
 }
@@ -65,25 +65,30 @@ export function Header({ text, left, right, onCustomPress }: HeaderProps) {
 const Container = styled.View`
   height: 8vh;
   margin: 5px;
-  display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-
+  justify-content: center;
   background-color: #e1f0f6ff;
   border-radius: 20px;
+  padding-horizontal: 16px;
+`;
+
+const LeftWrapper = styled.View`
+  position: absolute;
+  left: 16px;
+`;
+
+const RightWrapper = styled.View`
+  position: absolute;
+  right: 16px;
 `;
 
 const Title = styled.Text`
-  color: '${colors.primary[900]}';
+  color: ${colors.primary[900]};
   font-family: ${typography.heading2.fontFamily};
   font-size: ${typography.heading2.fontSize}px;
   text-transform: ${typography.heading2.textTransform};
   letter-spacing: ${typography.heading2.letterSpacing}px;
-`;
-
-const Placeholder = styled.View`
-  width: 40px;
 `;
 
 export default Header;

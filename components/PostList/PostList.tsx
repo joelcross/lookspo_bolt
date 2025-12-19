@@ -70,6 +70,7 @@ const PostWrapper = styled.View`
 `;
 
 const PostsContainer = styled.ScrollView`
+  padding-vertical: 5px;
   margin: 5px;
   background-color: #fff;
   border-radius: 20px;

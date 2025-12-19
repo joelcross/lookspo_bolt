@@ -337,12 +337,15 @@ export default function PostDetailScreen() {
         ) : (
           <>
             {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
+
             {savedCollections.length > 0 && (
-              <LookbookList
-                display="grid"
-                headerText="Featured In"
-                collections={savedCollections}
-              />
+              <LookbookListWrapper>
+                <LookbookList
+                  display="grid"
+                  headerText="Featured In"
+                  collections={savedCollections}
+                />
+              </LookbookListWrapper>
             )}
           </>
         )}
@@ -395,6 +398,12 @@ const Content = styled.View`
 
 const PostCardWrapper = styled.View`
   margin-horizontal: 10px;
+`;
+
+const LookbookListWrapper = styled.View`
+  background-color: #ffffffff;
+  margin: 5px;
+  border-radius: 20px;
 `;
 
 // Delete modal

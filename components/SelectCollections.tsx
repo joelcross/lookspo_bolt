@@ -1,6 +1,6 @@
 // components/SelectCollections.tsx
 import React, { useState, useEffect } from 'react';
-import { Modal, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { Modal, FlatList, TouchableWithoutFeedback, View } from 'react-native';
 import { CheckCircleIcon, CircleIcon, TShirtIcon } from 'phosphor-react-native';
 import { supabase } from '@/lib/supabase';
 import styled from 'styled-components/native';
@@ -105,15 +105,17 @@ export default function SelectCollections({
           }}
         />
 
-        <ButtonWrapper>
+        <NewButtonWrapper>
           <Button
             title="＋ Add new collection"
             variant="secondary"
             onPress={() => setShowModal(true)}
           />
-          <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
-        </ButtonWrapper>
+        </NewButtonWrapper>
       </ScrollableContent>
+      <PostButtonWrapper>
+        <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
+      </PostButtonWrapper>
 
       <Modal visible={showModal} transparent animationType="fade">
         <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
@@ -146,10 +148,13 @@ export default function SelectCollections({
   );
 }
 
-const Container = styled.View``;
+const Container = styled.View`
+  flex: 1;
+  justify-content: space-between;
+`;
 const ScrollableContent = styled.View``;
 
-const CollectionRow = styled.TouchableOpacity<{ isLast: boolean }>`
+const CollectionRow = styled.Pressable<{ isLast: boolean }>`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -181,9 +186,13 @@ const CollectionName = styled.Text`
   flex: 1;
 `;
 
-const ButtonWrapper = styled.View`
+const NewButtonWrapper = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  margin: 16px;
+`;
+
+const PostButtonWrapper = styled.View`
   margin: 16px;
 `;
 

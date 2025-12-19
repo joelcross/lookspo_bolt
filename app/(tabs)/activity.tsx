@@ -146,7 +146,7 @@ export default function ActivityScreen() {
 
       <Content>
         {loading && !refreshing ? (
-          <View style={styles.loadingContainer}>
+          <View>
             <ActivityIndicator size="large" color="#000" />
           </View>
         ) : (
@@ -170,6 +170,7 @@ const Container = styled.SafeAreaView`
 `;
 
 const Content = styled.View`
+  background-color: #fff;
   flex: 1;
   margin: 5px;
   border-radius: 20px;
@@ -179,7 +180,6 @@ const Content = styled.View`
 const styles = StyleSheet.create({
   container: { flex: 1 },
   title: { fontSize: 24, fontWeight: '700', color: '#000', marginBottom: 12 },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { paddingTop: 60, alignItems: 'center' },
   emptyText: { fontSize: 16, color: '#999' },
 });

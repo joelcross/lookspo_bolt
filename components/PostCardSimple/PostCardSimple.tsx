@@ -60,6 +60,9 @@ const PostContainer = styled.View`
   margin-horizontal: 10px;
   display: flex;
   flex-direction: column;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
 `;
 
 const TopBanner = styled.View`

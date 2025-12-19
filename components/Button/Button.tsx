@@ -29,6 +29,7 @@ const ButtonWrapper = styled.TouchableOpacity<{
   align-items: center;
   justify-content: center;
   flex-direction: row;
+  min-width: 20vw;
 
   ${({ variant, disabled }) => {
     switch (variant) {

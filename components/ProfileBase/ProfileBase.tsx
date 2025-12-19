@@ -312,7 +312,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         right={isOwnProfile ? 'settings' : undefined}
       />
 
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <BioCard
           image={targetProfile.avatar_url}
           name={targetProfile.name}

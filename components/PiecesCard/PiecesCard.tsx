@@ -21,9 +21,57 @@ interface PiecesCardProps {
   isMakingPost?: boolean;
 }
 
+const PiecesCard: React.FC<PiecesCardProps> = ({
+  pieces,
+  onAdd,
+  onRemove,
+  isMakingPost = false,
+}) => {
+  return (
+    <Container>
+      <Head>Tagged Pieces</Head>
+
+      {pieces.map((piece, i) => {
+        const hasUrl = !!piece.url;
+        const RowComponent = i === pieces.length - 1 ? LastRow : Row;
+
+        return (
+          <RowComponent key={i}>
+            <PieceName numberOfLines={2}>{piece.name}</PieceName>
+
+            {hasUrl ? (
+              <TouchableOpacity onPress={() => Linking.openURL(piece.url!)}>
+                <BrandText hasUrl>{piece.brand}</BrandText>
+              </TouchableOpacity>
+            ) : (
+              <BrandText hasUrl={false}>{piece.brand}</BrandText>
+            )}
+
+            {isMakingPost && (
+              <>
+                <RemoveButton onPress={() => onRemove(i)}>
+                  <X size={18} color="#999" />
+                </RemoveButton>
+              </>
+            )}
+          </RowComponent>
+        );
+      })}
+      {isMakingPost && (
+        <>
+          <AddButton onPress={onAdd}>
+            <Plus size={20} color={colors.neutral[400]} />
+            <AddText>Add new...</AddText>
+          </AddButton>
+        </>
+      )}
+    </Container>
+  );
+};
+
 const Container = styled.View`
   background-color: white;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 20px;
   margin-horizontal: 10px;
   elevation: 5;
@@ -85,53 +133,5 @@ const AddText = styled.Text`
   font-size: ${typography.body.fontSize}px;
   margin-left: 4px;
 `;
-
-const PiecesCard: React.FC<PiecesCardProps> = ({
-  pieces,
-  onAdd,
-  onRemove,
-  isMakingPost = false,
-}) => {
-  return (
-    <Container>
-      <Head>Tagged Pieces</Head>
-
-      {pieces.map((piece, i) => {
-        const hasUrl = !!piece.url;
-        const RowComponent = i === pieces.length - 1 ? LastRow : Row;
-
-        return (
-          <RowComponent key={i}>
-            <PieceName numberOfLines={2}>{piece.name}</PieceName>
-
-            {hasUrl ? (
-              <TouchableOpacity onPress={() => Linking.openURL(piece.url!)}>
-                <BrandText hasUrl>{piece.brand}</BrandText>
-              </TouchableOpacity>
-            ) : (
-              <BrandText hasUrl={false}>{piece.brand}</BrandText>
-            )}
-
-            {isMakingPost && (
-              <>
-                <RemoveButton onPress={() => onRemove(i)}>
-                  <X size={18} color="#999" />
-                </RemoveButton>
-              </>
-            )}
-          </RowComponent>
-        );
-      })}
-      {isMakingPost && (
-        <>
-          <AddButton onPress={onAdd}>
-            <Plus size={20} color={colors.neutral[400]} />
-            <AddText>Add new...</AddText>
-          </AddButton>
-        </>
-      )}
-    </Container>
-  );
-};
 
 export default PiecesCard;

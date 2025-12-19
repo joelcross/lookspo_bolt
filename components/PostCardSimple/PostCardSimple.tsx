@@ -33,26 +33,24 @@ export default function PostCardSimple({
   return (
     <PostContainer>
       <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-        <ShadowWrapper>
-          <SmartImage
-            uri={image}
-            resizeMode="contain"
-            style={{
-              borderRadius: 10,
-              borderBottomLeftRadius: 0,
-              borderBottomRightRadius: 0,
-            }}
-          />
+        <SmartImage
+          uri={image}
+          resizeMode="contain"
+          style={{
+            borderRadius: 10,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+          }}
+        />
 
-          <CaptionInput
-            placeholder="Add a caption..."
-            placeholderTextColor={colors.neutral[400]}
-            value={caption}
-            onChangeText={setCaption}
-            multiline
-            textAlignVertical="top"
-          />
-        </ShadowWrapper>
+        <CaptionInput
+          placeholder="Add a caption..."
+          placeholderTextColor={colors.neutral[400]}
+          value={caption}
+          onChangeText={setCaption}
+          multiline
+          textAlignVertical="top"
+        />
       </TouchableOpacity>
     </PostContainer>
   );
@@ -96,14 +94,6 @@ const BottomContainer = styled.View`
   font-size: 16px;
   padding: 8px;
   border-radius: 10px;
-`;
-
-const ShadowWrapper = styled.View`
-  border-radius: 10px;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.1;
-  shadow-radius: 10px;
 `;
 
 const LeftWrapper = styled.View`

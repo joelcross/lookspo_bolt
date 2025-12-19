@@ -26,10 +26,6 @@ const Container = styled.View`
   border-radius: 16px;
   padding: 20px;
   margin-horizontal: 10px;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.06;
-  shadow-radius: 12px;
   elevation: 5;
 `;
 

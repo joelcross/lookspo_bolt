@@ -25,7 +25,7 @@ const PostList: React.FC<PostListProps> = ({
   refreshing,
   handleRefresh,
   handleLoadMore,
-  emptyText = 'No posts',
+  emptyText = '# todo - Is this default val ever used?',
   numColumns = 2,
   hideTopBar = false,
   headerText,
@@ -36,9 +36,18 @@ const PostList: React.FC<PostListProps> = ({
     </PostWrapper>
   );
 
+  if (!loading && posts.length === 0) {
+    return (
+      <PostsContainer showsVerticalScrollIndicator={false}>
+        {headerText && <Heading>{headerText}</Heading>}
+        <EmptyText>{emptyText}</EmptyText>
+      </PostsContainer>
+    );
+  }
+
   return (
     <PostsContainer showsVerticalScrollIndicator={false}>
-      <Heading>{headerText}</Heading>
+      {headerText && <Heading>{headerText}</Heading>}
       <FlashList
         showsVerticalScrollIndicator={false}
         masonry
@@ -48,13 +57,6 @@ const PostList: React.FC<PostListProps> = ({
         onRefresh={handleRefresh}
         refreshing={refreshing}
         onEndReached={handleLoadMore}
-        ListEmptyComponent={
-          !loading ? (
-            <EmptyContainer>
-              <EmptyText>{emptyText}</EmptyText>
-            </EmptyContainer>
-          ) : null
-        }
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
       />
@@ -69,7 +71,6 @@ const PostWrapper = styled.View`
 
 const PostsContainer = styled.ScrollView`
   margin: 5px;
-  padding: 5px;
   background-color: #fff;
   border-radius: 20px;
 `;
@@ -83,7 +84,7 @@ const Heading = styled.Text`
 `;
 
 const EmptyContainer = styled.View`
-  padding-top: 60px;
+  padding: 10px;
 `;
 
 const EmptyText = styled.Text`

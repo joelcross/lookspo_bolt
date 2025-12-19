@@ -54,11 +54,15 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     avatar_url: '',
   });
   const [isFollowing, setIsFollowing] = useState(false);
+  const [selectedLookbookId, setSelectedLookbookId] = useState<string | null>(
+    null
+  );
   const targetProfile = isOwnProfile ? ownProfile : otherProfile;
 
   const mode = useMemo(() => {
-    return { type: 'user' as const, userId: targetProfile?.id };
-  }, [targetProfile]);
+    if (!selectedLookbookId) return null;
+    return { type: 'collection' as const, collectionId: selectedLookbookId };
+  }, [selectedLookbookId]);
 
   const {
     posts,
@@ -67,18 +71,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     handleLoadMore,
     handleRefresh,
   } = usePosts(mode);
-
-  // Initialize form state
-  //   useEffect(() => {
-  //     if (ownProfile) {
-  //       setForm({
-  //         name: ownProfile.name || '',
-  //         username: ownProfile.username || '',
-  //         bio: ownProfile.bio || '',
-  //         avatar_url: ownProfile.avatar_url || '',
-  //       });
-  //     }
-  //   }, [ownProfile]);
 
   const fetchOtherProfile = async () => {
     if (!otherUsername || !user) return;
@@ -155,6 +147,13 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
       fetchCollections();
     }
   }, [targetProfile]);
+
+  // Select first collection by default once they have loaded
+  useEffect(() => {
+    if (collections.length > 0 && !selectedLookbookId) {
+      setSelectedLookbookId(collections[0].id);
+    }
+  }, [collections]);
 
   // Pick new avatar
   const pickAvatar = async () => {
@@ -313,7 +312,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         right={isOwnProfile ? 'settings' : undefined}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView>
         <BioCard
           image={targetProfile.avatar_url}
           name={targetProfile.name}
@@ -329,49 +328,8 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             </ButtonWrapper>
           )}
         </BioCard>
-        {/* <TouchableOpacity onPress={isEditing ? pickAvatar : undefined}>
-          {form.avatar_url ? (
-            <Image source={{ uri: form.avatar_url }} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <Text style={styles.avatarText}>
-                {form.name.charAt(0).toUpperCase()}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
 
-        {isEditing ? (
-          <>
-            <TextInput
-              style={styles.input}
-              value={form.name}
-              onChangeText={(t) => setForm({ ...form, name: t })}
-              placeholder="Name"
-            />
-            <TextInput
-              style={styles.input}
-              value={form.username}
-              onChangeText={(t) => setForm({ ...form, username: t })}
-              placeholder="Username"
-            />
-            <TextInput
-              style={[styles.input, { height: 100 }]}
-              multiline
-              value={form.bio}
-              onChangeText={(t) => setForm({ ...form, bio: t })}
-              placeholder="Bio"
-            />
-          </>
-        ) : (
-          <>
-            <Text style={styles.name}>{ownProfile.name}</Text>
-            <Text style={styles.username}>@{ownProfile.username}</Text>
-            <Text style={styles.bio}>{ownProfile.bio || 'No bio yet'}</Text>
-          </>
-        )} */}
-
-        <View>
+        <PostsContent>
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
@@ -379,132 +337,103 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
               display="carousel"
               headerText="Lookbooks"
               collections={collections}
-              hideAuthor={isOwnProfile}
+              hideAuthor
+              selectable
+              onSelectionChange={(id) => setSelectedLookbookId(id)}
             />
-            // <View style={styles.grid}>
-            //   {[...collections, { id: 'new', isNew: true }].map((collection) =>
-            //     collection.isNew ? (
-            //       <TouchableOpacity
-            //         key="new"
-            //         style={[styles.collectionTile, styles.newCollectionTile]}
-            //         onPress={() => setShowModal(true)}
-            //       >
-            //         <Text style={styles.newCollectionPlus}>＋</Text>
-            //         <Text style={styles.collectionTileName}>
-            //           Add new collection
-            //         </Text>
-            //       </TouchableOpacity>
-            //     ) : (
-            //       <View key={collection.id} style={styles.collectionTile}>
-            //         <TouchableOpacity
-            //           disabled={isEditing}
-            //           onPress={() =>
-            //             router.push(`/collection/${collection.id}`)
-            //           }
-            //         >
-            //           <Text style={styles.collectionTileName}>
-            //             {collection.name}
-            //           </Text>
-            //         </TouchableOpacity>
-            //         {isEditing && (
-            //           <TouchableOpacity
-            //             style={styles.deleteButton}
-            //             onPress={() => removeCollection(collection.id)}
-            //           >
-            //             <Trash2 color="red" size={18} />
-            //           </TouchableOpacity>
-            //         )}
-            //       </View>
-            //     )
-            //   )}
-            // </View>
           )}
-        </View>
-        <PostList
-          posts={posts}
-          loading={postsLoading}
-          refreshing={refreshing}
-          emptyText={'No looks to display yet!'}
-          handleLoadMore={handleLoadMore}
-          handleRefresh={handleRefresh}
-          hideTopBar
-          headerText={'Looks'}
-        />
-      </ScrollView>
-      <Modal
-        visible={showModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>New Collection</Text>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Enter collection name"
-              value={newCollectionName}
-              onChangeText={setNewCollectionName}
-              placeholderTextColor="#999"
-            />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowModal(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.createButton]}
-                onPress={async () => {
-                  if (!newCollectionName.trim()) return;
 
-                  const tempCollection = {
-                    id: `temp-${Date.now()}`,
-                    name: newCollectionName.trim(),
-                    isTemp: true,
-                  };
+          <PostList
+            posts={posts}
+            loading={postsLoading}
+            refreshing={refreshing}
+            emptyText={'No looks to display yet!'}
+            handleLoadMore={handleLoadMore}
+            handleRefresh={handleRefresh}
+            hideTopBar
+          />
+        </PostsContent>
+        <Modal
+          visible={showModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>New Collection</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Enter collection name"
+                value={newCollectionName}
+                onChangeText={setNewCollectionName}
+                placeholderTextColor="#999"
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setShowModal(false)}
+                >
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.createButton]}
+                  onPress={async () => {
+                    if (!newCollectionName.trim()) return;
 
-                  if (isEditing) {
-                    // Stage it locally; won't save to DB until user clicks Save
-                    setCollections([...collections, tempCollection]);
-                  } else {
-                    // Immediately insert into DB
-                    const { data, error } = await supabase
-                      .from('collections')
-                      .insert({
-                        name: newCollectionName.trim(),
-                        user_id: ownProfile.id,
-                      })
-                      .select()
-                      .single();
+                    const tempCollection = {
+                      id: `temp-${Date.now()}`,
+                      name: newCollectionName.trim(),
+                      isTemp: true,
+                    };
 
-                    if (error) {
-                      alert('Error creating collection: ' + error.message);
-                      return;
+                    if (isEditing) {
+                      // Stage it locally; won't save to DB until user clicks Save
+                      setCollections([...collections, tempCollection]);
+                    } else {
+                      // Immediately insert into DB
+                      const { data, error } = await supabase
+                        .from('collections')
+                        .insert({
+                          name: newCollectionName.trim(),
+                          user_id: ownProfile.id,
+                        })
+                        .select()
+                        .single();
+
+                      if (error) {
+                        alert('Error creating collection: ' + error.message);
+                        return;
+                      }
+
+                      setCollections([...collections, data]);
                     }
 
-                    setCollections([...collections, data]);
-                  }
-
-                  setNewCollectionName('');
-                  setShowModal(false);
-                }}
-              >
-                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
-                  Create
-                </Text>
-              </TouchableOpacity>
+                    setNewCollectionName('');
+                    setShowModal(false);
+                  }}
+                >
+                  <Text style={[styles.modalButtonText, { color: '#fff' }]}>
+                    Create
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </ScrollView>
     </Container>
   );
 };
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
+`;
+
+const PostsContent = styled.View`
+  background-color: #ffffffff;
+  margin: 5px;
+  border-radius: 20px;
 `;
 
 const ButtonWrapper = styled.View`

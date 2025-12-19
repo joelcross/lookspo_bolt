@@ -128,6 +128,7 @@ const TopBanner = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 4px;
 `;
 
 const Username = styled.Text`

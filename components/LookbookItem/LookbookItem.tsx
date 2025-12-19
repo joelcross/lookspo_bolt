@@ -1,46 +1,101 @@
 // components/LookbookItem.tsx
 import React from 'react';
 import styled from 'styled-components/native';
-import { useRouter } from 'expo-router';
 import { colors } from '@/theme/colors';
 import { TShirtIcon } from 'phosphor-react-native';
 import { typography } from '@/theme/typography';
 import { Collection } from '@/lib/types';
-import { color } from 'storybook/theming';
 
 interface LookbookItemProps {
   lookbook: Collection;
   cardWidth: number;
-  hideAuthor: Boolean;
+  display: 'carousel' | 'grid';
+  hideAuthor?: Boolean;
+  handleLookbookPress?: () => void;
+  isSelected?: boolean;
 }
 
-const Card = styled.TouchableOpacity<{ cardWidth: number }>`
+const LookbookItem: React.FC<LookbookItemProps> = ({
+  lookbook,
+  cardWidth,
+  display,
+  hideAuthor = false,
+  handleLookbookPress,
+  isSelected,
+}) => {
+  const slots = [...lookbook.cover_images];
+
+  // Fill with null for placeholders
+  while (slots.length < 4) {
+    slots.push(null);
+  }
+
+  return (
+    <Card cardWidth={cardWidth} onPress={handleLookbookPress}>
+      <CollageContainer cardWidth={cardWidth}>
+        {slots.map((img, index) =>
+          img ? (
+            <CollageImage key={index} index={index} source={{ uri: img }} />
+          ) : (
+            <Placeholder key={index} index={index}>
+              <TShirtIcon
+                size={18}
+                color={colors.neutral[400]}
+                weight="light"
+              />
+            </Placeholder>
+          )
+        )}
+
+        <CountBadge
+          style={{ transform: [{ translateX: -9 }, { translateY: -9 }] }}
+        >
+          <CountText>{lookbook.post_count}</CountText>
+        </CountBadge>
+      </CollageContainer>
+      <TextContainer>
+        <Title numberOfLines={2} isSelected={isSelected}>
+          {lookbook.name}
+        </Title>
+        {!hideAuthor && <Author>@{lookbook.user.username}</Author>}
+      </TextContainer>
+      {/* Only show dot on profile pages (i.e. when display == carousel) */}
+      {isSelected && display === 'carousel' && <SelectedDot />}
+    </Card>
+  );
+};
+
+const Card = styled.Pressable<{ cardWidth: number }>`
   width: ${({ cardWidth }) => cardWidth}px;
-  background-color: white;
-  border-radius: 16px;
-  overflow: hidden;
-  elevation: 6;
-  border-width: 1px;
-  border-color: ${colors.neutral[200]};
+  align-items: center;
 `;
 
 const TextContainer = styled.View`
-  justify-content: flex-end;
-  padding: 12px;
+  align-items: center;
 `;
 
-const Title = styled.Text`
-  font-family: ${typography.heading3.fontFamily};
-  font-size: ${typography.heading3.fontSize}px;
+const Title = styled.Text<{ isSelected?: boolean }>`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  font-family: ${typography.body.fontFamily};
+  font-size: 12px;
   color: ${colors.text.primary};
+
+  ${({ isSelected }) => `font-weight: ${isSelected ? 500 : 400};`}
+`;
+
+const SelectedDot = styled.View`
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  margin-top: 4px;
+  background-color: ${colors.secondary.medium};
 `;
 
 const Author = styled.Text`
   font-family: ${typography.caption.fontFamily};
   font-size: ${typography.caption.fontSize}px;
   color: ${colors.neutral[400]};
-  opacity: 0.9;
-  margin-top: 2px;
 `;
 
 const CollageContainer = styled.View<{ cardWidth: number }>`
@@ -51,27 +106,69 @@ const CollageContainer = styled.View<{ cardWidth: number }>`
   overflow: hidden;
 `;
 
-const CollageImage = styled.Image`
+const CollageImage = styled.Image<{ index: number }>`
   width: 50%;
   height: 50%;
+
+  ${({ index }) =>
+    index === 0 &&
+    `
+      border-top-left-radius: 10px;
+    `}
+  ${({ index }) =>
+    index === 1 &&
+    `
+      border-top-right-radius: 10px;
+    `}
+  ${({ index }) =>
+    index === 2 &&
+    `
+      border-bottom-left-radius: 10px;
+    `}
+  ${({ index }) =>
+    index === 3 &&
+    `
+      border-bottom-right-radius: 10px;
+    `}
 `;
 
-const Placeholder = styled.View`
+const Placeholder = styled.View<{ index: number }>`
   width: 50%;
   height: 50%;
-  background-color: ${colors.neutral[100]};
+  background-color: ${colors.neutral[200]};
   align-items: center;
   justify-content: center;
+
+  ${({ index }) =>
+    index === 0 &&
+    `
+      border-top-left-radius: 10px;
+    `}
+  ${({ index }) =>
+    index === 1 &&
+    `
+      border-top-right-radius: 10px;
+    `}
+  ${({ index }) =>
+    index === 2 &&
+    `
+      border-bottom-left-radius: 10px;
+    `}
+  ${({ index }) =>
+    index === 3 &&
+    `
+      border-bottom-right-radius: 10px;
+    `}
 `;
 
 const CountBadge = styled.View`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   border-radius: 12px;
-  background-color: ${colors.primary[200]};
+  background-color: #fff;
   align-items: center;
   justify-content: center;
 `;
@@ -81,52 +178,5 @@ const CountText = styled.Text`
   font-size: 12px;
   font-weight: 600;
 `;
-
-const LookbookItem: React.FC<LookbookItemProps> = ({
-  lookbook,
-  cardWidth,
-  hideAuthor,
-}) => {
-  const router = useRouter();
-  const slots = [...lookbook.cover_images];
-
-  // Fill with null for placeholders
-  while (slots.length < 4) {
-    slots.push(null);
-  }
-
-  return (
-    <Card
-      cardWidth={cardWidth}
-      onPress={() => router.push(`/collection/${lookbook.id}`)}
-    >
-      <TextContainer>
-        <Title numberOfLines={2}>{lookbook.name}</Title>
-        {!hideAuthor && <Author>@{lookbook.user.username}</Author>}
-      </TextContainer>
-      <CollageContainer cardWidth={cardWidth}>
-        {slots.map((img, index) =>
-          img ? (
-            <CollageImage key={index} source={{ uri: img }} />
-          ) : (
-            <Placeholder key={index}>
-              <TShirtIcon
-                size={36}
-                color={colors.neutral[200]}
-                weight="light"
-              />
-            </Placeholder>
-          )
-        )}
-
-        <CountBadge
-          style={{ transform: [{ translateX: -12 }, { translateY: -12 }] }}
-        >
-          <CountText>{lookbook.post_count}</CountText>
-        </CountBadge>
-      </CollageContainer>
-    </Card>
-  );
-};
 
 export default LookbookItem;

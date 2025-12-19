@@ -121,16 +121,13 @@ export default function SearchScreen() {
           />
         </SearchBarWrapper>
       </SectionTabs>
-
-      {hasSearched &&
-        (loading ? (
-          <ActivityIndicator style={{ marginTop: 20 }} color="#000" />
-        ) : results.length === 0 ? (
-          <Results>
+      <Results>
+        {hasSearched ? (
+          loading ? (
+            <ActivityIndicator style={{ marginTop: 20 }} color="#000" />
+          ) : results.length === 0 ? (
             <NoResultsText>No results found</NoResultsText>
-          </Results>
-        ) : tab === 'users' ? (
-          <Results>
+          ) : tab === 'users' ? (
             <FlatList
               key="users"
               data={results}
@@ -139,9 +136,7 @@ export default function SearchScreen() {
               contentContainerStyle={{ padding: 16 }}
               ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
             />
-          </Results>
-        ) : (
-          <Results>
+          ) : (
             <FlatList
               key="collections"
               data={results}
@@ -150,8 +145,11 @@ export default function SearchScreen() {
               renderItem={renderCollectionItem}
               contentContainerStyle={styles.gridContainer}
             />
-          </Results>
-        ))}
+          )
+        ) : (
+          <NoResultsText>Make a search</NoResultsText>
+        )}
+      </Results>
     </Container>
   );
 }

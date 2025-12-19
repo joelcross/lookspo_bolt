@@ -46,11 +46,7 @@ const Container = styled.View`
   border-radius: 20px;
   margin-horizontal: 5px;
   padding: 10px;
-  overflow: hidden; /* 🔑 prevents leaks */
-
-  shadow-color: #000;
-  shadow-opacity: 0.15;
-  shadow-radius: 20px;
+  overflow: hidden;
 `;
 
 const RowContent = styled.View`
@@ -62,7 +58,7 @@ const RowContent = styled.View`
 
 const TextContent = styled.View`
   flex: 1;
-  flex-shrink: 1; /* 🔑 allow shrinking */
+  flex-shrink: 1;
   padding-horizontal: 12px;
   gap: 8px;
 `;
@@ -72,7 +68,7 @@ const Name = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: 600;
-  flex-shrink: 1; /* 🔑 */
+  flex-shrink: 1;
 `;
 
 const Bio = styled.Text`
@@ -80,5 +76,5 @@ const Bio = styled.Text`
   font-family: ${typography.caption.fontFamily};
   font-size: ${typography.caption.fontSize}px;
   line-height: 19px;
-  flex-shrink: 1; /* 🔑 */
+  flex-shrink: 1;
 `;

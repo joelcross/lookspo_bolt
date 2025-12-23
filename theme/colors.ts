@@ -3,7 +3,7 @@ export const colors = {
     100: '#FAFAFA', // Off-White
     200: '#F4F4F5', // Mist Grey
     500: '#4B4B4B', // Slate
-    900: '#2E2E32', // Graphite
+    900: '#303030ff', // Graphite
   },
   secondary: {
     light: '#d2a1a2ff',
@@ -11,7 +11,7 @@ export const colors = {
     dark: '#b26e6fff',
   },
   tertiary: {
-    light: '#f3efe5ff',
+    light: '#f6f4f2ff',
     medium: '#e1d7b9',
     dark: '#cabc92ff',
   },
@@ -19,7 +19,7 @@ export const colors = {
     500: '#D8D89F', // Chartreuse
   },
   text: {
-    primary: '#2E2E32',
+    primary: '#303030ff',
     secondary: '#4B4B4B',
     disabled: '#9F9F9F',
   },

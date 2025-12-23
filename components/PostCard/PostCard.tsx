@@ -132,7 +132,7 @@ const TopBanner = styled.View`
 `;
 
 const Username = styled.Text`
-  color: #4b4b4b;
+  color: ${colors.tertiary.dark};
 
   font-family: ${typography.caption.fontFamily};
   font-weight: ${typography.caption.fontWeight};

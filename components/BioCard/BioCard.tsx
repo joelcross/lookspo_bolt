@@ -42,7 +42,7 @@ export function BioCard({ image, name, bio, children }: BioCardProps) {
 }
 
 const Container = styled.View`
-  background-color: ${colors.primary[100]};
+  background-color: #fff;
   border-radius: 20px;
   margin-horizontal: 5px;
   padding: 10px;

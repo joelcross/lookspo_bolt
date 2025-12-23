@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ImageBackground } from 'react-native';
 import { Slot, useRouter } from 'expo-router';
 import NavBar from '@/components/NavBar';
+import { colors } from '@/theme/colors';
 
 export default function TabLayout() {
   const [activeTab, setActiveTab] = useState<
@@ -35,7 +36,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#242424ff',
+    backgroundColor: colors.tertiary.light,
   },
   content: {
     flex: 1,

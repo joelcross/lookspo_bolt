@@ -8,6 +8,7 @@ import {
   ChatTeardropIcon,
   UserIcon,
 } from 'phosphor-react-native';
+import { colors } from '@/theme/colors';
 
 export type TabKey = 'home' | 'search' | 'new_post' | 'activity' | 'profile';
 
@@ -66,7 +67,7 @@ export function NavBar({ activeKey, onTabPress }: NavBarProps) {
               style={[
                 {
                   transform: [{ scale }],
-                  backgroundColor: isActive ? '#484848ff' : 'transparent',
+
                   borderRadius: 100,
                   overflow: 'hidden',
                   padding: 10,
@@ -75,7 +76,7 @@ export function NavBar({ activeKey, onTabPress }: NavBarProps) {
             >
               {' '}
               <Icon
-                color={isActive ? '#e1f0f6ff' : '#484848ff'}
+                color={colors.tertiary.medium}
                 size={20}
                 weight={isActive ? 'fill' : 'regular'}
               />
@@ -93,12 +94,12 @@ const Container = styled.View`
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  height: 12vh;
-  padding-horizontal: 20px;
+  height: 8vh;
   margin: 5px;
   margin-top: 0;
+  padding-horizontal: 16px;
 
-  background-color: #e1f0f6ff;
+  background-color: ${colors.secondary.medium};
   border-radius: 20px;
 `;
 

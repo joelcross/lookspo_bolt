@@ -7,6 +7,7 @@ import { Piece } from '@/lib/types';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PageHeader from '@/components/PageHeader/PageHeader';
+import styled from 'styled-components/native';
 
 interface Params {
   imageUri: string;
@@ -131,21 +132,28 @@ export default function SaveToLookbooksScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <PageHeader text="Save to lookbooks?" left="back" />
-      <SelectCollections
-        collections={collections}
-        setCollections={setCollections}
-        confirmText="Post"
-        userId={user.id} // important for creating new collection
-        onConfirm={handlePost} // or handleSave
-      />
+      <SelectListWrapper>
+        <SelectCollections
+          collections={collections}
+          setCollections={setCollections}
+          confirmText="Post"
+          userId={user.id} // important for creating new collection
+          onConfirm={handlePost} // or handleSave
+        />
+      </SelectListWrapper>
     </SafeAreaView>
   );
 }
 
+const SelectListWrapper = styled.ScrollView`
+  background-color: #fff;
+  margin: 5px;
+  border-radius: 20px;
+`;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',

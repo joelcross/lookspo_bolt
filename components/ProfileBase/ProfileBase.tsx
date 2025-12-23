@@ -318,15 +318,17 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           name={targetProfile.name}
           bio={targetProfile.bio}
         >
-          {!isOwnProfile && (
-            <ButtonWrapper>
+          <ButtonWrapper>
+            {isOwnProfile ? (
+              <Button title={'Edit Profile'} variant={'secondary'} />
+            ) : (
               <Button
                 title={isFollowing ? 'Following' : 'Follow'}
                 variant={isFollowing ? 'secondary' : 'default'}
                 onPress={handleFollowToggle}
               />
-            </ButtonWrapper>
-          )}
+            )}
+          </ButtonWrapper>
         </BioCard>
 
         <PostsContent>

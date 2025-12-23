@@ -33,24 +33,26 @@ export default function SettingsScreen() {
     <Container>
       <PageHeader text="Settings" left="back" />
 
-      <ItemContainer onPress={handlePressEditProfile}>
-        <ItemWrapper>
-          <PencilIcon color="#000000ff" size={20} />
-          <ItemText>Edit Profile</ItemText>
-        </ItemWrapper>
-      </ItemContainer>
-      <ItemContainer onPress={handlePressFeedback}>
-        <ItemWrapper>
-          <EnvelopeSimpleIcon color="#000000ff" size={20} />
-          <ItemText>Feedback</ItemText>
-        </ItemWrapper>
-      </ItemContainer>
-      <ItemContainer onPress={handleSignOut}>
-        <ItemWrapper>
-          <HandWavingIcon color="#ff3b30" size={20} />
-          <ItemText>Sign Out</ItemText>
-        </ItemWrapper>
-      </ItemContainer>
+      <ListContent>
+        <ItemContainer onPress={handlePressEditProfile}>
+          <ItemWrapper>
+            <PencilIcon color="#000000ff" size={20} />
+            <ItemText>Edit Profile</ItemText>
+          </ItemWrapper>
+        </ItemContainer>
+        <ItemContainer onPress={handlePressFeedback}>
+          <ItemWrapper>
+            <EnvelopeSimpleIcon color="#000000ff" size={20} />
+            <ItemText>Feedback</ItemText>
+          </ItemWrapper>
+        </ItemContainer>
+        <ItemContainer onPress={handleSignOut}>
+          <ItemWrapper>
+            <HandWavingIcon color="#ff3b30" size={20} />
+            <ItemText>Sign Out</ItemText>
+          </ItemWrapper>
+        </ItemContainer>
+      </ListContent>
     </Container>
   );
 }
@@ -59,6 +61,12 @@ const Container = styled.SafeAreaView``;
 
 const ItemContainer = styled.TouchableOpacity`
   padding: 16px;
+`;
+
+const ListContent = styled.ScrollView`
+  background: #fff;
+  border-radius: 20px;
+  margin-horizontal: 5px;
 `;
 
 const ItemWrapper = styled.View`

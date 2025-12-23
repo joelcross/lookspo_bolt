@@ -195,7 +195,8 @@ const Container = styled.View`
 const HeadingText = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary.medium};
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.text.primary};
   margin-bottom: 12px;
 `;
 

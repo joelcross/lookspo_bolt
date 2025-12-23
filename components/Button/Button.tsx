@@ -38,7 +38,7 @@ const ButtonWrapper = styled.TouchableOpacity<{
           background-color: ${colors.neutral[100]};
           border-width: 1px;
           border-color: ${
-            disabled ? colors.neutral[200] : colors.secondary.medium
+            disabled ? colors.neutral[200] : colors.tertiary.medium
           };
         `;
       case 'text':
@@ -66,7 +66,7 @@ const ButtonText = styled.Text<{ variant: ButtonVariant; disabled?: boolean }>`
     switch (variant) {
       case 'secondary':
         return `color: ${
-          disabled ? colors.neutral[400] : colors.secondary.medium
+          disabled ? colors.neutral[400] : colors.tertiary.dark
         };`;
       case 'text':
         return `color: ${
@@ -95,7 +95,7 @@ export function Button({
         : colors.primary[100]
       : disabled
       ? colors.neutral[400]
-      : colors.secondary.medium;
+      : colors.primary[900];
 
   return (
     <ButtonWrapper

@@ -14,6 +14,7 @@ export const typography = {
   heading3: {
     fontFamily: 'Outfit',
     fontSize: 14,
+    fontWeight: '500',
     lineHeight: 24,
   },
   body: {

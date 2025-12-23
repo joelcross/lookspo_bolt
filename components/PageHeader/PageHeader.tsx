@@ -68,19 +68,19 @@ const Container = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  background-color: #e1f0f6ff;
+  background-color: ${colors.tertiary.medium};
   border-radius: 20px;
   padding-horizontal: 16px;
 `;
 
 const LeftWrapper = styled.View`
   position: absolute;
-  left: 16px;
+  left: 0px;
 `;
 
 const RightWrapper = styled.View`
   position: absolute;
-  right: 16px;
+  right: 0px;
 `;
 
 const Title = styled.Text`

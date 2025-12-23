@@ -54,7 +54,7 @@ const Container = styled.View`
   margin-bottom: 0;
   min-height: 8vh;
 
-  background-color: #e1f0f6ff;
+  background-color: ${colors.tertiary.medium};
   border-radius: 20px;
 `;
 
@@ -72,7 +72,7 @@ const TabButton = styled(TouchableOpacity)<{ isActive: boolean }>`
   min-width: 60px;
   border-bottom-width: ${({ isActive }) => (isActive ? '2px' : '0px')};
   border-bottom-color: ${({ isActive }) =>
-    isActive ? '#c8e1eaff' : 'transparent'};
+    isActive ? colors.tertiary.dark : 'transparent'};
 `;
 
 const TabText = styled.Text<{ isActive: boolean }>`
@@ -80,7 +80,7 @@ const TabText = styled.Text<{ isActive: boolean }>`
   font-size: ${typography.heading2.fontSize}px;
   text-transform: ${typography.heading2.textTransform};
   letter-spacing: ${typography.heading2.letterSpacing}px;
-  color: ${({ isActive }) => (isActive ? '#484848ff' : '#747474ff')};
+  color: ${({ isActive }) => (isActive ? '#857752ff' : colors.tertiary.dark)};
   font-weight: 600;
 `;
 

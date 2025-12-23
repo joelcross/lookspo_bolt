@@ -89,7 +89,7 @@ const SelectedDot = styled.View`
   height: 6px;
   border-radius: 3px;
   margin-top: 4px;
-  background-color: ${colors.secondary.medium};
+  background-color: ${colors.tertiary.medium};
 `;
 
 const Author = styled.Text`
@@ -113,22 +113,22 @@ const CollageImage = styled.Image<{ index: number }>`
   ${({ index }) =>
     index === 0 &&
     `
-      border-top-left-radius: 10px;
+      border-top-left-radius: 20px;
     `}
   ${({ index }) =>
     index === 1 &&
     `
-      border-top-right-radius: 10px;
+      border-top-right-radius: 20px;
     `}
   ${({ index }) =>
     index === 2 &&
     `
-      border-bottom-left-radius: 10px;
+      border-bottom-left-radius: 20px;
     `}
   ${({ index }) =>
     index === 3 &&
     `
-      border-bottom-right-radius: 10px;
+      border-bottom-right-radius: 20px;
     `}
 `;
 
@@ -142,22 +142,22 @@ const Placeholder = styled.View<{ index: number }>`
   ${({ index }) =>
     index === 0 &&
     `
-      border-top-left-radius: 10px;
+      border-top-left-radius: 20px;
     `}
   ${({ index }) =>
     index === 1 &&
     `
-      border-top-right-radius: 10px;
+      border-top-right-radius: 20px;
     `}
   ${({ index }) =>
     index === 2 &&
     `
-      border-bottom-left-radius: 10px;
+      border-bottom-left-radius: 20px;
     `}
   ${({ index }) =>
     index === 3 &&
     `
-      border-bottom-right-radius: 10px;
+      border-bottom-right-radius: 20px;
     `}
 `;
 

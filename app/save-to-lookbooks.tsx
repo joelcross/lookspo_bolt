@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import SelectCollections, { Collection } from '@/components/SelectCollections';
+import LookbookGrid, {
+  Collection,
+} from '@/components/LookbookGrid/LookbookGrid';
 import { Piece } from '@/lib/types';
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import PageHeader from '@/components/PageHeader/PageHeader';
 import styled from 'styled-components/native';
 
@@ -27,35 +27,35 @@ export default function SaveToLookbooksScreen() {
 
     const fetchCollections = async () => {
       try {
-        // 1. Fetch collections (id + name)
+        // Fetch collections
         const { data: collectionsData, error } = await supabase
           .from('collections')
-          .select('id, name')
+          .select('*, user:user_id (username)')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        // 2. Fetch FIRST image for each collection
-        const enriched = await Promise.all(
+        // Enrich each collection with up to 4 image URLs
+        const collectionsWithImages = await Promise.all(
           (collectionsData || []).map(async (col) => {
-            const { data: imageData } = await supabase
+            const { data: images, count } = await supabase
               .from('saves')
-              .select('posts(image_url)')
+              .select('posts(image_url)', { count: 'exact' })
               .eq('collection_id', col.id)
               .order('created_at', { ascending: true })
-              .limit(1)
-              .single();
+              .limit(4);
 
             return {
               ...col,
-              cover_image: imageData?.posts?.image_url || null,
+              cover_images: images?.map((i) => i.posts.image_url) || [],
+              post_count: count || 0,
             };
           })
         );
 
-        // 3. Save enriched collections
-        setCollections(enriched);
+        // 3. Save enriched list
+        setCollections(collectionsWithImages);
       } catch (err) {
         console.error(err);
       }
@@ -133,12 +133,12 @@ export default function SaveToLookbooksScreen() {
     <Container>
       <PageHeader text="Save to lookbooks?" left="back" />
       <SelectListWrapper>
-        <SelectCollections
+        <LookbookGrid
           collections={collections}
           setCollections={setCollections}
           confirmText="Post"
-          userId={user.id} // important for creating new collection
-          onConfirm={handlePost} // or handleSave
+          userId={user.id}
+          onConfirm={handlePost}
         />
       </SelectListWrapper>
     </Container>

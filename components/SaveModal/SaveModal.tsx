@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { Modal, View, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { XIcon } from 'phosphor-react-native';
-import SelectCollections from '@/components/SelectCollections';
+import LookbookGrid from '@/components/LookbookGrid/LookbookGrid';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { typography } from '@/theme/typography';
@@ -34,32 +34,32 @@ export default function SaveModal({
           // Fetch collections
           const { data: collectionsData, error } = await supabase
             .from('collections')
-            .select('id, name')
+            .select('*, user:user_id (username)')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });
 
           if (error) throw error;
 
-          // Fetch first image for each collection
-          const enriched = await Promise.all(
+          // Enrich each collection with up to 4 image URLs
+          const collectionsWithImages = await Promise.all(
             (collectionsData || []).map(async (col) => {
-              const { data: imageData } = await supabase
+              const { data: images, count } = await supabase
                 .from('saves')
-                .select('posts(image_url)')
+                .select('posts(image_url)', { count: 'exact' })
                 .eq('collection_id', col.id)
                 .order('created_at', { ascending: true })
-                .limit(1)
-                .maybeSingle();
+                .limit(4);
 
               return {
                 ...col,
-                cover_image: imageData?.posts?.image_url || null,
+                cover_images: images?.map((i) => i.posts.image_url) || [],
+                post_count: count || 0,
               };
             })
           );
 
           // 3. Save enriched list
-          setCollections(enriched);
+          setCollections(collectionsWithImages);
         } catch (err) {
           console.error(err);
         }
@@ -122,7 +122,7 @@ export default function SaveModal({
             <ModalTitle>Save to lookbooks</ModalTitle>
             <View style={{ width: 28 }} />
           </HeaderRow>
-          <SelectCollections
+          <LookbookGrid
             collections={collections}
             setCollections={setCollections}
             preSelected={currentCollectionIds}

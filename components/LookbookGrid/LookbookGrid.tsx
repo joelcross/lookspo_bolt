@@ -1,14 +1,19 @@
-// components/SelectCollections.tsx
-import React, { useState, useEffect } from 'react';
-import { Modal, FlatList, TouchableWithoutFeedback, View } from 'react-native';
-import { CheckCircleIcon, CircleIcon, TShirtIcon } from 'phosphor-react-native';
+import React, { useState } from 'react';
+import {
+  Modal,
+  TouchableWithoutFeedback,
+  View,
+  Dimensions,
+} from 'react-native';
+import { PlusIcon } from 'phosphor-react-native';
 import { supabase } from '@/lib/supabase';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { Button } from './Button/Button';
-import TextInput from './CustomTextInput/CustomTextInput';
-import SmartImage from './SmartImage/SmartImage';
+import { Button } from '../Button/Button';
+import TextInput from '../CustomTextInput/CustomTextInput';
+import LookbookItem from '../LookbookItem/LookbookItem';
+import { FlashList } from '@shopify/flash-list';
 
 export interface Collection {
   id: string;
@@ -24,7 +29,17 @@ interface Props {
   userId?: string;
 }
 
-export default function SelectCollections({
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const NUM_COLUMNS = 3;
+const GRID_GAP = 36;
+
+const CONTAINER_MARGIN = 10;
+
+const CARD_WIDTH =
+  (SCREEN_WIDTH - CONTAINER_MARGIN * 2 - GRID_GAP * (NUM_COLUMNS - 1)) /
+  NUM_COLUMNS;
+
+export default function LookbookGrid({
   collections,
   setCollections,
   preSelected = [],
@@ -53,7 +68,13 @@ export default function SelectCollections({
 
       if (error) throw error;
 
-      setCollections((prev) => [...prev, data]);
+      const collectionWithCoverImages = {
+        ...data,
+        cover_images: [],
+        post_count: 0,
+      };
+
+      setCollections((prev) => [collectionWithCoverImages, ...prev]);
       setShowModal(false);
       setNewCollectionName('');
     } catch (err) {
@@ -64,54 +85,37 @@ export default function SelectCollections({
   return (
     <Container>
       <ScrollableContent>
-        <FlatList
-          data={collections}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingHorizontal: 16 }}
-          //style={{ maxHeight: 300 }}
+        <FlashList
+          ListHeaderComponent={<View style={{ height: 12 }} />}
           showsVerticalScrollIndicator={false}
+          data={[...collections, {}]} // Append empty obj to end of list
+          numColumns={3}
+          ItemSeparatorComponent={() => <View style={{ height: 18 }} />}
           renderItem={({ item, index }) => {
-            const isLast = index === collections.length - 1;
+            // Render custom item to let user make a new lookbook
+            if (index === collections.length) {
+              return (
+                <ItemWrapper>
+                  <NewLookbookCard onPress={() => setShowModal(true)}>
+                    <PlusIcon size={24} color={colors.neutral[400]} />
+                  </NewLookbookCard>
+                </ItemWrapper>
+              );
+            }
+
             return (
-              <CollectionRow
-                onPress={() => toggleSelect(item.id)}
-                isLast={isLast}
-              >
-                <ImageWrapper>
-                  {item.cover_image ? (
-                    <SmartImage uri={item.cover_image} resizeMode="cover" />
-                  ) : (
-                    <GreyBackground>
-                      <TShirtIcon
-                        size={24}
-                        color={colors.neutral[400]}
-                        weight="light"
-                      />
-                    </GreyBackground>
-                  )}
-                </ImageWrapper>
-                <CollectionName>{item.name}</CollectionName>
-                {selectedIds.includes(item.id) ? (
-                  <CheckCircleIcon
-                    size={28}
-                    color={colors.secondary.medium}
-                    weight="fill"
-                  />
-                ) : (
-                  <CircleIcon size={28} color={colors.secondary.medium} />
-                )}
-              </CollectionRow>
+              <ItemWrapper>
+                <LookbookItem
+                  lookbook={item}
+                  cardWidth={CARD_WIDTH}
+                  isSelected={selectedIds.includes(item.id)}
+                  handleLookbookPress={() => toggleSelect(item.id)}
+                  hideAuthor
+                />
+              </ItemWrapper>
             );
           }}
         />
-
-        <NewButtonWrapper>
-          <Button
-            title="＋ Add new collection"
-            variant="secondary"
-            onPress={() => setShowModal(true)}
-          />
-        </NewButtonWrapper>
       </ScrollableContent>
       <PostButtonWrapper>
         <Button title={confirmText} onPress={() => onConfirm(selectedIds)} />
@@ -152,47 +156,22 @@ const Container = styled.View`
   justify-content: space-between;
   max-height: 80vh;
 `;
-const ScrollableContent = styled.View`
-  flex-shrink: 1;
-  max-height: 70vh;
-`;
 
-const CollectionRow = styled.Pressable<{ isLast: boolean }>`
-  flex-direction: row;
-  justify-content: space-between;
+const ItemWrapper = styled.View`
   align-items: center;
-  padding-vertical: 10px;
-  border-bottom-width: ${(props) => (props.isLast ? '0px' : '1px')};
-  border-bottom-color: #eee;
 `;
 
-const ImageWrapper = styled.View`
-  width: 40px;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  border-radius: 10px;
-  margin-right: 16px;
-`;
-
-const GreyBackground = styled.View`
-  height: 100%;
-  width: 100%;
+const NewLookbookCard = styled.TouchableOpacity`
+  width: ${CARD_WIDTH}px;
+  aspect-ratio: 1;
   background-color: ${colors.neutral[200]};
+  border-radius: 20px;
   justify-content: center;
   align-items: center;
 `;
-
-const CollectionName = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  color: ${colors.text.primary};
-  flex: 1;
-`;
-
-const NewButtonWrapper = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin: 16px;
+const ScrollableContent = styled.View`
+  flex-shrink: 1;
+  max-height: 70vh;
 `;
 
 const PostButtonWrapper = styled.View`

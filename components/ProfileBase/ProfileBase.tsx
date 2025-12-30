@@ -10,14 +10,12 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
-import { showConfirmDialog } from '@/lib/showConfirmDialog';
 import { Collection, Profile } from '@/lib/types';
 import PageHeader from '@/components/PageHeader/PageHeader';
-import LookbookList from '@/components/LookbookList/LookbookList';
+import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
 import { BioCard } from '@/components/BioCard/BioCard';
 import { Button } from '../Button/Button';
 import styled from 'styled-components/native';
@@ -340,9 +338,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
-            <LookbookList
-              display="carousel"
-              headerText="Lookbooks"
+            <LookbookCarousel
               collections={collections}
               hideAuthor
               selectable

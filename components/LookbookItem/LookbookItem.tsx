@@ -1,4 +1,3 @@
-// components/LookbookItem.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
@@ -9,19 +8,19 @@ import { Collection } from '@/lib/types';
 interface LookbookItemProps {
   lookbook: Collection;
   cardWidth: number;
-  display: 'carousel' | 'grid';
   hideAuthor?: Boolean;
   handleLookbookPress?: () => void;
   isSelected?: boolean;
+  isHighlighted?: boolean;
 }
 
 const LookbookItem: React.FC<LookbookItemProps> = ({
   lookbook,
   cardWidth,
-  display,
   hideAuthor = false,
   handleLookbookPress,
   isSelected,
+  isHighlighted,
 }) => {
   const slots = [...lookbook.cover_images];
 
@@ -48,19 +47,27 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
         )}
 
         <CountBadge
-          style={{ transform: [{ translateX: -9 }, { translateY: -9 }] }}
+          style={{
+            transform: [
+              { translateX: isSelected ? -12 : -9 },
+              { translateY: isSelected ? -12 : -9 },
+            ],
+          }}
+          isSelected={isSelected}
         >
-          <CountText>{lookbook.post_count}</CountText>
+          <CountText isSelected={isSelected}>
+            {isSelected ? lookbook.post_count + 1 : lookbook.post_count}
+          </CountText>
         </CountBadge>
       </CollageContainer>
       <TextContainer>
-        <Title numberOfLines={2} isSelected={isSelected}>
+        <Title numberOfLines={2} isHighlighted={isHighlighted}>
           {lookbook.name}
         </Title>
         {!hideAuthor && <Author>@{lookbook.user.username}</Author>}
       </TextContainer>
       {/* Only show dot on profile pages (i.e. when hideAuthor == True) */}
-      {isSelected && hideAuthor && <SelectedDot />}
+      {isHighlighted && hideAuthor && <SelectedDot />}
     </Card>
   );
 };
@@ -74,14 +81,14 @@ const TextContainer = styled.View`
   align-items: center;
 `;
 
-const Title = styled.Text<{ isSelected?: boolean }>`
+const Title = styled.Text<{ isHighlighted?: boolean }>`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
   font-family: ${typography.body.fontFamily};
   font-size: 12px;
   color: ${colors.text.primary};
 
-  ${({ isSelected }) => `font-weight: ${isSelected ? 500 : 400};`}
+  ${({ isHighlighted }) => `font-weight: ${isHighlighted ? 500 : 400};`}
 `;
 
 const SelectedDot = styled.View`
@@ -161,20 +168,24 @@ const Placeholder = styled.View<{ index: number }>`
     `}
 `;
 
-const CountBadge = styled.View`
+const CountBadge = styled.View<{ isSelected?: boolean }>`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 18px;
-  height: 18px;
   border-radius: 12px;
   background-color: #fff;
   align-items: center;
   justify-content: center;
+
+  ${({ isSelected }) => `
+  width: ${isSelected ? 24 : 18};
+  height: ${isSelected ? 24 : 18};
+  background-color: ${isSelected ? colors.secondary.medium : '#fff'};
+  `}
 `;
 
-const CountText = styled.Text`
-  color: ${colors.secondary.medium};
+const CountText = styled.Text<{ isSelected?: boolean }>`
+  color: ${({ isSelected }) => (isSelected ? '#fff' : colors.secondary.medium)};
   font-size: 12px;
   font-weight: 600;
 `;

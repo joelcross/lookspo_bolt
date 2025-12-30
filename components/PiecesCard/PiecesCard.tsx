@@ -1,8 +1,7 @@
-// components/PiecesCard/PiecesCard.tsx
 import React from 'react';
-import { Linking, TouchableOpacity } from 'react-native';
+import { Linking, View } from 'react-native';
 import styled from 'styled-components/native';
-import { Plus, X } from 'lucide-react-native';
+import { Plus, X, ShoppingCart } from 'lucide-react-native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 
@@ -17,7 +16,6 @@ interface PiecesCardProps {
   pieces: Piece[];
   onAdd?: () => void;
   onRemove?: (index: number) => void;
-  onEdit?: (index: number, piece: Piece) => void;
   isMakingPost?: boolean;
 }
 
@@ -32,38 +30,41 @@ const PiecesCard: React.FC<PiecesCardProps> = ({
       <Head>Tagged Pieces</Head>
 
       {pieces.map((piece, i) => {
-        const hasUrl = !!piece.url;
         const RowComponent = i === pieces.length - 1 ? LastRow : Row;
 
         return (
           <RowComponent key={i}>
-            <PieceName numberOfLines={2}>{piece.name}</PieceName>
+            {/* Column 1 - Item name */}
+            <NameColumn numberOfLines={2}>{piece.name}</NameColumn>
 
-            {hasUrl ? (
-              <TouchableOpacity onPress={() => Linking.openURL(piece.url!)}>
-                <BrandText hasUrl>{piece.brand}</BrandText>
-              </TouchableOpacity>
-            ) : (
-              <BrandText hasUrl={false}>{piece.brand}</BrandText>
-            )}
+            {/* Column 2 - Brand */}
+            <BrandColumn numberOfLines={1}>{piece.brand}</BrandColumn>
 
-            {isMakingPost && (
-              <>
-                <RemoveButton onPress={() => onRemove(i)}>
+            {/* Column 3 - Actions */}
+            <RightColumn>
+              <IconButton
+                disabled={!piece.url}
+                style={{ opacity: piece.url ? 1 : 0 }}
+                onPress={() => piece.url && Linking.openURL(piece.url)}
+              >
+                <ShoppingCart size={18} color={colors.tertiary.medium} />
+              </IconButton>
+
+              {isMakingPost && (
+                <IconButton onPress={() => onRemove?.(i)}>
                   <X size={18} color="#999" />
-                </RemoveButton>
-              </>
-            )}
+                </IconButton>
+              )}
+            </RightColumn>
           </RowComponent>
         );
       })}
+
       {isMakingPost && (
-        <>
-          <AddButton onPress={onAdd}>
-            <Plus size={18} color={colors.neutral[400]} />
-            <AddText>Add new...</AddText>
-          </AddButton>
-        </>
+        <AddButton onPress={onAdd}>
+          <Plus size={18} color={colors.neutral[400]} />
+          <AddText>Add new...</AddText>
+        </AddButton>
       )}
     </Container>
   );
@@ -86,7 +87,6 @@ const Head = styled.Text`
 
 const Row = styled.View`
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
   padding-vertical: 10px;
   border-bottom-width: 1px;
@@ -97,24 +97,29 @@ const LastRow = styled(Row)`
   border-bottom-width: 0;
 `;
 
-const PieceName = styled.Text`
+const NameColumn = styled.Text`
+  flex: 2;
   font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontFamily}px;
+  font-size: ${typography.body.fontSize}px;
   color: ${colors.primary[900]};
-  flex: 1;
   margin-right: 12px;
 `;
 
-const BrandText = styled.Text<{ hasUrl: boolean }>`
+const BrandColumn = styled.Text`
+  flex: 1;
   font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontFamily}px;
-  color: ${({ hasUrl }) =>
-    hasUrl ? colors.tertiary.dark : colors.primary[900]};
-  min-width: 100px;
-  text-align: right;
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.primary[900]};
 `;
 
-const RemoveButton = styled.TouchableOpacity`
+const RightColumn = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: 12px;
+`;
+
+const IconButton = styled.TouchableOpacity`
   padding: 4px;
   margin-left: 8px;
 `;

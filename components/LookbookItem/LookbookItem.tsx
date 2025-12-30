@@ -59,8 +59,8 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
         </Title>
         {!hideAuthor && <Author>@{lookbook.user.username}</Author>}
       </TextContainer>
-      {/* Only show dot on profile pages (i.e. when display == carousel) */}
-      {isSelected && display === 'carousel' && <SelectedDot />}
+      {/* Only show dot on profile pages (i.e. when hideAuthor == True) */}
+      {isSelected && hideAuthor && <SelectedDot />}
     </Card>
   );
 };

@@ -84,10 +84,6 @@ const Heading = styled.Text`
   margin-bottom: 5px;
 `;
 
-const EmptyContainer = styled.View`
-  padding: 10px;
-`;
-
 const EmptyText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;

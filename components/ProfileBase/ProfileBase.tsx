@@ -24,6 +24,7 @@ import PostList from '../PostList/PostList';
 import { usePosts } from '@/hooks/usePosts';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
+import { DotsThreeIcon } from 'phosphor-react-native';
 
 interface ProfileBaseProps {
   isOwnProfile: boolean;
@@ -54,15 +55,15 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     avatar_url: '',
   });
   const [isFollowing, setIsFollowing] = useState(false);
-  const [selectedLookbookId, setSelectedLookbookId] = useState<string | null>(
+  const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
     null
   );
   const targetProfile = isOwnProfile ? ownProfile : otherProfile;
 
   const mode = useMemo(() => {
-    if (!selectedLookbookId) return null;
-    return { type: 'collection' as const, collectionId: selectedLookbookId };
-  }, [selectedLookbookId]);
+    if (!selectedLookbook) return null;
+    return { type: 'collection' as const, collectionId: selectedLookbook.id };
+  }, [selectedLookbook]);
 
   const {
     posts,
@@ -150,8 +151,8 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
   // Select first collection by default once they have loaded
   useEffect(() => {
-    if (collections.length > 0 && !selectedLookbookId) {
-      setSelectedLookbookId(collections[0].id);
+    if (collections.length > 0 && !selectedLookbook) {
+      setSelectedLookbook(collections[0]);
     }
   }, [collections]);
 
@@ -250,14 +251,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     setCollections((prev) => prev.filter((c) => c.id !== id));
   };
 
-  // Cancel editing
-  const handleCancel = () => {
-    setCollections(originalCollections); // restore original
-    setRemovedCollectionIds([]); // clear any staged deletions
-    setIsEditing(false);
-    router.push('/profile');
-  };
-
   // Save all changes
   const handleSave = async () => {
     if (!ownProfile) return;
@@ -288,12 +281,15 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
       }
 
       await refreshProfile?.();
-      setIsEditing(false);
       router.push('/profile');
     } catch (err) {
       console.error(err);
       alert('Failed to save profile');
     }
+  };
+
+  const handleThreeDotsPress = () => {
+    // show modal with rename and delete options
   };
 
   if (!targetProfile) {
@@ -307,7 +303,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   return (
     <Container>
       <PageHeader
-        text={isEditing ? 'Edit Profile' : `@${targetProfile.username}`}
+        text={`@${targetProfile.username}`}
         left={isOwnProfile ? undefined : 'back'}
         right={isOwnProfile ? 'settings' : undefined}
       />
@@ -320,7 +316,11 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         >
           <ButtonWrapper>
             {isOwnProfile ? (
-              <Button title={'Edit Profile'} variant={'secondary'} />
+              <Button
+                title={'Edit Profile'}
+                variant={'secondary'}
+                onPress={() => router.push('/edit-profile')}
+              />
             ) : (
               <Button
                 title={isFollowing ? 'Following' : 'Follow'}
@@ -341,15 +341,24 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
               collections={collections}
               hideAuthor
               selectable
-              onSelectionChange={(id) => setSelectedLookbookId(id)}
+              onSelectionChange={(collection) =>
+                setSelectedLookbook(collection)
+              }
             />
           )}
+
+          <LookbookMetadata>
+            <SelectedLookbookTitle>
+              {selectedLookbook?.name}
+            </SelectedLookbookTitle>
+            {isOwnProfile && <DotsThreeIcon onPress={handleThreeDotsPress} />}
+          </LookbookMetadata>
 
           <PostList
             posts={posts}
             loading={postsLoading}
             refreshing={refreshing}
-            emptyText={'No looks to display yet!'}
+            emptyText={'No looks to display.'}
             handleLoadMore={handleLoadMore}
             handleRefresh={handleRefresh}
             hideTopBar
@@ -438,6 +447,21 @@ const PostsContent = styled.View`
   border-radius: 20px;
 `;
 
+const LookbookMetadata = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-horizontal: 12px;
+  padding-vertical: 8px;
+  border-top-width: 1px;
+  border-top-color: #eee;
+`;
+
+const SelectedLookbookTitle = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  color: ${colors.secondary.medium};
+`;
 const ButtonWrapper = styled.View`
   margin-top: 12px;
   width: 100%;

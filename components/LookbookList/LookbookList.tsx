@@ -31,7 +31,7 @@ interface LookbookListProps {
   display: 'carousel' | 'grid';
   hideAuthor?: Boolean;
   selectable?: Boolean;
-  onSelectionChange?: (id: string) => void;
+  onSelectionChange?: (collection: Collection) => void;
 }
 
 const LookbookList: React.FC<LookbookListProps> = ({
@@ -45,13 +45,16 @@ const LookbookList: React.FC<LookbookListProps> = ({
   const flatListRef = useRef<FlatList>(null);
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(true);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
+    null
+  );
 
   useEffect(() => {
-    if (collections.length > 0 && !selectedId) {
-      setSelectedId(collections[0].id);
+    console.log('selectedLookbook', selectedLookbook);
+    if (collections.length > 0 && !selectedLookbook) {
+      setSelectedLookbook(collections[0]);
       if (onSelectionChange) {
-        onSelectionChange(collections[0].id);
+        onSelectionChange(collections[0]);
       }
     }
   }, [collections]);
@@ -67,8 +70,8 @@ const LookbookList: React.FC<LookbookListProps> = ({
 
   const handleLookbookPress = (item: Collection) => {
     if (selectable) {
-      setSelectedId(item.id);
-      onSelectionChange?.(item.id);
+      setSelectedLookbook(item);
+      onSelectionChange?.(item);
     } else {
       router.push(`/collection/${item.id}`);
     }
@@ -113,7 +116,7 @@ const LookbookList: React.FC<LookbookListProps> = ({
                 <LookbookItem
                   lookbook={item}
                   cardWidth={CARD_WIDTH}
-                  isSelected={selectedId === item.id}
+                  isSelected={selectedLookbook?.id === item.id}
                   handleLookbookPress={() => handleLookbookPress(item)}
                   display={display}
                 />
@@ -157,7 +160,7 @@ const LookbookList: React.FC<LookbookListProps> = ({
                 lookbook={item}
                 cardWidth={CARD_WIDTH}
                 hideAuthor={hideAuthor}
-                isSelected={selectedId === item.id}
+                isSelected={selectedLookbook?.id === item.id}
                 handleLookbookPress={() => handleLookbookPress(item)}
                 display={display}
               />

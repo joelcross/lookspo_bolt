@@ -68,7 +68,7 @@ export default function SelectCollections({
           data={collections}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingHorizontal: 16 }}
-          style={{ maxHeight: 300 }} // <- set your max height here
+          //style={{ maxHeight: 300 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => {
             const isLast = index === collections.length - 1;

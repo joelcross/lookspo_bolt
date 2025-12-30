@@ -26,7 +26,7 @@ export default function SettingsScreen() {
   };
 
   const handlePressEditProfile = async () => {
-    router.push({ pathname: '/profile', params: { edit: 'true' } });
+    router.push('/edit-profile');
   };
 
   return (

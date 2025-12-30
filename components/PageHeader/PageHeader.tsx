@@ -9,11 +9,20 @@ type HeaderProps = {
   text: string;
   left?: 'back' | 'cancel';
   right?: 'settings' | 'more' | 'trash';
+  onCustomLeftPress?: () => void;
   onCustomPress?: () => void;
 };
 
-export function Header({ text, left, right, onCustomPress }: HeaderProps) {
-  const handleLeftButtonPress = () => router.back();
+export function Header({
+  text,
+  left,
+  right,
+  onCustomLeftPress,
+  onCustomPress,
+}: HeaderProps) {
+  const handleLeftButtonPress = () => {
+    onCustomLeftPress ? onCustomLeftPress() : router.back();
+  };
 
   const handleSettingsButtonPress = () => router.push('/settings');
 

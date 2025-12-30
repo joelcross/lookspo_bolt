@@ -170,7 +170,7 @@ export default function CollectionScreen() {
                     setMenuVisible(false);
                   }}
                 >
-                  <Text>Rename</Text>
+                  <RenameText>Rename</RenameText>
                 </MenuItem>
                 <MenuItem
                   onPress={() => {
@@ -274,8 +274,9 @@ const DropdownOverlay = styled.Pressable`
 const DropdownMenu = styled.View`
   margin-top: 44px;
   margin-right: 10px;
+  padding-vertical: 5px;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 20px;
   overflow: hidden;
   min-width: 140px;
   elevation: 10;
@@ -291,7 +292,15 @@ const MenuItem = styled.TouchableOpacity`
   align-items: center;
 `;
 
+const RenameText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.text.primary};
+`;
+
 const DeleteText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
   color: ${colors.feedback.error};
 `;
 
@@ -316,7 +325,7 @@ const StyledText = styled.Text`
 const ModalCard = styled.View`
   width: 80vw;
   background-color: #fff;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 16px;
   shadow-color: #000;
   shadow-offset: 0px 10px;

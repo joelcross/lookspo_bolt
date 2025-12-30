@@ -111,7 +111,6 @@ const InputContainer = styled.View<{
 }>`
   flex-direction: row;
   align-items: center;
-  height: 36px;
   border-radius: 10px;
   padding-horizontal: 16px;
   background-color: #ffffff;
@@ -137,10 +136,11 @@ const InputContainer = styled.View<{
 const StyledTextInput = styled(TextInput)<{
   hasValue: boolean;
   disabled?: boolean;
+  multiline?: boolean;
 }>`
   flex: 1;
   color: ${(props) => (props.disabled ? '#9E9E9E' : '#212121')};
-  padding-vertical: 16px;
+  padding-vertical: 12px;
 
   outline-width: 0;
   outline-color: transparent;

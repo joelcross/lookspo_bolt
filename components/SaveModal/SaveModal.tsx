@@ -146,6 +146,7 @@ const ModalContainer = styled.View`
   background-color: white;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
+  flex: 1;
 `;
 
 const HeaderRow = styled.View`

@@ -341,7 +341,7 @@ export default function PostDetailScreen() {
             {savedCollections.length > 0 && (
               <LookbookListWrapper>
                 <LookbookList
-                  display="grid"
+                  display="carousel"
                   headerText="Featured In"
                   collections={savedCollections}
                 />
@@ -388,7 +388,6 @@ export default function PostDetailScreen() {
 // Styled Components
 const Container = styled.ScrollView`
   flex: 1;
-  background-color: #fafafa;
 `;
 
 const Content = styled.View`

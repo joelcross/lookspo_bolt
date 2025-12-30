@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Pressable,
+} from 'react-native';
 import { Post } from '@/lib/types';
 import { getTimeAgo } from '@/lib/utils';
 import { router } from 'expo-router';
@@ -32,12 +38,12 @@ export default function PostCardSimple({
 }: PostCardSimpleProps) {
   return (
     <PostContainer>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+      <Pressable onPress={onPress}>
         <SmartImage
           uri={image}
           resizeMode="contain"
           style={{
-            borderRadius: 10,
+            borderRadius: 20,
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
           }}
@@ -51,7 +57,7 @@ export default function PostCardSimple({
           multiline
           textAlignVertical="top"
         />
-      </TouchableOpacity>
+      </Pressable>
     </PostContainer>
   );
 }
@@ -87,16 +93,6 @@ const Timestamp = styled.Text`
   font-family: ${typography.caption.fontFamily};
   font-weight: ${typography.caption.fontWeight};
   font-size: ${typography.caption.fontSize}px;
-`;
-
-const BottomContainer = styled.View`
-  background-color: white;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  font-size: 16px;
-  padding: 8px;
-  border-radius: 10px;
 `;
 
 const LeftWrapper = styled.View`

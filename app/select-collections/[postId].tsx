@@ -98,7 +98,7 @@ export default function SelectCollectionsScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <ChevronLeft color="#000" size={28} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Save to Lookbooks</Text>
+        <Text style={styles.headerTitle}>Save to Lookbooks :)</Text>
         <View style={{ width: 28 }} />
       </View>
       <SelectCollections

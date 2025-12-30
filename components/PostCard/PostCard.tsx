@@ -73,16 +73,22 @@ export default function PostCard({
           uri={post.image_url}
           resizeMode="contain"
           style={{
-            borderRadius: 10,
-            borderBottomLeftRadius: showActions ? 0 : 10,
-            borderBottomRightRadius: showActions ? 0 : 10,
+            borderRadius: 20,
+            borderBottomLeftRadius: showActions ? 0 : 20,
+            borderBottomRightRadius: showActions ? 0 : 20,
           }}
         />
 
         {/* Only show like/save if showActions is true */}
         {showActions && (
           <View>
-            <BottomContainer>
+            <BottomContainer
+              style={{
+                borderRadius: 20,
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+              }}
+            >
               <LeftWrapper>
                 <Avatar uri={post.profiles?.avatar_url} />
                 <Caption>{post.caption}</Caption>
@@ -154,7 +160,6 @@ const BottomContainer = styled.View`
   justify-content: space-between;
   font-size: 16px;
   padding: 8px;
-  border-radius: 10px;
 `;
 
 const LeftWrapper = styled.View`

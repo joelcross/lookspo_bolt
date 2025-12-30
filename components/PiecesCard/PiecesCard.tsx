@@ -60,7 +60,7 @@ const PiecesCard: React.FC<PiecesCardProps> = ({
       {isMakingPost && (
         <>
           <AddButton onPress={onAdd}>
-            <Plus size={20} color={colors.neutral[400]} />
+            <Plus size={18} color={colors.neutral[400]} />
             <AddText>Add new...</AddText>
           </AddButton>
         </>
@@ -99,19 +99,17 @@ const LastRow = styled(Row)`
 
 const PieceName = styled.Text`
   font-family: ${typography.body.fontFamily};
-  font-size: 16px;
-  font-weight: 500;
-  color: ${colors.text.primary};
+  font-size: ${typography.body.fontFamily}px;
+  color: ${colors.primary[900]};
   flex: 1;
   margin-right: 12px;
 `;
 
 const BrandText = styled.Text<{ hasUrl: boolean }>`
   font-family: ${typography.body.fontFamily};
-  font-size: 16px;
-  font-weight: 500;
+  font-size: ${typography.body.fontFamily}px;
   color: ${({ hasUrl }) =>
-    hasUrl ? colors.secondary.medium : colors.primary[900]};
+    hasUrl ? colors.tertiary.dark : colors.primary[900]};
   min-width: 100px;
   text-align: right;
 `;

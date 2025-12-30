@@ -71,6 +71,7 @@ const PostWrapper = styled.View`
 
 const PostsContainer = styled.ScrollView`
   padding-vertical: 5px;
+  padding-horizontal: 8px;
   margin: 5px;
   background-color: #fff;
   border-radius: 20px;
@@ -87,7 +88,7 @@ const Heading = styled.Text`
 const EmptyText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.primary[900]};
+  color: ${colors.neutral[400]};
 `;
 
 export default PostList;

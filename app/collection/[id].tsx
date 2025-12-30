@@ -311,17 +311,6 @@ const Overlay = styled.Pressable`
   align-items: center;
 `;
 
-const TextWrapper = styled.View`
-  padding-top: 60;
-  align-items: center;
-`;
-
-const StyledText = styled.Text`
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  color: ${colors.secondary.light};
-`;
-
 const ModalCard = styled.View`
   width: 80vw;
   background-color: #fff;

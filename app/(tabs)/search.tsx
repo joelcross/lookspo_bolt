@@ -147,7 +147,7 @@ export default function SearchScreen() {
             />
           )
         ) : (
-          <NoResultsText>Make a search</NoResultsText>
+          <NoResultsText>Make a search to begin...</NoResultsText>
         )}
       </Results>
     </Container>

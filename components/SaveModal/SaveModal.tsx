@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, TouchableOpacity, Text } from 'react-native';
+import { Modal, View, TouchableOpacity, Text, ScrollView } from 'react-native';
 import styled from 'styled-components/native';
 import { XIcon } from 'phosphor-react-native';
 import SelectCollections from '@/components/SelectCollections';
@@ -138,15 +138,15 @@ export default function SaveModal({
 
 const Overlay = styled.Pressable`
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.2);
   justify-content: flex-end;
+  background-color: rgba(0, 0, 0, 0.2);
 `;
 
 const ModalContainer = styled.View`
+  max-height: 90vh;
   background-color: white;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  flex: 1;
 `;
 
 const HeaderRow = styled.View`

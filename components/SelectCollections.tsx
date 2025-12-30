@@ -149,10 +149,13 @@ export default function SelectCollections({
 }
 
 const Container = styled.View`
-  flex: 1;
   justify-content: space-between;
+  max-height: 80vh;
 `;
-const ScrollableContent = styled.View``;
+const ScrollableContent = styled.View`
+  flex-shrink: 1;
+  max-height: 70vh;
+`;
 
 const CollectionRow = styled.Pressable<{ isLast: boolean }>`
   flex-direction: row;

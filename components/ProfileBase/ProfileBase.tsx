@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   Modal,
+  Pressable,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { supabase } from '@/lib/supabase';
@@ -24,7 +25,8 @@ import PostList from '../PostList/PostList';
 import { usePosts } from '@/hooks/usePosts';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
-import { DotsThreeIcon } from 'phosphor-react-native';
+import { PencilIcon, TrashIcon } from 'phosphor-react-native';
+import CustomTextInput from '../CustomTextInput/CustomTextInput';
 
 interface ProfileBaseProps {
   isOwnProfile: boolean;
@@ -38,10 +40,11 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
   const { edit } = useLocalSearchParams();
   const [isEditing, setIsEditing] = useState(edit === 'true');
-  const [collections, setCollections] = useState([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [removedCollectionIds, setRemovedCollectionIds] = useState<string[]>(
     []
   );
+
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [originalCollections, setOriginalCollections] = useState<Collection[]>(
@@ -58,7 +61,12 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
     null
   );
+
   const targetProfile = isOwnProfile ? ownProfile : otherProfile;
+
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [newLookbookName, setNewLookbookName] = useState('');
 
   const mode = useMemo(() => {
     if (!selectedLookbook) return null;
@@ -156,36 +164,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     }
   }, [collections]);
 
-  // Pick new avatar
-  const pickAvatar = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.7,
-    });
-    if (!result.canceled) {
-      const file = result.assets[0];
-      const ext = file.uri.split('.').pop();
-      const filePath = `${ownProfile.id}/avatar.${ext}`;
-      const { error } = await supabase.storage
-        .from('avatars')
-        .upload(
-          filePath,
-          { uri: file.uri, type: file.type || 'image/jpeg', name: filePath },
-          { upsert: true }
-        );
-      if (error) {
-        alert('Error uploading avatar: ' + error.message);
-      } else {
-        const { data: urlData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(filePath);
-        setForm({ ...form, avatar_url: urlData.publicUrl });
-      }
-    }
-  };
-
   const handleFollowToggle = async () => {
     if (!user || !otherProfile) return;
 
@@ -236,21 +214,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     }
   };
 
-  // Remove collection locally (staged)
-  const removeCollection = async (id: string) => {
-    const confirmed = await showConfirmDialog({
-      title: 'Remove Collection',
-      message:
-        'Are you sure you want to remove this collection from your profile?',
-      confirmText: 'Remove',
-      cancelText: 'Cancel',
-      destructive: true,
-    });
-    if (!confirmed) return;
-    setRemovedCollectionIds((prev) => [...prev, id]);
-    setCollections((prev) => prev.filter((c) => c.id !== id));
-  };
-
   // Save all changes
   const handleSave = async () => {
     if (!ownProfile) return;
@@ -288,8 +251,50 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     }
   };
 
-  const handleThreeDotsPress = () => {
-    // show modal with rename and delete options
+  const handleRenameLookbook = async () => {
+    if (!selectedLookbook || !newLookbookName.trim()) return;
+
+    try {
+      await supabase
+        .from('collections')
+        .update({ name: newLookbookName.trim() })
+        .eq('id', selectedLookbook.id);
+
+      setCollections((prev) =>
+        prev.map((c) =>
+          c.id === selectedLookbook.id
+            ? { ...c, name: newLookbookName.trim() }
+            : c
+        )
+      );
+
+      setSelectedLookbook((prev) =>
+        prev ? { ...prev, name: newLookbookName.trim() } : prev
+      );
+    } catch (err) {
+      console.error('Failed to rename lookbook', err);
+    } finally {
+      setRenameModalVisible(false);
+      setNewLookbookName('');
+    }
+  };
+
+  const handleDeleteLookbook = async () => {
+    if (!selectedLookbook) return;
+
+    try {
+      await supabase.from('collections').delete().eq('id', selectedLookbook.id);
+
+      setCollections((prev) =>
+        prev.filter((c) => c.id !== selectedLookbook.id)
+      );
+
+      setSelectedLookbook(null);
+    } catch (err) {
+      console.error('Failed to delete lookbook', err);
+    } finally {
+      setDeleteModalVisible(false);
+    }
   };
 
   if (!targetProfile) {
@@ -351,7 +356,16 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             <SelectedLookbookTitle>
               {selectedLookbook?.name}
             </SelectedLookbookTitle>
-            {isOwnProfile && <DotsThreeIcon onPress={handleThreeDotsPress} />}
+            {isOwnProfile && (
+              <Icons>
+                <Pressable onPress={() => setRenameModalVisible(true)}>
+                  <PencilIcon size={18} color={colors.primary[900]} />
+                </Pressable>
+                <Pressable onPress={() => setDeleteModalVisible(true)}>
+                  <TrashIcon size={18} color={colors.primary[900]} />
+                </Pressable>
+              </Icons>
+            )}
           </LookbookMetadata>
 
           <PostList
@@ -372,7 +386,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>New Collection</Text>
+              <Text style={styles.modalText}>New Collection</Text>
               <TextInput
                 style={styles.modalInput}
                 placeholder="Enter collection name"
@@ -432,6 +446,54 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             </View>
           </View>
         </Modal>
+
+        {renameModalVisible && (
+          <Modal transparent animationType="fade" visible={renameModalVisible}>
+            <Overlay onPress={() => setRenameModalVisible(false)}>
+              <TouchableOpacity activeOpacity={1}>
+                <ModalCard>
+                  <ModalText>Rename Lookbook</ModalText>
+                  <CustomTextInput
+                    placeholder="Enter new name"
+                    value={newLookbookName}
+                    onChangeText={setNewLookbookName}
+                    autoFocus
+                  />
+                  <ButtonRow>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setRenameModalVisible(false)}
+                    />
+                    <Button title="Done" onPress={handleRenameLookbook} />
+                  </ButtonRow>
+                </ModalCard>
+              </TouchableOpacity>
+            </Overlay>
+          </Modal>
+        )}
+
+        {deleteModalVisible && (
+          <Modal transparent animationType="fade" visible={deleteModalVisible}>
+            <Overlay onPress={() => setDeleteModalVisible(false)}>
+              <TouchableOpacity activeOpacity={1}>
+                <ModalCard>
+                  <ModalText>
+                    Are you sure you want to delete this lookbook?
+                  </ModalText>
+                  <ButtonRow>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setDeleteModalVisible(false)}
+                    />
+                    <Button title="Delete" onPress={handleDeleteLookbook} />
+                  </ButtonRow>
+                </ModalCard>
+              </TouchableOpacity>
+            </Overlay>
+          </Modal>
+        )}
       </ScrollView>
     </Container>
   );
@@ -465,6 +527,39 @@ const SelectedLookbookTitle = styled.Text`
 const ButtonWrapper = styled.View`
   margin-top: 12px;
   width: 100%;
+`;
+
+const Icons = styled.View`
+  flex-direction: row;
+  gap: 8px;
+`;
+
+const Overlay = styled.Pressable`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalCard = styled.View`
+  width: 60vw;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 16px;
+`;
+
+const ModalText = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  text-align: center;
+  margin-bottom: 10px;
+`;
+
+const ButtonRow = styled.View`
+  margin-top: 12px;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 8px;
 `;
 
 const styles = StyleSheet.create({
@@ -522,7 +617,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
-  modalTitle: {
+  modalText: {
     fontSize: 20,
     fontWeight: '700',
     color: '#000',

@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import SelectCollections, { Collection } from '@/components/SelectCollections';
 import { Piece } from '@/lib/types';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PageHeader from '@/components/PageHeader/PageHeader';
 import styled from 'styled-components/native';
@@ -130,7 +130,7 @@ export default function SaveToLookbooksScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <Container>
       <PageHeader text="Save to lookbooks?" left="back" />
       <SelectListWrapper>
         <SelectCollections
@@ -141,32 +141,18 @@ export default function SaveToLookbooksScreen() {
           onConfirm={handlePost} // or handleSave
         />
       </SelectListWrapper>
-    </SafeAreaView>
+    </Container>
   );
 }
 
-const SelectListWrapper = styled.ScrollView`
+const Container = styled.View`
+  flex: 1;
+  justify-content: flex-end;
+`;
+
+const SelectListWrapper = styled.View`
+  flex: 1;
   background-color: #fff;
   margin: 5px;
   border-radius: 20px;
 `;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000',
-  },
-});

@@ -113,6 +113,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
       .from('collections')
       .select('*, user:user_id (username)')
       .eq('user_id', targetProfile.id)
+      .order('is_default', { ascending: false })
       .order('created_at', { ascending: false });
 
     // Enrich each collection with up to 4 image URLs
@@ -348,7 +349,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             <SelectedLookbookTitle>
               {selectedLookbook?.name}
             </SelectedLookbookTitle>
-            {isOwnProfile && (
+            {isOwnProfile && !selectedLookbook?.is_default && (
               <Icons>
                 <Pressable onPress={() => setRenameModalVisible(true)}>
                   <PencilIcon size={18} color={colors.tertiary.dark} />

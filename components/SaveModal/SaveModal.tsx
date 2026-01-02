@@ -36,6 +36,7 @@ export default function SaveModal({
             .from('collections')
             .select('*, user:user_id (username)')
             .eq('user_id', user.id)
+            .order('is_default', { ascending: false })
             .order('created_at', { ascending: false });
 
           if (error) throw error;
@@ -111,6 +112,8 @@ export default function SaveModal({
     }
   };
 
+  if (!collections.length) return null;
+
   return (
     <Modal visible={visible} transparent animationType="slide">
       <Overlay onPress={onClose}>
@@ -124,6 +127,7 @@ export default function SaveModal({
           </HeaderRow>
           <LookbookGrid
             collections={collections}
+            showDefaultLookbook={false}
             setCollections={setCollections}
             preSelected={currentCollectionIds}
             confirmText="Done"

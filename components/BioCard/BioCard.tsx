@@ -30,13 +30,15 @@ export function BioCard({ image, name, bio, children }: BioCardProps) {
 
         <TextContent>
           <Name numberOfLines={1}>{name}</Name>
-          <Bio numberOfLines={7} ellipsizeMode="tail">
-            {bio}
-          </Bio>
+          <BioWrapper>
+            <Bio numberOfLines={7} ellipsizeMode="tail">
+              {bio}
+            </Bio>
+          </BioWrapper>
         </TextContent>
       </RowContent>
 
-      {children}
+      {children && <ChildrenWrapper>{children}</ChildrenWrapper>}
     </Container>
   );
 }
@@ -53,14 +55,22 @@ const RowContent = styled.View`
   flex-direction: row;
   width: 100%;
   gap: 10px;
-  align-items: flex-start;
+  align-items: stretch;
 `;
 
 const TextContent = styled.View`
   flex: 1;
-  flex-shrink: 1;
-  padding-horizontal: 12px;
+  flex-direction: column;
+  justify-content: flex-start;
   gap: 8px;
+`;
+
+const BioWrapper = styled.View`
+  /* exists in case i want a bg color on the bio text */
+  border-radius: 20px;
+  /* background-color: ${colors.tertiary.light}; */
+  flex-grow: 1;
+  justify-content: flex-start;
 `;
 
 const Name = styled.Text`
@@ -68,7 +78,6 @@ const Name = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: 600;
-  flex-shrink: 1;
 `;
 
 const Bio = styled.Text`
@@ -76,5 +85,8 @@ const Bio = styled.Text`
   font-family: ${typography.caption.fontFamily};
   font-size: ${typography.caption.fontSize}px;
   line-height: 19px;
-  flex-shrink: 1;
+`;
+
+const ChildrenWrapper = styled.View`
+  width: 100%;
 `;

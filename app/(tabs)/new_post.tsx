@@ -195,7 +195,7 @@ const ScrollableContent = styled.ScrollView`
 `;
 
 const Content = styled.View`
-  gap: 16px;
+  gap: 5px;
 `;
 
 // Empty State

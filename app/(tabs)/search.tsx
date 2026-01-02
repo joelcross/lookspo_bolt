@@ -198,6 +198,7 @@ const NoResultsText = styled.Text`
   font-size: ${typography.body.fontSize}px;
   color: ${colors.neutral[400]};
   padding: 16px;
+  font-style: italic;
 `;
 
 const styles = StyleSheet.create({

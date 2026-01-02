@@ -175,7 +175,7 @@ const ErrorText = styled.Text`
 const LinkText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.secondary.medium};
+  color: ${colors.tertiary.dark};
   text-decoration-line: underline;
 `;
 

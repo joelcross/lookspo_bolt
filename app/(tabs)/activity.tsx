@@ -14,6 +14,8 @@ import { ActivityType } from '@/components/HeaderDropdown/HeaderDropdown';
 import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import ActivityItem from '@/components/ActivityItem/ActivityItem';
 import styled from 'styled-components/native';
+import { typography } from '@/theme/typography';
+import { colors } from '@/theme/colors';
 
 export default function ActivityScreen() {
   const { user } = useAuth();
@@ -106,12 +108,12 @@ export default function ActivityScreen() {
   const renderEmpty = () => {
     if (loading) return null;
     return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>
+      <View>
+        <EmptyText>
           {feedType === 'you'
             ? 'No activity yet'
             : 'Follow users to see their activity'}
-        </Text>
+        </EmptyText>
       </View>
     );
   };
@@ -177,9 +179,15 @@ const Content = styled.View`
   overflow: hidden;
 `;
 
+const EmptyText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.neutral[400]};
+  padding: 16px;
+  font-style: italic;
+`;
+
 const styles = StyleSheet.create({
   container: { flex: 1 },
   title: { fontSize: 24, fontWeight: '700', color: '#000', marginBottom: 12 },
-  emptyContainer: { paddingTop: 60, alignItems: 'center' },
-  emptyText: { fontSize: 16, color: '#999' },
 });

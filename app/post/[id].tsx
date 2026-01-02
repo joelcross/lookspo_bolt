@@ -388,17 +388,17 @@ const Container = styled.ScrollView`
 `;
 
 const Content = styled.View`
-  gap: 16px;
+  gap: 5px;
   padding-bottom: 40px;
 `;
 
 const PostCardWrapper = styled.View`
-  margin-horizontal: 10px;
+  margin-horizontal: 5px;
 `;
 
 const LookbookCarouselWrapper = styled.View`
   background-color: #ffffffff;
-  margin: 5px;
+  margin-horizontal: 5px;
   border-radius: 20px;
 `;
 

@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import {
-  View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   ActivityIndicator,
@@ -166,7 +163,7 @@ const BodyText = styled.Text`
 const LinkText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.secondary.medium};
+  color: ${colors.tertiary.dark};
   margin-left: 4px;
   text-decoration-line: underline;
 `;

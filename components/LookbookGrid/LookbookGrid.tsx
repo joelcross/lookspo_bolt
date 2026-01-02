@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   TouchableWithoutFeedback,
@@ -27,6 +27,7 @@ interface Props {
   onConfirm: (selected: string[]) => Promise<void>;
   confirmText?: string;
   userId?: string;
+  showDefaultLookbook?: boolean;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -46,10 +47,27 @@ export default function LookbookGrid({
   onConfirm,
   confirmText = 'Done',
   userId,
+  showDefaultLookbook = true,
 }: Props) {
-  const [selectedIds, setSelectedIds] = useState<string[]>(preSelected);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
+
+  useEffect(() => {
+    if (!preSelected) return;
+
+    setSelectedIds((prev) => {
+      const newSelected = Array.isArray(preSelected)
+        ? preSelected
+        : [preSelected];
+
+      // Only update if different
+      if (JSON.stringify(prev) !== JSON.stringify(newSelected)) {
+        return newSelected;
+      }
+      return prev; // no change → no re-render
+    });
+  }, [preSelected]);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -74,7 +92,11 @@ export default function LookbookGrid({
         post_count: 0,
       };
 
-      setCollections((prev) => [collectionWithCoverImages, ...prev]);
+      setCollections((prev) => [
+        prev[0],
+        collectionWithCoverImages,
+        ...prev.slice(1),
+      ]);
       setShowModal(false);
       setNewCollectionName('');
     } catch (err) {
@@ -88,12 +110,14 @@ export default function LookbookGrid({
         <FlashList
           ListHeaderComponent={<View style={{ height: 12 }} />}
           showsVerticalScrollIndicator={false}
-          data={[...collections, {}]} // Append empty obj to end of list
+          data={[...collections]
+            .filter((_, index) => !(index === 0 && !showDefaultLookbook))
+            .concat({})} // filter out first item if needed
           numColumns={3}
           ItemSeparatorComponent={() => <View style={{ height: 18 }} />}
           renderItem={({ item, index }) => {
             // Render custom item to let user make a new lookbook
-            if (index === collections.length) {
+            if (index === collections.length - (showDefaultLookbook ? 0 : 1)) {
               return (
                 <ItemWrapper>
                   <NewLookbookCard onPress={() => setShowModal(true)}>
@@ -108,6 +132,7 @@ export default function LookbookGrid({
                 <LookbookItem
                   lookbook={item}
                   cardWidth={CARD_WIDTH}
+                  isDefault={showDefaultLookbook && index === 0}
                   isSelected={selectedIds.includes(item.id)}
                   handleLookbookPress={() => toggleSelect(item.id)}
                   hideAuthor

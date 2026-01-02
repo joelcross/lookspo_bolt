@@ -74,7 +74,7 @@ const Container = styled.View`
   background-color: white;
   border-radius: 20px;
   padding: 20px;
-  margin-horizontal: 10px;
+  margin-horizontal: 5px;
   elevation: 5;
 `;
 

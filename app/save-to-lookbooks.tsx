@@ -32,6 +32,7 @@ export default function SaveToLookbooksScreen() {
           .from('collections')
           .select('*, user:user_id (username)')
           .eq('user_id', user.id)
+          .order('is_default', { ascending: false })
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -134,6 +135,8 @@ export default function SaveToLookbooksScreen() {
       <PageHeader text="Save to lookbooks?" left="back" />
       <SelectListWrapper>
         <LookbookGrid
+          preSelected={[collections[0]?.id]}
+          showDefaultLookbook={true}
           collections={collections}
           setCollections={setCollections}
           confirmText="Post"

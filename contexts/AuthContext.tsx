@@ -116,20 +116,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username,
+          name,
+        },
+      },
     });
+    // Profile is created server-side via supabase trigger
 
     if (authError) throw authError;
     if (!authData.user) throw new Error('User creation failed');
-
-    // Insert profile
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: authData.user.id, // this UUID matches auth.users
-      username,
-      name,
-      bio: '',
-    });
-
-    if (profileError) throw profileError;
 
     return authData;
   };

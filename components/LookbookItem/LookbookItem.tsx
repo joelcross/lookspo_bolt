@@ -10,6 +10,7 @@ interface LookbookItemProps {
   cardWidth: number;
   hideAuthor?: Boolean;
   handleLookbookPress?: () => void;
+  isDefault?: boolean;
   isSelected?: boolean;
   isHighlighted?: boolean;
 }
@@ -19,6 +20,7 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
   cardWidth,
   hideAuthor = false,
   handleLookbookPress,
+  isDefault = false,
   isSelected,
   isHighlighted,
 }) => {
@@ -29,9 +31,18 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
     slots.push(null);
   }
 
+  const handlePress = () => {
+    // Prevent anything from happening when user presses default lookbooks
+    if (!isDefault && handleLookbookPress) handleLookbookPress();
+  };
+
   return (
-    <Card cardWidth={cardWidth} onPress={handleLookbookPress}>
-      <CollageContainer cardWidth={cardWidth} isSelected={isSelected}>
+    <Card cardWidth={cardWidth} isDefault={isDefault} onPress={handlePress}>
+      <CollageContainer
+        cardWidth={cardWidth}
+        isSelected={isSelected}
+        isDefault={isDefault}
+      >
         {slots.map((img, index) =>
           img ? (
             <CollageImage key={index} index={index} source={{ uri: img }} />
@@ -54,9 +65,12 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
             ],
           }}
           isSelected={isSelected}
+          isDefault={isDefault}
         >
-          <CountText isSelected={isSelected}>
-            {isSelected ? lookbook.post_count + 1 : lookbook.post_count}
+          <CountText isSelected={isSelected} isDefault={isDefault}>
+            {isSelected || isDefault
+              ? lookbook.post_count + 1
+              : lookbook.post_count}
           </CountText>
         </CountBadge>
       </CollageContainer>
@@ -72,9 +86,15 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
   );
 };
 
-const Card = styled.Pressable<{ cardWidth: number }>`
+const Card = styled.Pressable<{ cardWidth: number; isDefault?: boolean }>`
   width: ${({ cardWidth }) => cardWidth}px;
   align-items: center;
+
+  ${({ isDefault }) =>
+    isDefault &&
+    `
+      opacity: 0.6; /* visually looks disabled */
+    `}
 `;
 
 const TextContainer = styled.View`
@@ -87,6 +107,7 @@ const Title = styled.Text<{ isHighlighted?: boolean }>`
   font-family: ${typography.body.fontFamily};
   font-size: 12px;
   color: ${colors.text.primary};
+  text-align: center;
 
   ${({ isHighlighted }) => `font-weight: ${isHighlighted ? 500 : 400};`}
 `;
@@ -108,16 +129,21 @@ const Author = styled.Text`
 const CollageContainer = styled.View<{
   cardWidth: number;
   isSelected?: boolean;
+  isDefault?: boolean;
 }>`
   width: 100%;
   height: ${({ cardWidth }) => cardWidth}px;
   flex-direction: row;
   flex-wrap: wrap;
   overflow: hidden;
-
   padding: 3px;
   border: 2px solid
-    ${({ isSelected }) => (isSelected ? colors.secondary.light : 'transparent')};
+    ${({ isSelected, isDefault }) =>
+      isDefault
+        ? colors.neutral[400] // default selected looks disabled
+        : isSelected
+        ? colors.secondary.light
+        : 'transparent'};
   border-radius: 24px;
 `;
 
@@ -176,24 +202,30 @@ const Placeholder = styled.View<{ index: number }>`
     `}
 `;
 
-const CountBadge = styled.View<{ isSelected?: boolean }>`
+const CountBadge = styled.View<{ isSelected?: boolean; isDefault?: boolean }>`
   position: absolute;
   top: 50%;
   left: 50%;
   border-radius: 12px;
-  background-color: #fff;
   align-items: center;
   justify-content: center;
 
-  ${({ isSelected }) => `
-  width: ${isSelected ? 24 : 18};
-  height: ${isSelected ? 24 : 18};
-  background-color: ${isSelected ? colors.secondary.medium : '#fff'};
+  ${({ isSelected, isDefault }) => `
+    width: ${isSelected || isDefault ? 24 : 18}px;
+    height: ${isSelected || isDefault ? 24 : 18}px;
+    background-color: ${
+      isDefault
+        ? colors.neutral[400]
+        : isSelected
+        ? colors.secondary.medium
+        : '#fff'
+    };
   `}
 `;
 
-const CountText = styled.Text<{ isSelected?: boolean }>`
-  color: ${({ isSelected }) => (isSelected ? '#fff' : colors.secondary.medium)};
+const CountText = styled.Text<{ isSelected?: boolean; isDefault?: boolean }>`
+  color: ${({ isSelected, isDefault }) =>
+    isDefault ? '#fff' : isSelected ? '#fff' : colors.secondary.medium};
   font-size: 12px;
   font-weight: 600;
 `;

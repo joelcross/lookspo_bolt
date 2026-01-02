@@ -89,6 +89,8 @@ const EmptyText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
   color: ${colors.neutral[400]};
+  padding: 16px;
+  font-style: italic;
 `;
 
 export default PostList;

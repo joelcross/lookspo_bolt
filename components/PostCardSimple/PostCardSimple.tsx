@@ -63,7 +63,7 @@ export default function PostCardSimple({
 }
 
 const PostContainer = styled.View`
-  margin-horizontal: 10px;
+  margin-horizontal: 5px;
   display: flex;
   flex-direction: column;
   background-color: white;

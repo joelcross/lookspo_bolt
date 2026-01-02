@@ -71,7 +71,6 @@ export default function CollectionScreen() {
   const fetchCollection = async () => {
     if (!id || !user) return;
 
-    //setLoading(true);
     try {
       const { data: collectionData } = await supabase
         .from('collections')

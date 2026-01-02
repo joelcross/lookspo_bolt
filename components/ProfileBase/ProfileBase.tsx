@@ -351,10 +351,10 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
             {isOwnProfile && (
               <Icons>
                 <Pressable onPress={() => setRenameModalVisible(true)}>
-                  <PencilIcon size={18} color={colors.primary[900]} />
+                  <PencilIcon size={18} color={colors.tertiary.dark} />
                 </Pressable>
                 <Pressable onPress={() => setDeleteModalVisible(true)}>
-                  <TrashIcon size={18} color={colors.primary[900]} />
+                  <TrashIcon size={18} color={colors.tertiary.dark} />
                 </Pressable>
               </Icons>
             )}

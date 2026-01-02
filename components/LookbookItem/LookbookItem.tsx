@@ -31,7 +31,7 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
 
   return (
     <Card cardWidth={cardWidth} onPress={handleLookbookPress}>
-      <CollageContainer cardWidth={cardWidth}>
+      <CollageContainer cardWidth={cardWidth} isSelected={isSelected}>
         {slots.map((img, index) =>
           img ? (
             <CollageImage key={index} index={index} source={{ uri: img }} />
@@ -105,12 +105,20 @@ const Author = styled.Text`
   color: ${colors.neutral[400]};
 `;
 
-const CollageContainer = styled.View<{ cardWidth: number }>`
+const CollageContainer = styled.View<{
+  cardWidth: number;
+  isSelected?: boolean;
+}>`
   width: 100%;
   height: ${({ cardWidth }) => cardWidth}px;
   flex-direction: row;
   flex-wrap: wrap;
   overflow: hidden;
+
+  padding: 3px;
+  border: 2px solid
+    ${({ isSelected }) => (isSelected ? colors.secondary.light : 'transparent')};
+  border-radius: 24px;
 `;
 
 const CollageImage = styled.Image<{ index: number }>`

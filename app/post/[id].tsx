@@ -21,6 +21,7 @@ import SaveModal from '@/components/SaveModal/SaveModal';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
+import { colors } from '@/theme/colors';
 
 export default function PostDetailScreen() {
   const { id: postId } = useLocalSearchParams<{ id: string }>();
@@ -340,6 +341,7 @@ export default function PostDetailScreen() {
 
             {savedCollections.length > 0 && (
               <LookbookCarouselWrapper>
+                <HeadingText>Featured In</HeadingText>
                 <LookbookCarousel collections={savedCollections} />
               </LookbookCarouselWrapper>
             )}
@@ -381,7 +383,6 @@ export default function PostDetailScreen() {
   );
 }
 
-// Styled Components
 const Container = styled.ScrollView`
   flex: 1;
 `;
@@ -399,6 +400,13 @@ const LookbookCarouselWrapper = styled.View`
   background-color: #ffffffff;
   margin: 5px;
   border-radius: 20px;
+`;
+
+const HeadingText = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  color: ${colors.secondary.medium};
+  padding: 12px;
 `;
 
 // Delete modal

@@ -46,7 +46,6 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
   );
 
   useEffect(() => {
-    console.log('selectedLookbook', selectedLookbook);
     if (collections.length > 0 && !selectedLookbook) {
       setSelectedLookbook(collections[0]);
       if (onSelectionChange) {

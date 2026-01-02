@@ -45,9 +45,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-  const [originalCollections, setOriginalCollections] = useState<Collection[]>(
-    []
-  );
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     name: '',
@@ -137,7 +134,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
     );
 
     setCollections(collectionsWithImages);
-    setOriginalCollections(collectionsWithImages);
     setLoading(false);
   };
 

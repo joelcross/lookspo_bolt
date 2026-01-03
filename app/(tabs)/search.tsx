@@ -9,16 +9,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
-import PageHeaderDropdown, {
-  SearchType,
-} from '@/components/HeaderDropdown/HeaderDropdown';
+import { SearchType } from '@/components/HeaderDropdown/HeaderDropdown';
 import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 import { colors } from '@/theme/colors';
+import LookbookGrid from '@/components/LookbookGrid/LookbookGrid';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -62,7 +60,24 @@ export default function SearchScreen() {
       .ilike('name', `%${query}%`);
 
     if (error) console.error('Error searching collections:', error);
-    setResults(data || []);
+
+    const collectionsWithImages = await Promise.all(
+      (data || []).map(async (col) => {
+        const { data: images, count } = await supabase
+          .from('saves')
+          .select('posts(image_url)', { count: 'exact' })
+          .eq('collection_id', col.id)
+          .order('created_at', { ascending: true })
+          .limit(4);
+
+        return {
+          ...col,
+          cover_images: images?.map((i) => i.posts.image_url) || [],
+          post_count: count || 0,
+        };
+      })
+    );
+    setResults(collectionsWithImages || []);
     setLoading(false);
   };
 
@@ -137,14 +152,14 @@ export default function SearchScreen() {
               ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
             />
           ) : (
-            <FlatList
-              key="collections"
-              data={results}
-              keyExtractor={(item) => item.id}
-              numColumns={3}
-              renderItem={renderCollectionItem}
-              contentContainerStyle={styles.gridContainer}
-            />
+            results.length > 0 && (
+              <LookbookGrid
+                collections={results}
+                showDefaultLookbook={false}
+                setCollections={null}
+                preSelected={[]}
+              />
+            )
           )
         ) : (
           <NoResultsText>Make a search to begin...</NoResultsText>

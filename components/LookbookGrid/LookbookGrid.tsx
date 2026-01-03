@@ -187,13 +187,15 @@ const ItemWrapper = styled.View`
 `;
 
 const NewLookbookCard = styled.TouchableOpacity`
-  width: ${CARD_WIDTH}px;
+  width: ${CARD_WIDTH - 10}px;
   aspect-ratio: 1;
   background-color: ${colors.neutral[200]};
   border-radius: 20px;
   justify-content: center;
   align-items: center;
+  margin: 5px;
 `;
+
 const ScrollableContent = styled.View`
   flex-shrink: 1;
   max-height: 70vh;

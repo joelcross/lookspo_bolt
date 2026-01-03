@@ -13,6 +13,8 @@ import LookbookItem from '../LookbookItem/LookbookItem';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Dimensions } from 'react-native';
 import { router } from 'expo-router';
+import { usePathname } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const NUM_COLUMNS = 4;
@@ -38,6 +40,7 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
   selectable = false,
   onSelectionChange,
 }) => {
+  const pathname = usePathname();
   const flatListRef = useRef<FlatList>(null);
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(true);
@@ -45,8 +48,11 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
     null
   );
 
+  const isProfileScreen =
+    pathname === '/profile' || pathname.startsWith('/user/');
+
   useEffect(() => {
-    if (collections.length > 0 && !selectedLookbook) {
+    if (isProfileScreen && collections.length > 0 && !selectedLookbook) {
       setSelectedLookbook(collections[0]);
       if (onSelectionChange) {
         onSelectionChange(collections[0]);
@@ -100,7 +106,7 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
           />
         )}
 
-        <FlatList
+        <FlashList
           ref={flatListRef}
           data={collections}
           horizontal

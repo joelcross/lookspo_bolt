@@ -16,7 +16,7 @@ import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 import { colors } from '@/theme/colors';
-import LookbookGrid from '@/components/LookbookGrid/LookbookGrid';
+import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -56,7 +56,7 @@ export default function SearchScreen() {
     setLoading(true);
     const { data, error } = await supabase
       .from('collections')
-      .select('id, name, cover_url')
+      .select('id, name, cover_url, user:user_id (username)')
       .ilike('name', `%${query}%`);
 
     if (error) console.error('Error searching collections:', error);
@@ -153,12 +153,7 @@ export default function SearchScreen() {
             />
           ) : (
             results.length > 0 && (
-              <LookbookGrid
-                collections={results}
-                showDefaultLookbook={false}
-                setCollections={null}
-                preSelected={[]}
-              />
+              <LookbookCarousel collections={results} displayMode="grid" />
             )
           )
         ) : (

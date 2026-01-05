@@ -111,7 +111,7 @@ const InputContainer = styled.View<{
 }>`
   flex-direction: row;
   align-items: center;
-  border-radius: 10px;
+  border-radius: 14px;
   padding-horizontal: 16px;
   background-color: #ffffff;
   border-width: 1px;

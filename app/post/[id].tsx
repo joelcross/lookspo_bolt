@@ -342,7 +342,10 @@ export default function PostDetailScreen() {
             {savedCollections.length > 0 && (
               <LookbookCarouselWrapper>
                 <HeadingText>Featured In</HeadingText>
-                <LookbookCarousel collections={savedCollections} />
+                <LookbookCarousel
+                  collections={savedCollections}
+                  displayMode="carousel"
+                />
               </LookbookCarouselWrapper>
             )}
           </>

@@ -127,7 +127,8 @@ export default function SaveModal({
           </HeaderRow>
           <LookbookGrid
             collections={collections}
-            showDefaultLookbook={false}
+            showDefaultLookbook={true}
+            incrementDefaultLookbook={false}
             setCollections={setCollections}
             preSelected={currentCollectionIds}
             confirmText="Done"

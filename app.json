@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lookspo.app"
+      "bundleIdentifier": "com.lookspo.app",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "package": "com.lookspo.app",

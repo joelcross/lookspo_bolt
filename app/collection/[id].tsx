@@ -134,7 +134,7 @@ export default function CollectionScreen() {
 
   if (loading) {
     return (
-      <Container style={styles.container}>
+      <Container>
         <ActivityIndicator size="large" color="#000" />
       </Container>
     );
@@ -142,14 +142,14 @@ export default function CollectionScreen() {
 
   if (!collection) {
     return (
-      <Container style={styles.container}>
+      <Container>
         <Text style={styles.errorText}>Collection not found</Text>
       </Container>
     );
   }
 
   return (
-    <Container style={styles.container} edges={['top']}>
+    <Container>
       <PageHeader
         text={collection.name}
         left="back"
@@ -232,20 +232,6 @@ export default function CollectionScreen() {
           </Overlay>
         </Modal>
       )}
-      {/* <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderPost}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-        ListEmptyComponent={
-          <TextWrapper>
-            <StyledText style={styles.emptyText}>
-              No posts in this collection
-            </StyledText>
-          </TextWrapper>
-        }
-      /> */}
       <PostList
         posts={posts}
         loading={loading}
@@ -260,6 +246,7 @@ export default function CollectionScreen() {
 
 const Container = styled.SafeAreaView`
   gap: 10px;
+  flex: 1;
 `;
 
 // Modal components

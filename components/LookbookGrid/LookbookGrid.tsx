@@ -28,6 +28,7 @@ interface Props {
   confirmText?: string;
   userId?: string;
   showDefaultLookbook?: boolean;
+  incrementDefaultLookbook?: boolean;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -48,6 +49,7 @@ export default function LookbookGrid({
   confirmText = 'Done',
   userId,
   showDefaultLookbook = true,
+  incrementDefaultLookbook = true,
 }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -133,6 +135,7 @@ export default function LookbookGrid({
                   lookbook={item}
                   cardWidth={CARD_WIDTH}
                   isDefault={showDefaultLookbook && index === 0}
+                  incrementDefaultLookbook={incrementDefaultLookbook}
                   isSelected={selectedIds.includes(item.id)}
                   handleLookbookPress={() => toggleSelect(item.id)}
                   hideAuthor

@@ -13,6 +13,7 @@ interface LookbookItemProps {
   isDefault?: boolean;
   isSelected?: boolean;
   isHighlighted?: boolean;
+  incrementDefaultLookbook?: boolean;
 }
 
 const LookbookItem: React.FC<LookbookItemProps> = ({
@@ -23,6 +24,7 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
   isDefault = false,
   isSelected,
   isHighlighted,
+  incrementDefaultLookbook,
 }) => {
   const slots = [...lookbook.cover_images];
 
@@ -68,7 +70,8 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
           isDefault={isDefault}
         >
           <CountText isSelected={isSelected} isDefault={isDefault}>
-            {isSelected || isDefault
+            {(isDefault && incrementDefaultLookbook) ||
+            (!isDefault && isSelected)
               ? lookbook.post_count + 1
               : lookbook.post_count}
           </CountText>
@@ -138,12 +141,17 @@ const CollageContainer = styled.View<{
   overflow: hidden;
   padding: 3px;
   border: 2px solid
-    ${({ isSelected, isDefault }) =>
-      isDefault
-        ? colors.neutral[400] // default selected looks disabled
-        : isSelected
-        ? colors.secondary.light
-        : 'transparent'};
+    ${({ isSelected, isDefault }) => {
+      if (isSelected && isDefault) {
+        return colors.neutral[400];
+      }
+
+      if (isSelected) {
+        return colors.secondary.light;
+      }
+
+      return 'transparent';
+    }};
   border-radius: 24px;
 `;
 
@@ -211,21 +219,25 @@ const CountBadge = styled.View<{ isSelected?: boolean; isDefault?: boolean }>`
   justify-content: center;
 
   ${({ isSelected, isDefault }) => `
-    width: ${isSelected || isDefault ? 24 : 18}px;
-    height: ${isSelected || isDefault ? 24 : 18}px;
-    background-color: ${
-      isDefault
+  width: ${isSelected ? 24 : 18}px;
+  height: ${isSelected ? 24 : 18}px;
+  background-color: ${
+    isSelected
+      ? isDefault
         ? colors.neutral[400]
-        : isSelected
-        ? colors.secondary.medium
-        : '#fff'
-    };
-  `}
+        : colors.secondary.medium
+      : '#fff'
+  };
+`}
 `;
 
 const CountText = styled.Text<{ isSelected?: boolean; isDefault?: boolean }>`
   color: ${({ isSelected, isDefault }) =>
-    isDefault ? '#fff' : isSelected ? '#fff' : colors.secondary.medium};
+    isSelected
+      ? '#fff'
+      : isDefault
+      ? colors.neutral[400]
+      : colors.secondary.medium};
   font-size: 12px;
   font-weight: 600;
 `;

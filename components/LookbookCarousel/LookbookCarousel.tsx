@@ -16,19 +16,9 @@ import { router } from 'expo-router';
 import { usePathname } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const NUM_COLUMNS = 4;
-const GRID_PADDING = 0;
-const GRID_GAP = 12;
-
-const CONTAINER_MARGIN = 10;
-
-const CARD_WIDTH =
-  (SCREEN_WIDTH - CONTAINER_MARGIN * 2 - GRID_GAP * (NUM_COLUMNS - 1)) /
-  NUM_COLUMNS;
-
 interface LookbookCarouselProps {
   collections: Collection[];
+  displayMode: 'grid' | 'carousel';
   hideAuthor?: Boolean;
   selectable?: Boolean;
   onSelectionChange?: (collection: Collection) => void;
@@ -36,6 +26,7 @@ interface LookbookCarouselProps {
 
 const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
   collections,
+  displayMode,
   hideAuthor = false,
   selectable = false,
   onSelectionChange,
@@ -50,6 +41,17 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
 
   const isProfileScreen =
     pathname === '/profile' || pathname.startsWith('/user/');
+
+  const SCREEN_WIDTH = Dimensions.get('window').width;
+  const NUM_COLUMNS = displayMode === 'grid' ? 3 : 4;
+  const GRID_GAP_HORIZONTAL = displayMode === 'grid' ? 36 : 12;
+  const GRID_GAP_VERTICAL = 12;
+  const CONTAINER_MARGIN = 10;
+  const CARD_WIDTH =
+    (SCREEN_WIDTH -
+      CONTAINER_MARGIN * 2 -
+      GRID_GAP_HORIZONTAL * (NUM_COLUMNS - 1)) /
+    NUM_COLUMNS;
 
   useEffect(() => {
     if (isProfileScreen && collections.length > 0 && !selectedLookbook) {
@@ -109,21 +111,28 @@ const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
         <FlashList
           ref={flatListRef}
           data={collections}
-          horizontal
+          numColumns={displayMode === 'grid' ? NUM_COLUMNS : 1}
+          horizontal={displayMode === 'carousel' ? true : false}
           showsHorizontalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16} // ensures frequent updates
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <LookbookItem
-              lookbook={item}
-              cardWidth={CARD_WIDTH}
-              hideAuthor={hideAuthor}
-              isHighlighted={selectedLookbook?.id === item.id}
-              handleLookbookPress={() => handleLookbookPress(item)}
+            <ItemWrapper>
+              <LookbookItem
+                lookbook={item}
+                cardWidth={CARD_WIDTH}
+                hideAuthor={hideAuthor}
+                isHighlighted={selectedLookbook?.id === item.id}
+                handleLookbookPress={() => handleLookbookPress(item)}
+              />
+            </ItemWrapper>
+          )}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{ height: GRID_GAP_VERTICAL, width: GRID_GAP_HORIZONTAL }}
             />
           )}
-          ItemSeparatorComponent={() => <View style={{ width: GRID_GAP }} />}
         />
 
         {showRightGradient && (
@@ -154,6 +163,10 @@ const Container = styled.View`
 
 const CarouselWrapper = styled.View`
   position: relative;
+`;
+
+const ItemWrapper = styled.View`
+  align-items: center;
 `;
 
 const EmptyState = styled.Text`

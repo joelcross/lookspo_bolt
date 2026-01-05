@@ -337,6 +337,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           ) : (
             <LookbookCarousel
               collections={collections}
+              displayMode="carousel"
               hideAuthor
               selectable
               onSelectionChange={(collection) =>

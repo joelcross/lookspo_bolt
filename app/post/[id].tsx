@@ -16,7 +16,7 @@ import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
 import PageHeader from '@/components/PageHeader/PageHeader';
 import PiecesCard from '@/components/PiecesCard/PiecesCard';
-import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import LookbooksDisplay from '@/components/LookbooksDisplay/LookbooksDisplay';
 import SaveModal from '@/components/SaveModal/SaveModal';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
@@ -340,13 +340,13 @@ export default function PostDetailScreen() {
             {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
 
             {savedCollections.length > 0 && (
-              <LookbookCarouselWrapper>
+              <LookbooksDisplayWrapper>
                 <HeadingText>Featured In</HeadingText>
-                <LookbookCarousel
+                <LookbooksDisplay
                   collections={savedCollections}
                   displayMode="carousel"
                 />
-              </LookbookCarouselWrapper>
+              </LookbooksDisplayWrapper>
             )}
           </>
         )}
@@ -399,7 +399,7 @@ const PostCardWrapper = styled.View`
   margin-horizontal: 5px;
 `;
 
-const LookbookCarouselWrapper = styled.View`
+const LookbooksDisplayWrapper = styled.View`
   background-color: #ffffffff;
   margin-horizontal: 5px;
   border-radius: 20px;

@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Collection, Profile } from '@/lib/types';
 import PageHeader from '@/components/PageHeader/PageHeader';
-import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import LookbooksDisplay from '@/components/LookbooksDisplay/LookbooksDisplay';
 import { BioCard } from '@/components/BioCard/BioCard';
 import { Button } from '../Button/Button';
 import styled from 'styled-components/native';
@@ -335,7 +335,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
-            <LookbookCarousel
+            <LookbooksDisplay
               collections={collections}
               displayMode="carousel"
               hideAuthor

@@ -16,7 +16,7 @@ import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
 import { colors } from '@/theme/colors';
-import LookbookCarousel from '@/components/LookbookCarousel/LookbookCarousel';
+import LookbooksDisplay from '@/components/LookbooksDisplay/LookbooksDisplay';
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -153,7 +153,7 @@ export default function SearchScreen() {
             />
           ) : (
             results.length > 0 && (
-              <LookbookCarousel collections={results} displayMode="grid" />
+              <LookbooksDisplay collections={results} displayMode="grid" />
             )
           )
         ) : (

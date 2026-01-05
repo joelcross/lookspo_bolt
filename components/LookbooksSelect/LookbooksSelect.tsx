@@ -41,7 +41,7 @@ const CARD_WIDTH =
   (SCREEN_WIDTH - CONTAINER_MARGIN * 2 - GRID_GAP * (NUM_COLUMNS - 1)) /
   NUM_COLUMNS;
 
-export default function LookbookGrid({
+export default function LookbooksSelect({
   collections,
   setCollections,
   preSelected = [],

@@ -16,7 +16,7 @@ import { router } from 'expo-router';
 import { usePathname } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 
-interface LookbookCarouselProps {
+interface LookbooksDisplayProps {
   collections: Collection[];
   displayMode: 'grid' | 'carousel';
   hideAuthor?: Boolean;
@@ -24,7 +24,7 @@ interface LookbookCarouselProps {
   onSelectionChange?: (collection: Collection) => void;
 }
 
-const LookbookCarousel: React.FC<LookbookCarouselProps> = ({
+const LookbooksDisplay: React.FC<LookbooksDisplayProps> = ({
   collections,
   displayMode,
   hideAuthor = false,
@@ -177,4 +177,4 @@ const EmptyState = styled.Text`
   text-align: center;
 `;
 
-export default LookbookCarousel;
+export default LookbooksDisplay;

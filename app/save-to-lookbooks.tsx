@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import LookbookGrid, {
+import LookbooksSelect, {
   Collection,
-} from '@/components/LookbookGrid/LookbookGrid';
+} from '@/components/LookbooksSelect/LookbooksSelect';
 import { Piece } from '@/lib/types';
 import PageHeader from '@/components/PageHeader/PageHeader';
 import styled from 'styled-components/native';
@@ -134,7 +134,7 @@ export default function SaveToLookbooksScreen() {
     <Container>
       <PageHeader text="Save to lookbooks?" left="back" />
       <SelectListWrapper>
-        <LookbookGrid
+        <LookbooksSelect
           preSelected={[collections[0]?.id]}
           showDefaultLookbook={true}
           collections={collections}

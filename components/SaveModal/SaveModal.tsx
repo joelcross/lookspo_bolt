@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { XIcon } from 'phosphor-react-native';
-import LookbookGrid from '@/components/LookbookGrid/LookbookGrid';
+import LookbooksSelect from '@/components/LookbooksSelect/LookbooksSelect';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { typography } from '@/theme/typography';
@@ -125,7 +125,7 @@ export default function SaveModal({
             <ModalTitle>Save to lookbooks</ModalTitle>
             <View style={{ width: 28 }} />
           </HeaderRow>
-          <LookbookGrid
+          <LookbooksSelect
             collections={collections}
             showDefaultLookbook={true}
             incrementDefaultLookbook={false}

@@ -21,7 +21,6 @@ export default function ActivityScreen() {
   const { user } = useAuth();
   const [feedType, setFeedType] = useState<ActivityType>('you');
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -31,7 +30,6 @@ export default function ActivityScreen() {
   const fetchActivities = async () => {
     if (!user) return;
 
-    setLoading(true);
     try {
       let query = supabase
         .from('activities')
@@ -80,7 +78,6 @@ export default function ActivityScreen() {
 
         if (followingIds.length === 0) {
           setActivities([]);
-          setLoading(false);
           return;
         }
 
@@ -95,7 +92,6 @@ export default function ActivityScreen() {
     } catch (error) {
       console.error('Error fetching activities:', error);
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -106,14 +102,9 @@ export default function ActivityScreen() {
   };
 
   const renderEmpty = () => {
-    if (loading) return null;
     return (
       <View>
-        <EmptyText>
-          {feedType === 'you'
-            ? 'No activity yet'
-            : 'Follow users to see their activity'}
-        </EmptyText>
+        <EmptyText>No activity to display.</EmptyText>
       </View>
     );
   };
@@ -147,21 +138,15 @@ export default function ActivityScreen() {
       />
 
       <Content>
-        {loading && !refreshing ? (
-          <View>
-            <ActivityIndicator size="large" color="#000" />
-          </View>
-        ) : (
-          <FlatList
-            data={activities}
-            keyExtractor={(item) => item.id}
-            renderItem={renderActivity}
-            onRefresh={handleRefresh}
-            refreshing={refreshing}
-            ListEmptyComponent={renderEmpty}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+        <FlatList
+          data={activities}
+          keyExtractor={(item) => item.id}
+          renderItem={renderActivity}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+          ListEmptyComponent={renderEmpty}
+          showsVerticalScrollIndicator={false}
+        />
       </Content>
     </Container>
   );

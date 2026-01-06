@@ -57,7 +57,6 @@ const PostList: React.FC<PostListProps> = ({
         onRefresh={handleRefresh}
         refreshing={refreshing}
         onEndReached={handleLoadMore}
-        ListFooterComponent={loading ? <ActivityIndicator /> : null}
         ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
       />
     </PostsContainer>

@@ -46,12 +46,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const [showModal, setShowModal] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({
-    name: '',
-    username: '',
-    bio: '',
-    avatar_url: '',
-  });
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
     null
@@ -206,43 +200,6 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
       console.error('Error toggling follow:', error);
       setIsFollowing(!newFollowingState);
     } finally {
-    }
-  };
-
-  // Save all changes
-  const handleSave = async () => {
-    if (!ownProfile) return;
-    try {
-      // Update profile
-      const { error: updateProfileError } = await supabase
-        .from('profiles')
-        .update({
-          name: form.name,
-          username: form.username,
-          bio: form.bio,
-          avatar_url: form.avatar_url,
-        })
-        .eq('id', ownProfile.id);
-      if (updateProfileError) throw updateProfileError;
-
-      // Delete removed collections
-      for (const id of removedCollectionIds) {
-        await supabase.from('saves').delete().eq('collection_id', id);
-        await supabase.from('collections').delete().eq('id', id);
-      }
-
-      // Add any new collections
-      for (const c of collections.filter((c) => c.isTemp)) {
-        await supabase
-          .from('collections')
-          .insert({ name: c.name, user_id: ownProfile.id });
-      }
-
-      await refreshProfile?.();
-      router.push('/profile');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to save profile');
     }
   };
 

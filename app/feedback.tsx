@@ -9,7 +9,6 @@ import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
 
 export default function FeedbackScreen() {
-  const router = useRouter();
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -39,15 +38,15 @@ export default function FeedbackScreen() {
   };
 
   return (
-    <Container>
+    <OuterContainer>
       <PageHeader text="Feedback" left="back" />
 
-      <Content>
-        <Heading>Have a question or a comment?</Heading>
-        <BodyText>We'd love to hear from you!</BodyText>
+      <InnerContainer>
+        <Content>
+          <Heading>Have a question or a comment?</Heading>
+          <BodyText>We'd love to hear from you!</BodyText>
 
-        {!submitted ? (
-          <>
+          {!submitted ? (
             <MessageInput
               placeholder="Type your feedback here..."
               placeholderTextColor={colors.neutral[400]}
@@ -56,31 +55,41 @@ export default function FeedbackScreen() {
               onChangeText={setMessage}
               textAlignVertical="top"
             />
+          ) : (
+            <TextWrapper>
+              <BodyText>Thank you for your feedback.</BodyText>
+            </TextWrapper>
+          )}
+        </Content>
 
-            <Button
-              title="Submit"
-              onPress={handleSubmit}
-              activeOpacity={0.8}
-            ></Button>
-          </>
-        ) : (
-          <TextWrapper>
-            <BodyText>Thank you for your feedback!</BodyText>
-          </TextWrapper>
-        )}
-      </Content>
-    </Container>
+        <ButtonWrapper>
+          <Button
+            title="Submit"
+            onPress={handleSubmit}
+            activeOpacity={0.8}
+            disabled={submitted}
+          />
+        </ButtonWrapper>
+      </InnerContainer>
+    </OuterContainer>
   );
 }
 
-const Container = styled.SafeAreaView`
+const OuterContainer = styled.SafeAreaView`
   flex: 1;
   background-color: ${colors.primary[100]};
 `;
 
-const Content = styled.View`
+const InnerContainer = styled.View`
   flex: 1;
-  padding: 24px;
+`;
+
+const Content = styled.View`
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 24px 24px 0 24px;
+  margin-horizontal: 5px;
+  margin-bottom: 24px;
 `;
 
 const Heading = styled.Text`
@@ -104,7 +113,7 @@ const MessageInput = styled.TextInput`
   border-radius: 12px;
   padding: 12px;
   font-family: ${typography.body.fontFamily};
-  font-size: 16px;
+  font-size: ${typography.body.fontSize}px;
   color: ${colors.text.primary};
   background-color: white;
   margin-bottom: 24px;
@@ -114,4 +123,11 @@ const MessageInput = styled.TextInput`
   outline-style: none;
 `;
 
-const TextWrapper = styled.View``;
+const TextWrapper = styled.View`
+  margin-top: 10px;
+`;
+
+const ButtonWrapper = styled.View`
+  margin-vertical: 24px;
+  margin-horizontal: 5px;
+`;

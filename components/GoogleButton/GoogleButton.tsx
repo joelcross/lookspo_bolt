@@ -5,17 +5,16 @@ import styled from 'styled-components/native';
 
 export function GoogleButton({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
-      <View style={styles.content}>
-        <Image
+    <ButtonWrapper onPress={onPress}>
+      <Content>
+        <Icon
           source={{
             uri: 'https://developers.google.com/identity/images/g-logo.png',
           }}
-          style={styles.icon}
         />
         <CustomText>Continue with Google</CustomText>
-      </View>
-    </TouchableOpacity>
+      </Content>
+    </ButtonWrapper>
   );
 }
 
@@ -24,23 +23,24 @@ const CustomText = styled.Text`
   font-size: ${typography.body.fontSize}px;
   color: ${colors.text.primary};
 `;
-const styles = StyleSheet.create({
-  button: {
-    height: 36,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#dadce0',
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  icon: {
-    width: 18,
-    height: 18,
-  },
-});
+
+const ButtonWrapper = styled.TouchableOpacity`
+  height: 36px;
+  border-radius: 20px;
+  border-width: 1px;
+  border-color: ${colors.tertiary.medium};
+  background-color: #fff;
+  justify-content: center;
+`;
+
+const Content = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+`;
+
+const Icon = styled.Image`
+  width: 18px;
+  height: 18px;
+`;

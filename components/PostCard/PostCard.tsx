@@ -73,9 +73,9 @@ export default function PostCard({
           uri={post.image_url}
           resizeMode="contain"
           style={{
-            borderRadius: 20,
-            borderBottomLeftRadius: showActions ? 0 : 20,
-            borderBottomRightRadius: showActions ? 0 : 20,
+            borderRadius: 10,
+            borderBottomLeftRadius: showActions ? 0 : 10,
+            borderBottomRightRadius: showActions ? 0 : 10,
           }}
         />
 

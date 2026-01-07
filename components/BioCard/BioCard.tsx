@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components/native';
 import SmartImage from '../SmartImage/SmartImage';
 import { useWindowDimensions } from 'react-native';
+import { Avatar } from '../Avatar/Avatar';
 
 type BioCardProps = {
   image: string;
@@ -18,15 +19,7 @@ export function BioCard({ image, name, bio, children }: BioCardProps) {
   return (
     <Container>
       <RowContent>
-        <SmartImage
-          uri={image}
-          shape="circle"
-          style={{
-            width: width * 0.25,
-            height: width * 0.25,
-          }}
-          resizeMode="cover"
-        />
+        <Avatar uri={image} size={width * 0.25} />
 
         <TextContent>
           <Name numberOfLines={1}>{name}</Name>

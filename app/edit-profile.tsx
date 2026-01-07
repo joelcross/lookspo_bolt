@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Modal,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { Modal, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import styled from 'styled-components/native';
 import { router } from 'expo-router';
@@ -13,15 +7,10 @@ import { supabase } from '@/lib/supabase';
 
 import PageHeader from '@/components/PageHeader/PageHeader';
 import { Button } from '@/components/Button/Button';
-import TextInput from '@/components/CustomTextInput/CustomTextInput';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
-
-/* ======================
-   Types
-====================== */
 
 type EditableProfile = {
   username: string;
@@ -29,10 +18,6 @@ type EditableProfile = {
   bio: string;
   avatarUrl: string | null;
 };
-
-/* ======================
-   Screen
-====================== */
 
 export default function EditProfileScreen() {
   const [initialProfile, setInitialProfile] = useState<EditableProfile | null>(
@@ -48,17 +33,17 @@ export default function EditProfileScreen() {
   const [tempValue, setTempValue] = useState('');
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const { profile } = useAuth();
+  const { profile, setProfile } = useAuth();
 
   useEffect(() => {
     if (!profile) return;
 
     const loadProfile = () => {
       const profile_data: EditableProfile = {
-        username: profile?.username,
-        name: profile?.name,
-        bio: profile?.bio,
-        avatarUrl: profile?.avatar_url,
+        username: profile.username,
+        name: profile.name,
+        bio: profile.bio,
+        avatarUrl: profile.avatar_url,
       };
 
       setInitialProfile(profile_data);
@@ -68,17 +53,9 @@ export default function EditProfileScreen() {
     loadProfile();
   }, []);
 
-  /* ======================
-     Derived state
-  ====================== */
-
   const hasChanges = useMemo(() => {
     return JSON.stringify(initialProfile) !== JSON.stringify(draftProfile);
   }, [initialProfile, draftProfile]);
-
-  /* ======================
-     Navigation
-  ====================== */
 
   const handleBack = () => {
     if (hasChanges) {
@@ -87,10 +64,6 @@ export default function EditProfileScreen() {
       router.back();
     }
   };
-
-  /* ======================
-     Field editing
-  ====================== */
 
   const openFieldEditor = (field: keyof EditableProfile) => {
     setTempValue(draftProfile?.[field] ?? '');
@@ -108,10 +81,6 @@ export default function EditProfileScreen() {
     setActiveField(null);
   };
 
-  /* ======================
-     Image picker
-  ====================== */
-
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -128,26 +97,63 @@ export default function EditProfileScreen() {
     }
   };
 
-  /* ======================
-     Save
-  ====================== */
-
   const handleSave = async () => {
     try {
+      let avatarUrl = initialProfile.avatarUrl;
+
+      // works with web + ios
+      const isLocalImage =
+        draftProfile.avatarUrl && !draftProfile.avatarUrl.startsWith('http');
+
+      if (isLocalImage) {
+        const response = await fetch(draftProfile.avatarUrl);
+        const arrayBuffer = await response.arrayBuffer();
+
+        const filePath = `${profile.id}/avatar.jpg`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, arrayBuffer, {
+            upsert: true,
+            contentType: 'image/jpeg',
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+
+        avatarUrl = data.publicUrl;
+      }
+
       const { error: updateProfileError } = await supabase
         .from('profiles')
         .update({
           name: draftProfile.name,
           username: draftProfile.username,
           bio: draftProfile.bio,
-          avatar_url: draftProfile.avatar_url,
+          avatar_url: avatarUrl,
         })
         .eq('id', profile.id);
+
       if (updateProfileError) throw updateProfileError;
 
-      setInitialProfile(draftProfile);
+      setInitialProfile({ ...draftProfile, avatarUrl: avatarUrl });
+
+      // Make sure updated profile is reflected in the context
+      const updatedProfile = {
+        ...profile,
+        name: draftProfile.name,
+        username: draftProfile.username,
+        bio: draftProfile.bio,
+        avatar_url: avatarUrl,
+      };
+      setProfile(updatedProfile);
+
       router.replace('/profile');
     } catch (err) {
+      console.error(err);
       Alert.alert('Error', 'Failed to save changes.');
     }
   };
@@ -167,7 +173,7 @@ export default function EditProfileScreen() {
         />
 
         <Content>
-          <ScrollView>
+          <ListContent>
             <EditRow
               label="Username"
               value={draftProfile.username}
@@ -191,16 +197,14 @@ export default function EditProfileScreen() {
               value="Change"
               onPress={pickImage}
             />
-          </ScrollView>
+          </ListContent>
 
           <Footer>
             <Button title="Save" onPress={handleSave} disabled={!hasChanges} />
           </Footer>
         </Content>
 
-        {/* ======================
-            Edit field modal
-        ====================== */}
+        {/* Edit field modal */}
         <Modal visible={!!activeField} transparent animationType="slide">
           <Overlay>
             <ModalCard>
@@ -225,9 +229,7 @@ export default function EditProfileScreen() {
           </Overlay>
         </Modal>
 
-        {/* ======================
-            Leave without saving
-        ====================== */}
+        {/* Leave without saving */}
         <Modal visible={showLeaveModal} transparent animationType="fade">
           <Overlay>
             <ModalCard>
@@ -255,10 +257,6 @@ export default function EditProfileScreen() {
   );
 }
 
-/* ======================
-   Reusable row
-====================== */
-
 function EditRow({
   label,
   value,
@@ -271,22 +269,25 @@ function EditRow({
   return (
     <Row onPress={onPress}>
       <Label>{label}</Label>
-      <Value numberOfLines={1}>{value || '—'}</Value>
+      <Value numberOfLines={1} value={value}>
+        {value || '—'}
+      </Value>
     </Row>
   );
 }
 
-/* ======================
-   Styles
-====================== */
-
 const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: #fff;
 `;
 
 const Content = styled.View`
   flex: 1;
+`;
+
+const ListContent = styled.View`
+  background: #fff;
+  border-radius: 20px;
+  margin-horizontal: 5px;
 `;
 
 const Row = styled.Pressable`
@@ -294,8 +295,6 @@ const Row = styled.Pressable`
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom-width: 1px;
-  border-bottom-color: ${colors.neutral[200]};
 `;
 
 const Label = styled.Text`
@@ -304,16 +303,21 @@ const Label = styled.Text`
   color: ${colors.text.primary};
 `;
 
-const Value = styled.Text`
+const Value = styled.Text<{ value?: string }>`
   max-width: 60%;
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.text.secondary};
+  color: ${colors.tertiary.dark};
   text-align: right;
+
+  color: ${({ value }) =>
+    value === 'Change' ? colors.secondary.medium : colors.tertiary.dark};
 `;
 
 const Footer = styled.View`
-  padding: 16px;
+  margin-top: auto;
+  margin-bottom: 5px;
+  margin-horizontal: 5px;
 `;
 
 const Overlay = styled.Pressable`

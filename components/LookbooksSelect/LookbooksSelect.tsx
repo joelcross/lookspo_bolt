@@ -14,6 +14,7 @@ import { Button } from '../Button/Button';
 import TextInput from '../CustomTextInput/CustomTextInput';
 import LookbookItem from '../LookbookItem/LookbookItem';
 import { FlashList } from '@shopify/flash-list';
+import CustomTextInput from '../CustomTextInput/CustomTextInput';
 
 export interface Collection {
   id: string;
@@ -156,21 +157,25 @@ export default function LookbooksSelect({
               <ModalCard>
                 <ModalTitle>New Collection</ModalTitle>
 
-                <TextInput
+                <CustomTextInput
                   placeholder="Enter collection name"
                   value={newCollectionName}
                   onChangeText={setNewCollectionName}
                   autoFocus
                 />
 
-                <NewCollectionButtonWrapper>
-                  <Button
-                    title="Cancel"
-                    variant="secondary"
-                    onPress={() => setShowModal(false)}
-                  />
-                  <Button title="Create" onPress={handleCreateCollection} />
-                </NewCollectionButtonWrapper>
+                <NewCollectionButtonsWrapper>
+                  <ButtonWrapper>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setShowModal(false)}
+                    />
+                  </ButtonWrapper>
+                  <ButtonWrapper>
+                    <Button title="Create" onPress={handleCreateCollection} />
+                  </ButtonWrapper>
+                </NewCollectionButtonsWrapper>
               </ModalCard>
             </TouchableWithoutFeedback>
           </Overlay>
@@ -208,10 +213,14 @@ const PostButtonWrapper = styled.View`
   margin: 16px;
 `;
 
-const NewCollectionButtonWrapper = styled.View`
+const ButtonWrapper = styled.View`
+  flex: 1;
+`;
+
+const NewCollectionButtonsWrapper = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  margin-top: 16px;
+  gap: 5px;
+  margin-top: 24px;
 `;
 
 // Modal
@@ -237,7 +246,8 @@ const ModalCard = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
+  font-weight: ${typography.heading3.fontWeight};
   text-align: center;
-  margin-bottom: 20px;
-  color: #000;
+  margin-bottom: 12px;
+  color: ${colors.primary[900]};
 `;

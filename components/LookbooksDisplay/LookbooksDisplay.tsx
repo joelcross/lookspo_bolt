@@ -80,80 +80,77 @@ const LookbooksDisplay: React.FC<LookbooksDisplayProps> = ({
     }
   };
 
-  if (collections.length === 0) {
+  if (collections.length > 0) {
     return (
       <Container>
-        <EmptyState>This look is not saved to any lookbooks yet.</EmptyState>
+        <CarouselWrapper>
+          {showLeftGradient && (
+            <LinearGradient
+              colors={['white', 'transparent']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 30,
+                zIndex: 1,
+              }}
+              pointerEvents="none"
+            />
+          )}
+
+          <FlashList
+            ref={flatListRef}
+            data={collections}
+            numColumns={displayMode === 'grid' ? NUM_COLUMNS : 1}
+            horizontal={displayMode === 'carousel' ? true : false}
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16} // ensures frequent updates
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ItemWrapper>
+                <LookbookItem
+                  lookbook={item}
+                  cardWidth={CARD_WIDTH}
+                  hideAuthor={hideAuthor}
+                  isHighlighted={selectedLookbook?.id === item.id}
+                  handleLookbookPress={() => handleLookbookPress(item)}
+                />
+              </ItemWrapper>
+            )}
+            ItemSeparatorComponent={() => (
+              <View
+                style={{
+                  height: GRID_GAP_VERTICAL,
+                  width: GRID_GAP_HORIZONTAL,
+                }}
+              />
+            )}
+          />
+
+          {showRightGradient && (
+            <LinearGradient
+              colors={['transparent', 'white']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 30,
+                zIndex: 1,
+              }}
+              pointerEvents="none"
+            />
+          )}
+        </CarouselWrapper>
       </Container>
     );
   }
-
-  return (
-    <Container>
-      <CarouselWrapper>
-        {showLeftGradient && (
-          <LinearGradient
-            colors={['white', 'transparent']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 30,
-              zIndex: 1,
-            }}
-            pointerEvents="none"
-          />
-        )}
-
-        <FlashList
-          ref={flatListRef}
-          data={collections}
-          numColumns={displayMode === 'grid' ? NUM_COLUMNS : 1}
-          horizontal={displayMode === 'carousel' ? true : false}
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16} // ensures frequent updates
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ItemWrapper>
-              <LookbookItem
-                lookbook={item}
-                cardWidth={CARD_WIDTH}
-                hideAuthor={hideAuthor}
-                isHighlighted={selectedLookbook?.id === item.id}
-                handleLookbookPress={() => handleLookbookPress(item)}
-              />
-            </ItemWrapper>
-          )}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{ height: GRID_GAP_VERTICAL, width: GRID_GAP_HORIZONTAL }}
-            />
-          )}
-        />
-
-        {showRightGradient && (
-          <LinearGradient
-            colors={['transparent', 'white']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 30,
-              zIndex: 1,
-            }}
-            pointerEvents="none"
-          />
-        )}
-      </CarouselWrapper>
-    </Container>
-  );
 };
 
 const Container = styled.View`

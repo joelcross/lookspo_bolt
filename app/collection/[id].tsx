@@ -132,120 +132,121 @@ export default function CollectionScreen() {
     <PostCard post={item} showActions={false} />
   );
 
-  if (loading) {
-    return (
-      <Container>
-        <ActivityIndicator size="large" color="#000" />
-      </Container>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Container>
+  //       <ActivityIndicator size="large" color="#000" />
+  //     </Container>
+  //   );
+  // }
 
-  if (!collection) {
-    return (
-      <Container>
-        <Text style={styles.errorText}>Collection not found</Text>
-      </Container>
-    );
-  }
+  // if (!collection) {
+  //   return (
+  //     <Container>
+  //       <ErrorText>Collection not found</ErrorText>
+  //     </Container>
+  //   );
+  // }
 
   return (
-    <Container>
-      <PageHeader
-        text={collection.name}
-        left="back"
-        right={isOwnCollection ? 'more' : undefined}
-        onCustomPress={handleCustomPress}
-      />
+    collection && (
+      <Container>
+        <PageHeader
+          text={collection.name}
+          left="back"
+          right={isOwnCollection ? 'more' : undefined}
+          onCustomPress={handleCustomPress}
+        />
 
-      {/* Three vertical dots dropdown */}
-      {menuVisible && (
-        <Modal transparent animationType="none" visible={menuVisible}>
-          <DropdownOverlay onPress={() => setMenuVisible(false)}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <MenuItem
-                  onPress={() => {
-                    setRenameModalVisible(true);
-                    setMenuVisible(false);
-                  }}
-                >
-                  <RenameText>Rename</RenameText>
-                </MenuItem>
-                <MenuItem
-                  onPress={() => {
-                    handleDelete();
-                    setMenuVisible(false);
-                  }}
-                >
-                  <DeleteText>Delete</DeleteText>
-                </MenuItem>
-              </DropdownMenu>
-            </Pressable>
-          </DropdownOverlay>
-        </Modal>
-      )}
+        {/* Three vertical dots dropdown */}
+        {menuVisible && (
+          <Modal transparent animationType="none" visible={menuVisible}>
+            <DropdownOverlay onPress={() => setMenuVisible(false)}>
+              <Pressable onPress={(e) => e.stopPropagation()}>
+                <DropdownMenu>
+                  <MenuItem
+                    onPress={() => {
+                      setRenameModalVisible(true);
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <RenameText>Rename</RenameText>
+                  </MenuItem>
+                  <MenuItem
+                    onPress={() => {
+                      handleDelete();
+                      setMenuVisible(false);
+                    }}
+                  >
+                    <DeleteText>Delete</DeleteText>
+                  </MenuItem>
+                </DropdownMenu>
+              </Pressable>
+            </DropdownOverlay>
+          </Modal>
+        )}
 
-      {/* Rename modal */}
-      {renameModalVisible && (
-        <Modal transparent animationType="fade" visible={renameModalVisible}>
-          <Overlay onPress={() => setRenameModalVisible(false)}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <ModalCard>
-                <ModalTitle>Rename Collection</ModalTitle>
-                <CustomTextInput
-                  placeholder="Enter new collection name"
-                  value={newCollectionName}
-                  onChangeText={setNewCollectionName}
-                  autoFocus
-                />
+        {/* Rename modal */}
+        {renameModalVisible && (
+          <Modal transparent animationType="fade" visible={renameModalVisible}>
+            <Overlay onPress={() => setRenameModalVisible(false)}>
+              <Pressable onPress={(e) => e.stopPropagation()}>
+                <ModalCard>
+                  <ModalTitle>Rename Collection</ModalTitle>
+                  <CustomTextInput
+                    placeholder="Enter new collection name"
+                    value={newCollectionName}
+                    onChangeText={setNewCollectionName}
+                    autoFocus
+                  />
+                  <ButtonRow>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setRenameModalVisible(false)}
+                    />
+                    <Button title="Done" onPress={handleRename} />
+                  </ButtonRow>
+                </ModalCard>
+              </Pressable>
+            </Overlay>
+          </Modal>
+        )}
+
+        {/* Delete modal */}
+        {deleteModalVisible && (
+          <Modal transparent animationType="fade" visible={deleteModalVisible}>
+            <Overlay onPress={() => setdeleteModalVisible(false)}>
+              <ModalCard onPress={(e) => e.stopPropagation()}>
+                <ModalTitle>
+                  Are you sure you want to delete this collection?
+                </ModalTitle>
                 <ButtonRow>
                   <Button
                     title="Cancel"
                     variant="secondary"
-                    onPress={() => setRenameModalVisible(false)}
+                    onPress={() => setdeleteModalVisible(false)}
                   />
-                  <Button title="Done" onPress={handleRename} />
+                  <Button title="Delete" onPress={handleDeleteCollection} />
                 </ButtonRow>
               </ModalCard>
-            </Pressable>
-          </Overlay>
-        </Modal>
-      )}
-
-      {/* Delete modal */}
-      {deleteModalVisible && (
-        <Modal transparent animationType="fade" visible={deleteModalVisible}>
-          <Overlay onPress={() => setdeleteModalVisible(false)}>
-            <ModalCard onPress={(e) => e.stopPropagation()}>
-              <ModalTitle>
-                Are you sure you want to delete this collection?
-              </ModalTitle>
-              <ButtonRow>
-                <Button
-                  title="Cancel"
-                  variant="secondary"
-                  onPress={() => setdeleteModalVisible(false)}
-                />
-                <Button title="Delete" onPress={handleDeleteCollection} />
-              </ButtonRow>
-            </ModalCard>
-          </Overlay>
-        </Modal>
-      )}
-      <PostList
-        posts={posts}
-        loading={loading}
-        refreshing={refreshing}
-        emptyText={'This lookbook is empty.'}
-        handleLoadMore={handleLoadMore}
-        handleRefresh={handleRefresh}
-      />
-    </Container>
+            </Overlay>
+          </Modal>
+        )}
+        <PostList
+          posts={posts}
+          loading={loading}
+          refreshing={refreshing}
+          emptyText={'This lookbook is empty.'}
+          handleLoadMore={handleLoadMore}
+          handleRefresh={handleRefresh}
+        />
+      </Container>
+    )
   );
 }
 
 const Container = styled.SafeAreaView`
-  gap: 10px;
   flex: 1;
 `;
 
@@ -322,19 +323,9 @@ const ButtonRow = styled.View`
   justify-content: space-between;
 `;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-  },
-});
+const ErrorText = styled.Text`
+  font-size: 16px;
+  color: #999;
+  text-align: center;
+  margin-top: 40px;
+`;

@@ -199,9 +199,9 @@ export default function EditProfileScreen() {
             />
           </ListContent>
 
-          <Footer>
+          <SaveButtonWrapper>
             <Button title="Save" onPress={handleSave} disabled={!hasChanges} />
-          </Footer>
+          </SaveButtonWrapper>
         </Content>
 
         {/* Edit field modal */}
@@ -209,21 +209,26 @@ export default function EditProfileScreen() {
           <Overlay>
             <ModalCard>
               <ModalTitle>Edit {activeField}</ModalTitle>
-
-              <CustomTextInput
-                value={tempValue}
-                onChangeText={setTempValue}
-                autoFocus
-                multiline={activeField === 'bio'}
-              />
+              <TextInputWrapper>
+                <CustomTextInput
+                  value={tempValue}
+                  onChangeText={setTempValue}
+                  autoFocus
+                  multiline={activeField === 'bio'}
+                />
+              </TextInputWrapper>
 
               <ModalActions>
-                <Button
-                  title="Cancel"
-                  variant="secondary"
-                  onPress={() => setActiveField(null)}
-                />
-                <Button title="Save" onPress={saveField} />
+                <ModalButtonWrapper>
+                  <Button
+                    title="Cancel"
+                    variant="secondary"
+                    onPress={() => setActiveField(null)}
+                  />
+                </ModalButtonWrapper>
+                <ModalButtonWrapper>
+                  <Button title="Save" onPress={saveField} />
+                </ModalButtonWrapper>
               </ModalActions>
             </ModalCard>
           </Overlay>
@@ -234,20 +239,23 @@ export default function EditProfileScreen() {
           <Overlay>
             <ModalCard>
               <ModalTitle>Leave without saving changes?</ModalTitle>
-
               <ModalActions>
-                <Button
-                  title="Cancel"
-                  variant="secondary"
-                  onPress={() => setShowLeaveModal(false)}
-                />
-                <Button
-                  title="OK"
-                  onPress={() => {
-                    setShowLeaveModal(false);
-                    router.back();
-                  }}
-                />
+                <ModalButtonWrapper>
+                  <Button
+                    title="Cancel"
+                    variant="secondary"
+                    onPress={() => setShowLeaveModal(false)}
+                  />
+                </ModalButtonWrapper>
+                <ModalButtonWrapper>
+                  <Button
+                    title="OK"
+                    onPress={() => {
+                      setShowLeaveModal(false);
+                      router.back();
+                    }}
+                  />
+                </ModalButtonWrapper>
               </ModalActions>
             </ModalCard>
           </Overlay>
@@ -280,13 +288,16 @@ const Container = styled.SafeAreaView`
   flex: 1;
 `;
 
-const Content = styled.View`
-  flex: 1;
-`;
+const Content = styled.View``;
 
 const ListContent = styled.View`
   background: #fff;
   border-radius: 20px;
+  margin-horizontal: 5px;
+  margin-bottom: 5px;
+`;
+
+const SaveButtonWrapper = styled.View`
   margin-horizontal: 5px;
 `;
 
@@ -314,10 +325,12 @@ const Value = styled.Text<{ value?: string }>`
     value === 'Change' ? colors.secondary.medium : colors.tertiary.dark};
 `;
 
-const Footer = styled.View`
-  margin-top: auto;
-  margin-bottom: 5px;
-  margin-horizontal: 5px;
+const TextInputWrapper = styled.View`
+  margin-bottom: 24px;
+`;
+
+const ModalButtonWrapper = styled.View`
+  flex: 1;
 `;
 
 const Overlay = styled.Pressable`
@@ -328,7 +341,7 @@ const Overlay = styled.Pressable`
 `;
 
 const ModalCard = styled.View`
-  width: 88%;
+  width: 85vw;
   background-color: #fff;
   border-radius: 20px;
   padding: 24px;
@@ -337,12 +350,12 @@ const ModalCard = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
+  font-weight: ${typography.heading3.fontWeight};
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 `;
 
 const ModalActions = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  margin-top: 16px;
+  gap: 8px;
 `;

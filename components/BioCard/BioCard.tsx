@@ -2,7 +2,6 @@ import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import React from 'react';
 import styled from 'styled-components/native';
-import SmartImage from '../SmartImage/SmartImage';
 import { useWindowDimensions } from 'react-native';
 import { Avatar } from '../Avatar/Avatar';
 
@@ -39,7 +38,6 @@ export function BioCard({ image, name, bio, children }: BioCardProps) {
 const Container = styled.View`
   background-color: #fff;
   border-radius: 20px;
-  margin-horizontal: 5px;
   padding: 10px;
   overflow: hidden;
 `;

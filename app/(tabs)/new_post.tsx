@@ -146,7 +146,7 @@ export default function NewPostScreen() {
           <Button
             title="Next"
             onPress={handleNext}
-            style={{ marginHorizontal: 10, marginBottom: 10 }}
+            style={{ marginHorizontal: 5 }}
           />
         </Content>
       </ScrollableContent>
@@ -196,6 +196,7 @@ const ScrollableContent = styled.ScrollView`
 
 const Content = styled.View`
   gap: 5px;
+  margin-bottom: 5px;
 `;
 
 // Empty State

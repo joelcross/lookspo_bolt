@@ -156,6 +156,6 @@ const Container = styled.View`
 const SelectListWrapper = styled.View`
   flex: 1;
   background-color: #fff;
-  margin: 5px;
+  margin-horizontal: 5px;
   border-radius: 20px;
 `;

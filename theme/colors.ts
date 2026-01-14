@@ -35,4 +35,16 @@ export const colors = {
     warning: '#FBBF24', // Orange
     info: '#60A5FA', // Blue
   },
+  like: {
+    light: '#fff3f0ff',
+    dark: '#c74d34',
+  },
+  follow: {
+    light: '#eaedf5ff',
+    dark: '#4462a2ff',
+  },
+  save: {
+    light: '#ebf5ebff',
+    dark: '#5f9061ff',
+  },
 };

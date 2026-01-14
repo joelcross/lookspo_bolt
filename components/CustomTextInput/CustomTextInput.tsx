@@ -79,6 +79,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
         error={isError}
         success={isSuccess}
         disabled={isDisabled}
+        multiline={rest.multiline}
       >
         {renderIcon()}
         <StyledTextInput
@@ -108,13 +109,16 @@ const InputContainer = styled.View<{
   error?: boolean;
   success?: boolean;
   disabled?: boolean;
+  multiline?: boolean;
 }>`
   flex-direction: row;
-  align-items: center;
   border-radius: 14px;
   padding-horizontal: 16px;
   background-color: #ffffff;
   border-width: 1px;
+
+  align-items: ${(props) => (props.multiline ? 'flex-start' : 'center')};
+
   border-color: ${(props) =>
     props.error
       ? colors.feedback.error
@@ -140,7 +144,12 @@ const StyledTextInput = styled(TextInput)<{
 }>`
   flex: 1;
   color: ${(props) => (props.disabled ? '#9E9E9E' : '#212121')};
-  padding-vertical: 12px;
+
+  padding-vertical: ${(props) => (props.multiline ? '12px' : '0px')};
+  padding-top: 12px;
+  padding-bottom: 12px;
+
+  text-align-vertical: ${(props) => (props.multiline ? 'top' : 'center')};
 
   outline-width: 0;
   outline-color: transparent;
@@ -149,6 +158,12 @@ const StyledTextInput = styled(TextInput)<{
   font-family: ${typography.body.fontFamily};
   font-weight: ${typography.body.fontWeight};
   font-size: ${typography.body.fontSize}px;
+
+  ${(props) =>
+    props.multiline &&
+    css`
+      min-height: 120px;
+    `}
 `;
 
 // Helper message (error/success)

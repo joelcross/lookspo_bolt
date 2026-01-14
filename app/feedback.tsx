@@ -1,12 +1,12 @@
 // screens/FeedbackScreen.tsx or wherever you keep it
 import React, { useState } from 'react';
-import { Alert, Linking, Text } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Alert, Linking, View } from 'react-native';
 import styled from 'styled-components/native';
 import PageHeader from '@/components/PageHeader/PageHeader';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from '@/components/Button/Button';
+import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
 
 export default function FeedbackScreen() {
   const [message, setMessage] = useState('');
@@ -47,14 +47,14 @@ export default function FeedbackScreen() {
           <BodyText>We'd love to hear from you!</BodyText>
 
           {!submitted ? (
-            <MessageInput
-              placeholder="Type your feedback here..."
-              placeholderTextColor={colors.neutral[400]}
-              multiline
-              value={message}
-              onChangeText={setMessage}
-              textAlignVertical="top"
-            />
+            <View style={{ marginBottom: 20 }}>
+              <CustomTextInput
+                placeholder="Type your feedback here..."
+                multiline
+                value={message}
+                onChangeText={setMessage}
+              />
+            </View>
           ) : (
             <TextWrapper>
               <BodyText>Thank you for your feedback.</BodyText>
@@ -89,7 +89,6 @@ const Content = styled.View`
   border-radius: 20px;
   padding: 24px 24px 0 24px;
   margin-horizontal: 5px;
-  margin-bottom: 24px;
 `;
 
 const Heading = styled.Text`
@@ -107,27 +106,11 @@ const BodyText = styled.Text`
   margin-bottom: 24px;
 `;
 
-const MessageInput = styled.TextInput`
-  height: 160px;
-  border: 1px solid ${colors.neutral[400]};
-  border-radius: 12px;
-  padding: 12px;
-  font-family: ${typography.body.fontFamily};
-  font-size: ${typography.body.fontSize}px;
-  color: ${colors.text.primary};
-  background-color: white;
-  margin-bottom: 24px;
-
-  outline-width: 0;
-  outline-color: transparent;
-  outline-style: none;
-`;
-
 const TextWrapper = styled.View`
   margin-top: 10px;
 `;
 
 const ButtonWrapper = styled.View`
-  margin-vertical: 24px;
+  margin-vertical: 5px;
   margin-horizontal: 5px;
 `;

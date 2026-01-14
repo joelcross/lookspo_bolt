@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   TextInput,
@@ -8,7 +8,7 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Plus, X } from 'lucide-react-native';
@@ -46,10 +46,13 @@ export default function PostDetailScreen() {
   const router = useRouter();
 
   // Fetch post + likes + saves + collections in ONE optimized query
-  useEffect(() => {
-    if (!postId || !user) return;
-    fetchEverything();
-  }, [postId, user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!postId || !user) return;
+
+      fetchEverything();
+    }, [postId, user])
+  );
 
   const fetchEverything = async () => {
     try {
@@ -220,169 +223,168 @@ export default function PostDetailScreen() {
     }
   };
 
-  if (loading || !post) {
-    return (
-      <Container>
-        <ActivityIndicator size="large" color="#000" />
-      </Container>
-    );
-  }
-
   return (
-    <Container showsVerticalScrollIndicator={false}>
-      <PageHeader
-        text="Look"
-        left="back"
-        right={isOwnPost ? 'trash' : undefined}
-        onCustomPress={() => setDeleteModalVisible(true)}
-      />
+    !loading &&
+    post && (
+      <Container showsVerticalScrollIndicator={false}>
+        <PageHeader
+          text="Look"
+          left="back"
+          right={isOwnPost ? 'trash' : undefined}
+          onCustomPress={() => setDeleteModalVisible(true)}
+        />
 
-      <Content>
-        <PostCardWrapper>
-          <PostCard
-            post={post}
-            onLikeToggle={handleLike}
-            onSavePress={() => setSaveModalVisible(true)}
-            showActions
-            isLiked={isLiked}
-            isSaved={isSaved}
-          />
-        </PostCardWrapper>
-
-        {/* Edit Mode */}
-        {isEditing ? (
-          <>
-            <TextInput
-              multiline
-              value={editedCaption}
-              onChangeText={setEditedCaption}
-              placeholder="Write a caption..."
-              style={styles.editInput}
+        <Content>
+          <PostCardWrapper>
+            <PostCard
+              post={post}
+              onLikeToggle={handleLike}
+              onSavePress={() => setSaveModalVisible(true)}
+              showActions
+              isLiked={isLiked}
+              isSaved={isSaved}
             />
+          </PostCardWrapper>
 
-            {editedPieces.map((piece, i) => (
-              <View key={i} style={styles.pieceRow}>
-                <TextInput
-                  placeholder="Name"
-                  value={piece.name}
-                  onChangeText={(t) => {
-                    const updated = [...editedPieces];
-                    updated[i].name = t;
-                    setEditedPieces(updated);
-                  }}
-                  style={[
-                    styles.pieceInput,
-                    showValidationErrors &&
-                      !piece.name.trim() &&
-                      styles.invalid,
-                  ]}
-                />
-                <TextInput
-                  placeholder="Brand"
-                  value={piece.brand}
-                  onChangeText={(t) => {
-                    const updated = [...editedPieces];
-                    updated[i].brand = t;
-                    setEditedPieces(updated);
-                  }}
-                  style={[
-                    styles.pieceInput,
-                    showValidationErrors &&
-                      !piece.brand.trim() &&
-                      styles.invalid,
-                  ]}
-                />
+          {/* Edit Mode */}
+          {isEditing ? (
+            <>
+              <TextInput
+                multiline
+                value={editedCaption}
+                onChangeText={setEditedCaption}
+                placeholder="Write a caption..."
+                style={styles.editInput}
+              />
+
+              {editedPieces.map((piece, i) => (
+                <View key={i} style={styles.pieceRow}>
+                  <TextInput
+                    placeholder="Name"
+                    value={piece.name}
+                    onChangeText={(t) => {
+                      const updated = [...editedPieces];
+                      updated[i].name = t;
+                      setEditedPieces(updated);
+                    }}
+                    style={[
+                      styles.pieceInput,
+                      showValidationErrors &&
+                        !piece.name.trim() &&
+                        styles.invalid,
+                    ]}
+                  />
+                  <TextInput
+                    placeholder="Brand"
+                    value={piece.brand}
+                    onChangeText={(t) => {
+                      const updated = [...editedPieces];
+                      updated[i].brand = t;
+                      setEditedPieces(updated);
+                    }}
+                    style={[
+                      styles.pieceInput,
+                      showValidationErrors &&
+                        !piece.brand.trim() &&
+                        styles.invalid,
+                    ]}
+                  />
+                  <TouchableOpacity
+                    onPress={() =>
+                      setEditedPieces((prev) =>
+                        prev.filter((_, idx) => idx !== i)
+                      )
+                    }
+                  >
+                    <X size={20} color="#999" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+
+              <TouchableOpacity
+                style={styles.addPieceBtn}
+                onPress={() =>
+                  setEditedPieces((prev) => [
+                    ...prev,
+                    { name: '', brand: '', url: '' },
+                  ])
+                }
+              >
+                <Plus size={18} color="#000" />
+                <Text style={styles.addPieceText}>Add piece</Text>
+              </TouchableOpacity>
+
+              <View style={styles.editActions}>
                 <TouchableOpacity
-                  onPress={() =>
-                    setEditedPieces((prev) =>
-                      prev.filter((_, idx) => idx !== i)
-                    )
-                  }
+                  onPress={() => setIsEditing(false)}
+                  style={styles.cancelBtn}
                 >
-                  <X size={20} color="#999" />
+                  <Text>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleSaveEdits}
+                  disabled={isSavingEdits}
+                  style={styles.saveBtn}
+                >
+                  <Text style={{ color: '#fff' }}>
+                    {isSavingEdits ? 'Saving...' : 'Save Changes'}
+                  </Text>
                 </TouchableOpacity>
               </View>
-            ))}
+            </>
+          ) : (
+            <>
+              {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
 
-            <TouchableOpacity
-              style={styles.addPieceBtn}
-              onPress={() =>
-                setEditedPieces((prev) => [
-                  ...prev,
-                  { name: '', brand: '', url: '' },
-                ])
-              }
-            >
-              <Plus size={18} color="#000" />
-              <Text style={styles.addPieceText}>Add piece</Text>
-            </TouchableOpacity>
-
-            <View style={styles.editActions}>
-              <TouchableOpacity
-                onPress={() => setIsEditing(false)}
-                style={styles.cancelBtn}
-              >
-                <Text>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleSaveEdits}
-                disabled={isSavingEdits}
-                style={styles.saveBtn}
-              >
-                <Text style={{ color: '#fff' }}>
-                  {isSavingEdits ? 'Saving...' : 'Save Changes'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        ) : (
-          <>
-            {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
-
-            {savedCollections.length > 0 && (
-              <LookbooksDisplayWrapper>
-                <HeadingText>Featured In</HeadingText>
-                <LookbooksDisplay
-                  collections={savedCollections}
-                  displayMode="carousel"
-                />
-              </LookbooksDisplayWrapper>
-            )}
-          </>
-        )}
-      </Content>
-
-      <SaveModal
-        visible={saveModalVisible}
-        onClose={() => setSaveModalVisible(false)}
-        post={post}
-        currentCollectionIds={savedCollections.map((c) => c.id)}
-        onSaved={() => {
-          setSaveModalVisible(false);
-          fetchEverything();
-        }}
-      />
-      {deleteModalVisible && (
-        <Modal transparent animationType="fade" visible={deleteModalVisible}>
-          <Overlay onPress={() => setDeleteModalVisible(false)}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <ModalCard>
-                <ModalTitle>Delete this post?</ModalTitle>
-
-                <ButtonRow>
-                  <Button
-                    title="Cancel"
-                    onPress={() => setDeleteModalVisible(false)}
-                    variant="text"
+              {savedCollections.length > 0 && (
+                <LookbooksDisplayWrapper>
+                  <HeadingText>Featured In</HeadingText>
+                  <LookbooksDisplay
+                    collections={savedCollections}
+                    displayMode="carousel"
                   />
-                  <Button title="Delete" onPress={handleDeletePost} />
-                </ButtonRow>
-              </ModalCard>
-            </Pressable>
-          </Overlay>
-        </Modal>
-      )}
-    </Container>
+                </LookbooksDisplayWrapper>
+              )}
+            </>
+          )}
+        </Content>
+
+        <SaveModal
+          visible={saveModalVisible}
+          onClose={() => setSaveModalVisible(false)}
+          post={post}
+          currentCollectionIds={savedCollections.map((c) => c.id)}
+          onSaved={() => {
+            setSaveModalVisible(false);
+            fetchEverything();
+          }}
+        />
+        {deleteModalVisible && (
+          <Modal transparent animationType="fade" visible={deleteModalVisible}>
+            <Overlay onPress={() => setDeleteModalVisible(false)}>
+              <Pressable onPress={(e) => e.stopPropagation()}>
+                <ModalCard>
+                  <ModalTitle>Delete this post?</ModalTitle>
+
+                  <ButtonRow>
+                    <ButtonWrapper>
+                      <Button
+                        title="Cancel"
+                        onPress={() => setDeleteModalVisible(false)}
+                        variant="secondary"
+                      />
+                    </ButtonWrapper>
+                    <ButtonWrapper>
+                      <Button title="Delete" onPress={handleDeletePost} />
+                    </ButtonWrapper>
+                  </ButtonRow>
+                </ModalCard>
+              </Pressable>
+            </Overlay>
+          </Modal>
+        )}
+      </Container>
+    )
   );
 }
 
@@ -408,7 +410,8 @@ const LookbooksDisplayWrapper = styled.View`
 const HeadingText = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary.medium};
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
   padding: 12px;
 `;
 
@@ -435,15 +438,18 @@ const ModalCard = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
+  font-weight: ${typography.heading3.fontWeight};
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 `;
 
 const ButtonRow = styled.View`
-  margin-top: 12px;
   flex-direction: row;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 5px;
+`;
+
+const ButtonWrapper = styled.View`
+  flex: 1;
 `;
 
 const styles = {

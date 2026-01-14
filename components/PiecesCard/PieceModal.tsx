@@ -15,39 +15,6 @@ interface PieceModalProps {
   onSave: (piece: Piece) => void;
 }
 
-const Overlay = styled.View`
-  flex: 1;
-  background-color: rgba(0, 0, 0, 0.2);
-  justify-content: flex-end;
-`;
-
-const ModalContainer = styled.View`
-  background-color: white;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 24px;
-  padding-top: 16px;
-`;
-
-const Title = styled.Text`
-  font-family: ${typography.heading3.fontFamily};
-  font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.text.primary};
-  text-align: center;
-  margin-bottom: 20px;
-`;
-
-const InputContainer = styled.View`
-  gap: 10px;
-  padding-bottom: 20px;
-`;
-
-const ButtonRow = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-top: 20px;
-`;
-
 export const PieceModal: React.FC<PieceModalProps> = ({
   visible,
   piece,
@@ -111,11 +78,53 @@ export const PieceModal: React.FC<PieceModalProps> = ({
             />
           </InputContainer>
           <ButtonRow>
-            <Button title="Cancel" variant="secondary" onPress={onClose} />
-            <Button title="Save" onPress={handleSave} />
+            <ButtonWrapper>
+              <Button title="Cancel" variant="secondary" onPress={onClose} />
+            </ButtonWrapper>
+            <ButtonWrapper>
+              <Button title="Save" onPress={handleSave} />
+            </ButtonWrapper>
           </ButtonRow>
         </ModalContainer>
       </Overlay>
     </Modal>
   );
 };
+
+const Overlay = styled.View`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.2);
+  justify-content: flex-end;
+`;
+
+const ModalContainer = styled.View`
+  background-color: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 24px;
+  padding-top: 16px;
+`;
+
+const Title = styled.Text`
+  font-family: ${typography.heading3.fontFamily};
+  font-size: ${typography.heading3.fontSize}px;
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.text.primary};
+  text-align: center;
+  margin-bottom: 12px;
+`;
+
+const InputContainer = styled.View`
+  gap: 5px;
+  padding-bottom: 20px;
+`;
+
+const ButtonWrapper = styled.View`
+  flex: 1;
+`;
+
+const ButtonRow = styled.View`
+  flex-direction: row;
+  margin-top: 24px;
+  gap: 8px;
+`;

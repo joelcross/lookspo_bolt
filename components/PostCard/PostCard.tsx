@@ -90,15 +90,13 @@ export default function PostCard({
               }}
             >
               <LeftWrapper>
-                <Avatar uri={post.profiles?.avatar_url} />
+                <Avatar uri={post.profiles?.avatar_url} size={36} />
                 <Caption>{post.caption}</Caption>
               </LeftWrapper>
               <RightWrapper>
                 <LikeButton onPress={onLikeToggle}>
                   <HeartIcon
-                    color={
-                      isLiked ? colors.feedback.error : colors.primary[900]
-                    }
+                    color={isLiked ? colors.like.dark : colors.primary[900]}
                     weight={isLiked ? 'fill' : 'regular'}
                     size={24}
                   />
@@ -107,7 +105,7 @@ export default function PostCard({
                 <SaveButton onPress={onSavePress}>
                   {isSaved ? (
                     <CheckCircleIcon
-                      color={colors.feedback.success}
+                      color={colors.save.dark}
                       size={24}
                       weight="fill"
                     />
@@ -181,9 +179,9 @@ const RightWrapper = styled.View`
 `;
 
 const LikeButton = styled.TouchableOpacity`
-  padding: 4px;
+  padding-horizontal: 2px;
 `;
 
 const SaveButton = styled.TouchableOpacity`
-  padding: 4px;
+  padding-horizontal: 2px;
 `;

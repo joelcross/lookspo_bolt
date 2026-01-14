@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
-  Text,
-  TextInput,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
-  StyleSheet,
   Modal,
   Pressable,
 } from 'react-native';
@@ -25,6 +21,7 @@ import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { PencilIcon, TrashIcon } from 'phosphor-react-native';
 import CustomTextInput from '../CustomTextInput/CustomTextInput';
+import Bridge from '../Bridge/Bridge';
 
 interface ProfileBaseProps {
   isOwnProfile: boolean;
@@ -36,15 +33,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const { user, profile: ownProfile, refreshProfile } = useAuth();
   const [otherProfile, setOtherProfile] = useState<Profile | null>(null);
 
-  const { edit } = useLocalSearchParams();
-  const [isEditing, setIsEditing] = useState(edit === 'true');
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [removedCollectionIds, setRemovedCollectionIds] = useState<string[]>(
-    []
-  );
-
-  const [showModal, setShowModal] = useState(false);
-  const [newCollectionName, setNewCollectionName] = useState('');
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
@@ -265,13 +254,13 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         right={isOwnProfile ? 'settings' : undefined}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollableContent showsVerticalScrollIndicator={false}>
         <BioCard
           image={targetProfile.avatar_url}
           name={targetProfile.name}
           bio={targetProfile.bio}
         >
-          <ButtonWrapper>
+          <BioButtonWrapper>
             {isOwnProfile ? (
               <Button
                 title={'Edit Profile'}
@@ -285,118 +274,58 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
                 onPress={handleFollowToggle}
               />
             )}
-          </ButtonWrapper>
+          </BioButtonWrapper>
         </BioCard>
 
-        <PostsContent>
-          {loading ? (
-            <ActivityIndicator size="small" color="#000" />
-          ) : (
-            <LookbooksDisplay
-              collections={collections}
-              displayMode="carousel"
-              hideAuthor
-              selectable
-              onSelectionChange={(collection) =>
-                setSelectedLookbook(collection)
-              }
-            />
-          )}
-
-          <LookbookMetadata>
-            <SelectedLookbookTitle>
-              {selectedLookbook?.name}
-            </SelectedLookbookTitle>
-            {isOwnProfile && !selectedLookbook?.is_default && (
-              <Icons>
-                <Pressable onPress={() => setRenameModalVisible(true)}>
-                  <PencilIcon size={18} color={colors.tertiary.dark} />
-                </Pressable>
-                <Pressable onPress={() => setDeleteModalVisible(true)}>
-                  <TrashIcon size={18} color={colors.tertiary.dark} />
-                </Pressable>
-              </Icons>
-            )}
-          </LookbookMetadata>
-
-          <PostList
-            posts={posts}
-            loading={postsLoading}
-            refreshing={refreshing}
-            emptyText={'No looks to display.'}
-            handleLoadMore={handleLoadMore}
-            handleRefresh={handleRefresh}
-            hideTopBar
-          />
-        </PostsContent>
-        <Modal
-          visible={showModal}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalText}>New Collection</Text>
-              <TextInput
-                style={styles.modalInput}
-                placeholder="Enter collection name"
-                value={newCollectionName}
-                onChangeText={setNewCollectionName}
-                placeholderTextColor="#999"
+        <View style={{ marginTop: 5 }}>
+          <PostsContent>
+            {loading ? (
+              <ActivityIndicator size="small" color="#000" />
+            ) : (
+              <LookbooksDisplay
+                collections={collections}
+                displayMode="carousel"
+                hideAuthor
+                selectable
+                onSelectionChange={(collection) =>
+                  setSelectedLookbook(collection)
+                }
               />
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.cancelButton]}
-                  onPress={() => setShowModal(false)}
-                >
-                  <Text style={styles.modalButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, styles.createButton]}
-                  onPress={async () => {
-                    if (!newCollectionName.trim()) return;
+            )}
+          </PostsContent>
+        </View>
 
-                    const tempCollection = {
-                      id: `temp-${Date.now()}`,
-                      name: newCollectionName.trim(),
-                      isTemp: true,
-                    };
+        <Bridge />
 
-                    if (isEditing) {
-                      // Stage it locally; won't save to DB until user clicks Save
-                      setCollections([...collections, tempCollection]);
-                    } else {
-                      // Immediately insert into DB
-                      const { data, error } = await supabase
-                        .from('collections')
-                        .insert({
-                          name: newCollectionName.trim(),
-                          user_id: ownProfile.id,
-                        })
-                        .select()
-                        .single();
+        <View style={{ marginBottom: 5 }}>
+          <PostsContent>
+            <LookbookMetadata>
+              <SelectedLookbookTitle>
+                {selectedLookbook?.name}
+              </SelectedLookbookTitle>
+              {isOwnProfile && !selectedLookbook?.is_default && (
+                <Icons>
+                  <Pressable onPress={() => setRenameModalVisible(true)}>
+                    <PencilIcon size={18} color={colors.tertiary.dark} />
+                  </Pressable>
+                  <Pressable onPress={() => setDeleteModalVisible(true)}>
+                    <TrashIcon size={18} color={colors.tertiary.dark} />
+                  </Pressable>
+                </Icons>
+              )}
+            </LookbookMetadata>
 
-                      if (error) {
-                        alert('Error creating collection: ' + error.message);
-                        return;
-                      }
-
-                      setCollections([...collections, data]);
-                    }
-
-                    setNewCollectionName('');
-                    setShowModal(false);
-                  }}
-                >
-                  <Text style={[styles.modalButtonText, { color: '#fff' }]}>
-                    Create
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
+            <PostList
+              posts={posts}
+              loading={postsLoading}
+              refreshing={refreshing}
+              emptyText={'No looks to display.'}
+              handleLoadMore={handleLoadMore}
+              handleRefresh={handleRefresh}
+              hideTopBar
+            />
+          </PostsContent>
+        </View>
 
         {renameModalVisible && (
           <Modal transparent animationType="fade" visible={renameModalVisible}>
@@ -404,19 +333,25 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
               <TouchableOpacity activeOpacity={1}>
                 <ModalCard>
                   <ModalText>Rename Lookbook</ModalText>
-                  <CustomTextInput
-                    placeholder="Enter new name"
-                    value={newLookbookName}
-                    onChangeText={setNewLookbookName}
-                    autoFocus
-                  />
-                  <ButtonRow>
-                    <Button
-                      title="Cancel"
-                      variant="secondary"
-                      onPress={() => setRenameModalVisible(false)}
+                  <ModalTextInputWrapper>
+                    <CustomTextInput
+                      placeholder="Enter new name"
+                      value={newLookbookName}
+                      onChangeText={setNewLookbookName}
+                      autoFocus
                     />
-                    <Button title="Done" onPress={handleRenameLookbook} />
+                  </ModalTextInputWrapper>
+                  <ButtonRow>
+                    <ModalButtonWrapper>
+                      <Button
+                        title="Cancel"
+                        variant="secondary"
+                        onPress={() => setRenameModalVisible(false)}
+                      />
+                    </ModalButtonWrapper>
+                    <ModalButtonWrapper>
+                      <Button title="Done" onPress={handleRenameLookbook} />
+                    </ModalButtonWrapper>
                   </ButtonRow>
                 </ModalCard>
               </TouchableOpacity>
@@ -433,19 +368,23 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
                     Are you sure you want to delete this lookbook?
                   </ModalText>
                   <ButtonRow>
-                    <Button
-                      title="Cancel"
-                      variant="secondary"
-                      onPress={() => setDeleteModalVisible(false)}
-                    />
-                    <Button title="Delete" onPress={handleDeleteLookbook} />
+                    <ModalButtonWrapper>
+                      <Button
+                        title="Cancel"
+                        variant="secondary"
+                        onPress={() => setDeleteModalVisible(false)}
+                      />
+                    </ModalButtonWrapper>
+                    <ModalButtonWrapper>
+                      <Button title="Delete" onPress={handleDeleteLookbook} />
+                    </ModalButtonWrapper>
                   </ButtonRow>
                 </ModalCard>
               </TouchableOpacity>
             </Overlay>
           </Modal>
         )}
-      </ScrollView>
+      </ScrollableContent>
     </Container>
   );
 };
@@ -454,9 +393,14 @@ const Container = styled.View`
   flex: 1;
 `;
 
+const ScrollableContent = styled.ScrollView`
+  flex: 1;
+  margin-horizontal: 5px;
+  border-radius: 20px;
+`;
+
 const PostsContent = styled.View`
   background-color: #ffffffff;
-  margin: 5px;
   border-radius: 20px;
 `;
 
@@ -466,16 +410,14 @@ const LookbookMetadata = styled.View`
   align-items: center;
   padding-horizontal: 12px;
   padding-vertical: 8px;
-  border-top-width: 1px;
-  border-top-color: #eee;
 `;
 
 const SelectedLookbookTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary.medium};
+  color: ${colors.primary[900]};
 `;
-const ButtonWrapper = styled.View`
+const BioButtonWrapper = styled.View`
   margin-top: 12px;
   width: 100%;
 `;
@@ -492,8 +434,16 @@ const Overlay = styled.Pressable`
   align-items: center;
 `;
 
+const ModalButtonWrapper = styled.View`
+  flex: 1;
+`;
+
+const ModalTextInputWrapper = styled.View`
+  margin-bottom: 24px;
+`;
+
 const ModalCard = styled.View`
-  width: 60vw;
+  width: 85vw;
   background-color: #fff;
   border-radius: 20px;
   padding: 16px;
@@ -502,110 +452,15 @@ const ModalCard = styled.View`
 const ModalText = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
+  font-weight: ${typography.heading3.fontWeight};
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 `;
 
 const ButtonRow = styled.View`
-  margin-top: 12px;
   flex-direction: row;
   justify-content: space-between;
   gap: 8px;
 `;
-
-const styles = StyleSheet.create({
-  avatar: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  avatarPlaceholder: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000',
-  },
-  avatarText: { fontSize: 48, color: '#fff', fontWeight: '700' },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 12,
-  },
-  name: { fontSize: 28, fontWeight: '700', textAlign: 'center' },
-  username: { textAlign: 'center', color: '#666', marginBottom: 12 },
-  bio: { textAlign: 'center', color: '#333', lineHeight: 22 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 12 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  collectionTile: {
-    backgroundColor: '#f5f5f5',
-    padding: 12,
-    borderRadius: 12,
-    flexBasis: '30%',
-    position: 'relative',
-    alignItems: 'center',
-  },
-  collectionTileName: { fontWeight: '600' },
-  deleteButton: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 12,
-  },
-  modalInput: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    gap: 8,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#f5f5f5',
-  },
-  createButton: {
-    backgroundColor: '#000',
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-  },
-});
 
 export default ProfileBase;

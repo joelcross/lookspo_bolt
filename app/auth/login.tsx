@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Image,
+} from 'react-native';
 WebBrowser.maybeCompleteAuthSession();
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -67,7 +73,14 @@ export default function LoginScreen() {
       >
         <Content>
           <TitleWrapper>
-            <Title>Lookspo</Title>
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={{
+                height: 50,
+                resizeMode: 'contain',
+                alignSelf: 'center',
+              }}
+            />
             <Subtitle>Discover | Create | Inspire</Subtitle>
           </TitleWrapper>
 

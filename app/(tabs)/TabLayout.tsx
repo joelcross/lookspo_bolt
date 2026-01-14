@@ -14,11 +14,13 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <>
       <View style={{ flex: 1 }}>
-        <Slot />
+        <View style={{ flex: 1 }}>
+          <Slot />
+        </View>
       </View>
       <NavBar activeKey={activeTab} onTabPress={handleTabPress} />
-    </View>
+    </>
   );
 }

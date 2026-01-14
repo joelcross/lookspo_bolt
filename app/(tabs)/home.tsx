@@ -49,4 +49,5 @@ export default function HomeScreen() {
 
 const Container = styled.SafeAreaView`
   flex: 1;
+  gap: 5px;
 `;

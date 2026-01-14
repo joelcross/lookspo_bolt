@@ -47,11 +47,17 @@ interface ActivityItemProps {
 const ActivityIcon = ({ type }: { type: ActivityType }) => {
   switch (type) {
     case 'like':
-      return <HeartIcon size={22} weight="fill" color="#ef4444" />;
+      return <HeartIcon size={22} weight="fill" color={colors.like.dark} />;
     case 'follow':
-      return <UserCirclePlusIcon size={22} weight="fill" color="#0ea5e9" />;
+      return (
+        <UserCirclePlusIcon
+          size={22}
+          weight="fill"
+          color={colors.follow.dark}
+        />
+      );
     case 'save':
-      return <BookmarkIcon size={22} weight="fill" color="#10b981" />;
+      return <BookmarkIcon size={22} weight="fill" color={colors.save.dark} />;
   }
 };
 
@@ -164,7 +170,11 @@ const IconWrapper = styled.View<{ type: ActivityType }>`
   height: 40px;
   border-radius: 20px;
   background-color: ${({ type }) =>
-    type === 'like' ? '#fef2f2' : type === 'follow' ? '#f0f9ff' : '#f0fdf4'};
+    type === 'like'
+      ? colors.like.light
+      : type === 'follow'
+      ? colors.follow.light
+      : colors.save.light};
   align-items: center;
   justify-content: center;
 `;

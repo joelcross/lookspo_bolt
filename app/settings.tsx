@@ -56,7 +56,10 @@ export default function SettingsScreen() {
   );
 }
 
-const Container = styled.SafeAreaView``;
+const Container = styled.View`
+  margin: 5px;
+  gap: 5px;
+`;
 
 const ItemContainer = styled.TouchableOpacity`
   padding: 16px;
@@ -65,7 +68,6 @@ const ItemContainer = styled.TouchableOpacity`
 const ListContent = styled.ScrollView`
   background: #fff;
   border-radius: 20px;
-  margin-horizontal: 5px;
 `;
 
 const ItemWrapper = styled.View`

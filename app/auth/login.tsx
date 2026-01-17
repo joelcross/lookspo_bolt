@@ -2,17 +2,14 @@ import React, { useState } from 'react';
 import {
   View,
   TouchableOpacity,
-  StyleSheet,
   Platform,
   Image,
+  ScrollView,
 } from 'react-native';
-WebBrowser.maybeCompleteAuthSession();
-
-import { useAuth } from '@/contexts/AuthContext';
-import { router } from 'expo-router';
-
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
+import { useAuth } from '@/contexts/AuthContext';
+import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/Button/Button';
 import { GoogleButton } from '@/components/GoogleButton/GoogleButton';
@@ -20,6 +17,8 @@ import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import CustomTextInput from '@/components/CustomTextInput/CustomTextInput';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -50,7 +49,7 @@ export default function LoginScreen() {
     try {
       const redirectUri =
         Platform.OS === 'web'
-          ? window.location.origin // localhost for web
+          ? window.location.origin
           : AuthSession.makeRedirectUri({ scheme: 'lookspo' });
 
       const { error } = await supabase.auth.signInWithOAuth({
@@ -66,10 +65,10 @@ export default function LoginScreen() {
 
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollableContainer
-        contentContainerStyle={styles.scrollContent}
+      <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
         <Content>
           <TitleWrapper>
@@ -92,6 +91,7 @@ export default function LoginScreen() {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              autoCapitalize="none"
             />
 
             <CustomTextInput
@@ -108,9 +108,9 @@ export default function LoginScreen() {
             disabled={loading}
           />
 
-          <View style={{ margin: 5, alignItems: 'center' }}>
+          <OrDivider>
             <BodyText>or</BodyText>
-          </View>
+          </OrDivider>
 
           <GoogleButton onPress={handleGoogleLogin} />
 
@@ -121,7 +121,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </Footer>
         </Content>
-      </ScrollableContainer>
+      </ScrollView>
     </Container>
   );
 }
@@ -130,25 +130,13 @@ const Container = styled.KeyboardAvoidingView`
   flex: 1;
 `;
 
-const ScrollableContainer = styled.ScrollView`
-  flex-grow: 1;
-`;
-
 const Content = styled.View`
-  flex: 1;
   padding: 24px;
-  justify-content: center;
+  padding-top: 80px;
 `;
 
 const TitleWrapper = styled.View`
   align-items: center;
-`;
-
-const Title = styled.Text`
-  font-family: ${typography.heading1.fontFamily};
-  font-size: ${typography.heading1.fontSize}px;
-  color: ${colors.primary[900]};
-  margin-bottom: 10px;
 `;
 
 const Subtitle = styled.Text`
@@ -173,7 +161,9 @@ const BodyText = styled.Text`
 const ErrorText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
-  color: ${colors.feedback.error};
+  color: ${colors.like.dark};
+  margin-bottom: 16px;
+  text-align: center;
 `;
 
 const LinkText = styled.Text`
@@ -183,14 +173,13 @@ const LinkText = styled.Text`
   text-decoration-line: underline;
 `;
 
+const OrDivider = styled.View`
+  margin: 16px 0;
+  align-items: center;
+`;
+
 const Footer = styled.View`
   flex-direction: row;
   justify-content: center;
   margin-top: 48px;
 `;
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-  },
-});

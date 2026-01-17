@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  Modal,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import styled from 'styled-components/native';
 import { router } from 'expo-router';
@@ -172,7 +178,7 @@ export default function EditProfileScreen() {
           onCustomLeftPress={handleBack}
         />
 
-        <Content>
+        <View>
           <ListContent>
             <EditRow
               label="Username"
@@ -199,10 +205,8 @@ export default function EditProfileScreen() {
             />
           </ListContent>
 
-          <SaveButtonWrapper>
-            <Button title="Save" onPress={handleSave} disabled={!hasChanges} />
-          </SaveButtonWrapper>
-        </Content>
+          <Button title="Save" onPress={handleSave} disabled={!hasChanges} />
+        </View>
 
         {/* Edit field modal */}
         <Modal visible={!!activeField} transparent animationType="slide">
@@ -286,19 +290,14 @@ function EditRow({
 
 const Container = styled.SafeAreaView`
   flex: 1;
+  margin: 5px;
+  gap: 5px;
 `;
-
-const Content = styled.View``;
 
 const ListContent = styled.View`
   background: #fff;
   border-radius: 20px;
-  margin-horizontal: 5px;
   margin-bottom: 5px;
-`;
-
-const SaveButtonWrapper = styled.View`
-  margin-horizontal: 5px;
 `;
 
 const Row = styled.Pressable`

@@ -49,10 +49,10 @@ const PostList: React.FC<PostListProps> = ({
       onEndReached={handleLoadMore}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
-        paddingVertical: 5,
-        paddingHorizontal: 8,
-        backgroundColor: transparentBackground ? 'transparent' : '#fff',
+        minHeight: '100%',
+        backgroundColor: '#fff',
         borderRadius: 20,
+        paddingBottom: 5,
       }}
       ListHeaderComponent={
         <>
@@ -72,15 +72,6 @@ const PostWrapper = styled.View`
   margin-bottom: 0px;
 `;
 
-const PostsContainer = styled.View<{ transparentBackground?: boolean }>`
-  flex: 1;
-  padding-horizontal: 8px;
-  margin: 0 5px 5px 5px;
-  background-color: ${({ transparentBackground }) =>
-    transparentBackground ? 'transparent' : '#ffffff'};
-  border-radius: 20px;
-`;
-
 const Heading = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
@@ -93,7 +84,7 @@ const EmptyText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
   color: ${colors.neutral[400]};
-  padding-top: 8px;
+  margin: 10px;
   font-style: italic;
 `;
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  View,
   TouchableOpacity,
   ActivityIndicator,
   Modal,
   Pressable,
+  View,
 } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -277,59 +277,70 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           transparentBackground
           ListHeaderComponent={
             <>
-              <BioCard
-                image={targetProfile.avatar_url}
-                name={targetProfile.name}
-                bio={targetProfile.bio}
-              >
-                <BioButtonWrapper>
-                  {isOwnProfile ? (
-                    <Button
-                      title="Edit Profile"
-                      variant="secondary"
-                      onPress={() => router.push('/edit-profile')}
-                    />
-                  ) : (
-                    <Button
-                      title={isFollowing ? 'Following' : 'Follow'}
-                      variant={isFollowing ? 'secondary' : 'default'}
-                      onPress={handleFollowToggle}
-                    />
-                  )}
-                </BioButtonWrapper>
-              </BioCard>
-
-              <View style={{ marginTop: 5 }}>
-                {loading ? (
-                  <ActivityIndicator size="small" color="#000" />
-                ) : (
-                  <LookbooksDisplay
-                    collections={collections}
-                    displayMode="carousel"
-                    hideAuthor
-                    selectable
-                    onSelectionChange={setSelectedLookbook}
-                  />
-                )}
+              <GreyWrapper>
+                <BioCard
+                  image={targetProfile.avatar_url}
+                  name={targetProfile.name}
+                  bio={targetProfile.bio}
+                >
+                  <BioButtonWrapper>
+                    {isOwnProfile ? (
+                      <Button
+                        title="Edit Profile"
+                        variant="secondary"
+                        onPress={() => router.push('/edit-profile')}
+                      />
+                    ) : (
+                      <Button
+                        title={isFollowing ? 'Following' : 'Follow'}
+                        variant={isFollowing ? 'secondary' : 'default'}
+                        onPress={handleFollowToggle}
+                      />
+                    )}
+                  </BioButtonWrapper>
+                </BioCard>
+              </GreyWrapper>
+              <View style={{ paddingTop: 5, backgroundColor: '#f2f2f2' }}>
+                <GreyWrapper>
+                  <WhiteCard>
+                    {loading ? (
+                      <ActivityIndicator size="small" color="#000" />
+                    ) : (
+                      <LookbooksDisplay
+                        collections={collections}
+                        displayMode="carousel"
+                        hideAuthor
+                        selectable
+                        onSelectionChange={setSelectedLookbook}
+                      />
+                    )}
+                  </WhiteCard>
+                </GreyWrapper>
               </View>
 
-              <Bridge />
+              <GreyWrapper>
+                <Bridge />
+              </GreyWrapper>
 
-              <LookbookMetadata>
-                <SelectedLookbookTitle>
-                  {selectedLookbook?.name}
-                </SelectedLookbookTitle>
-                {isOwnProfile && !selectedLookbook?.is_default && (
-                  <Icons>
-                    <Pressable onPress={() => setRenameModalVisible(true)}>
-                      <PencilIcon size={18} color={colors.tertiary.dark} />
-                    </Pressable>
-                    <Pressable onPress={() => setDeleteModalVisible(true)}>
-                      <TrashIcon size={18} color={colors.tertiary.dark} />
-                    </Pressable>
-                  </Icons>
-                )}
-              </LookbookMetadata>
+              <GreyWrapperTopOnly>
+                <WhiteCard>
+                  <LookbookMetadata>
+                    <SelectedLookbookTitle>
+                      {selectedLookbook?.name}
+                    </SelectedLookbookTitle>
+                    {isOwnProfile && !selectedLookbook?.is_default && (
+                      <Icons>
+                        <Pressable onPress={() => setRenameModalVisible(true)}>
+                          <PencilIcon size={18} color={colors.tertiary.dark} />
+                        </Pressable>
+                        <Pressable onPress={() => setDeleteModalVisible(true)}>
+                          <TrashIcon size={18} color={colors.tertiary.dark} />
+                        </Pressable>
+                      </Icons>
+                    )}
+                  </LookbookMetadata>
+                </WhiteCard>
+              </GreyWrapperTopOnly>
             </>
           }
         />
@@ -398,17 +409,23 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
 
 const Container = styled.View`
   flex: 1;
+  gap: 5px;
+  margin: 5px;
 `;
 
-const ScrollableContent = styled.ScrollView`
-  flex: 1;
-  margin-horizontal: 5px;
-  border-radius: 20px;
+const GreyWrapper = styled.View`
+  background-color: #f2f2f2;
+`;
+const GreyWrapperTopOnly = styled.View`
+  background-color: #f2f2f2;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 `;
 
 const PostsContent = styled.View`
   border-radius: 20px;
   flex: 1;
+  overflow: hidden;
 `;
 
 const LookbookMetadata = styled.View`
@@ -427,6 +444,11 @@ const SelectedLookbookTitle = styled.Text`
 const BioButtonWrapper = styled.View`
   margin-top: 12px;
   width: 100%;
+`;
+
+const WhiteCard = styled.View`
+  background-color: #fff;
+  border-radius: 20px;
 `;
 
 const Icons = styled.View`

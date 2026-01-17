@@ -4,6 +4,7 @@ import { usePosts } from '@/hooks/usePosts';
 import styled from 'styled-components/native';
 import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import PostList from '@/components/PostList/PostList';
+import { View } from 'react-native';
 
 type FeedType = 'following' | 'explore';
 
@@ -41,24 +42,31 @@ export default function HomeScreen() {
         value={feedType}
         onChange={setFeedType}
       />
-
-      <PostList
-        posts={posts}
-        loading={loading}
-        refreshing={refreshing}
-        emptyText={
-          feedType === 'following'
-            ? 'Follow users to see their posts here'
-            : 'No posts yet'
-        }
-        handleLoadMore={handleLoadMore}
-        handleRefresh={handleRefresh}
-      />
+      <View
+        style={{
+          flex: 1,
+          margin: 5,
+          borderRadius: 20,
+          overflow: 'hidden',
+        }}
+      >
+        <PostList
+          posts={posts}
+          loading={loading}
+          refreshing={refreshing}
+          emptyText={
+            feedType === 'following'
+              ? 'Follow users to see their posts here'
+              : 'No posts yet'
+          }
+          handleLoadMore={handleLoadMore}
+          handleRefresh={handleRefresh}
+        />
+      </View>
     </Container>
   );
 }
 
 const Container = styled.SafeAreaView`
   flex: 1;
-  gap: 5px;
 `;

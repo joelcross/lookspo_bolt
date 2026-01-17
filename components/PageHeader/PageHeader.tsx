@@ -73,7 +73,6 @@ export function Header({
 
 const Container = styled.View`
   height: 8vh;
-  margin: 5px;
   flex-direction: row;
   align-items: center;
   justify-content: center;

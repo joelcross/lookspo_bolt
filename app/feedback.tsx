@@ -77,7 +77,8 @@ export default function FeedbackScreen() {
 
 const OuterContainer = styled.SafeAreaView`
   flex: 1;
-  background-color: ${colors.primary[100]};
+  margin: 5px;
+  gap: 5px;
 `;
 
 const InnerContainer = styled.View`
@@ -88,15 +89,13 @@ const Content = styled.View`
   background-color: #fff;
   border-radius: 20px;
   padding: 24px 24px 0 24px;
-  margin-horizontal: 5px;
 `;
 
 const Heading = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  font-weight: 600;
-  color: ${colors.secondary.medium};
-  margin-bottom: 4px;
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
 `;
 
 const BodyText = styled.Text`
@@ -111,6 +110,5 @@ const TextWrapper = styled.View`
 `;
 
 const ButtonWrapper = styled.View`
-  margin-vertical: 5px;
-  margin-horizontal: 5px;
+  margin-top: 5px;
 `;

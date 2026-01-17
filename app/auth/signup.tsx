@@ -45,7 +45,7 @@ export default function SignUpScreen() {
         email,
         password,
         username,
-        name
+        name,
       );
       if (signUpError) throw signUpError;
       setMessage('Check your email to confirm your account.');
@@ -60,17 +60,17 @@ export default function SignUpScreen() {
   return (
     <Container behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
         <Content>
           <Title>Lookspo</Title>
           <Subtitle>Create your account</Subtitle>
 
           {loading && <ActivityIndicator color="#000" />}
-          {message ? <Text style={styles.message}>{message}</Text> : null}
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {message ? <MessageText>{message}</MessageText> : null}
+          {error ? <ErrorText>{error}</ErrorText> : null}
 
           <InputContainer>
             <CustomTextInput
@@ -104,7 +104,7 @@ export default function SignUpScreen() {
 
           <Button title="Sign Up" onPress={handleSignUp} disabled={loading} />
 
-          <Footer style={styles.footer}>
+          <Footer>
             <BodyText>Already have an account?</BodyText>
             <TouchableOpacity onPress={() => router.replace('/auth/login')}>
               <LinkText>Sign In</LinkText>
@@ -121,9 +121,8 @@ const Container = styled.KeyboardAvoidingView`
 `;
 
 const Content = styled.View`
-  flex: 1;
   padding: 24px;
-  justify-content: center;
+  padding-top: 60px;
 `;
 
 const Title = styled.Text`
@@ -168,18 +167,18 @@ const LinkText = styled.Text`
   text-decoration-line: underline;
 `;
 
-const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-  },
-  error: {
-    color: '#ff3b30',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  message: {
-    color: '#38a22aff',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-});
+const MessageText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.save.dark};
+  margin-bottom: 16px;
+  text-align: center;
+`;
+
+const ErrorText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.like.dark};
+  margin-bottom: 16px;
+  text-align: center;
+`;

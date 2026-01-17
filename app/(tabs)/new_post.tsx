@@ -122,7 +122,7 @@ export default function NewPostScreen() {
 
   return (
     <Container>
-      <PageHeader text="New Look" left="back" />
+      <PageHeader text="New Look" left="back" onCustomLeftPress={handleBack} />
 
       {/* Main Scrollable Content */}
       <ScrollableContent showsVerticalScrollIndicator={false}>
@@ -169,14 +169,18 @@ export default function NewPostScreen() {
               lost.
             </ModalText>
 
-            <ModalActions>
-              <Button
-                title="Cancel"
-                variant="secondary"
-                onPress={() => setShowDiscardModal(false)}
-              />
-              <Button title="Yes, discard" onPress={confirmDiscard} />
-            </ModalActions>
+            <ModalButtons>
+              <ButtonWrapper>
+                <Button
+                  title="Cancel"
+                  variant="secondary"
+                  onPress={() => setShowDiscardModal(false)}
+                />
+              </ButtonWrapper>
+              <ButtonWrapper>
+                <Button title="Yes, discard" onPress={confirmDiscard} />
+              </ButtonWrapper>
+            </ModalButtons>
           </ModalContainer>
         </ModalOverlay>
       </Modal>
@@ -229,7 +233,7 @@ const ModalContainer = styled.View`
   background-color: white;
   border-radius: 20px;
   padding: 24px;
-  width: 85%;
+  width: 85vw;
   shadow-color: #000;
   shadow-opacity: 0.15;
   shadow-radius: 20px;
@@ -239,24 +243,25 @@ const ModalContainer = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary.medium};
-
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 `;
 
 const ModalText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
   color: ${colors.text.primary};
-
   text-align: center;
   margin-bottom: 24px;
-  line-height: 22px;
 `;
 
-const ModalActions = styled.View`
+const ButtonWrapper = styled.View`
+  flex: 1;
+`;
+
+const ModalButtons = styled.View`
   flex-direction: row;
-  justify-content: center;
-  gap: 16px;
+  gap: 5px;
 `;

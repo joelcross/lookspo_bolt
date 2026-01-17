@@ -116,7 +116,7 @@ const Title = styled.Text`
 
 const InputContainer = styled.View`
   gap: 5px;
-  padding-bottom: 20px;
+  margin-bottom: 24px;
 `;
 
 const ButtonWrapper = styled.View`
@@ -125,6 +125,5 @@ const ButtonWrapper = styled.View`
 
 const ButtonRow = styled.View`
   flex-direction: row;
-  margin-top: 24px;
-  gap: 8px;
+  gap: 5px;
 `;

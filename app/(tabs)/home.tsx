@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { usePosts } from '@/hooks/usePosts';
 import styled from 'styled-components/native';
@@ -17,8 +17,19 @@ export default function HomeScreen() {
       : { type: 'all' as const };
   }, [feedType]);
 
-  const { posts, loading, refreshing, handleLoadMore, handleRefresh } =
-    usePosts(mode);
+  const {
+    posts,
+    loading,
+    refreshing,
+    handleLoadMore,
+    handleRefresh,
+    fetchPosts,
+  } = usePosts(mode);
+
+  // Fetch whenever mode changes
+  useEffect(() => {
+    fetchPosts(mode, true);
+  }, [mode]);
 
   return (
     <Container>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { FlatListProps, View } from 'react-native';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -7,7 +7,7 @@ import { Post } from '@/lib/types';
 import { FlashList } from '@shopify/flash-list';
 import PostCard from '../PostCard';
 
-interface PostListProps {
+interface PostListProps extends FlatListProps<Post> {
   posts: Post[];
   loading: boolean;
   refreshing: boolean;
@@ -17,6 +17,7 @@ interface PostListProps {
   numColumns?: number;
   hideTopBar?: boolean;
   headerText?: string;
+  transparentBackground?: boolean;
 }
 
 const PostList: React.FC<PostListProps> = ({
@@ -25,41 +26,44 @@ const PostList: React.FC<PostListProps> = ({
   refreshing,
   handleRefresh,
   handleLoadMore,
-  emptyText = '# todo - Is this default val ever used?',
+  emptyText,
   numColumns = 2,
   hideTopBar = false,
   headerText,
+  transparentBackground = false,
+  ...flatListProps
 }) => {
-  const renderPost = ({ item }: { item: Post }) => (
-    <PostWrapper>
-      <PostCard post={item} showActions={false} hideTopBar={hideTopBar} />
-    </PostWrapper>
-  );
-
-  if (!loading && posts.length === 0) {
-    return (
-      <PostsContainer showsVerticalScrollIndicator={false}>
-        {headerText && <Heading>{headerText}</Heading>}
-        <EmptyText>{emptyText}</EmptyText>
-      </PostsContainer>
-    );
-  }
-
   return (
-    <PostsContainer showsVerticalScrollIndicator={false}>
-      {headerText && <Heading>{headerText}</Heading>}
-      <FlashList
-        showsVerticalScrollIndicator={false}
-        masonry
-        data={posts}
-        numColumns={numColumns}
-        renderItem={renderPost}
-        onRefresh={handleRefresh}
-        refreshing={refreshing}
-        onEndReached={handleLoadMore}
-        ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
-      />
-    </PostsContainer>
+    <FlashList
+      masonry
+      data={posts}
+      keyExtractor={(item) => item.id}
+      numColumns={numColumns}
+      renderItem={({ item }) => (
+        <PostWrapper>
+          <PostCard post={item} showActions={false} hideTopBar={hideTopBar} />
+        </PostWrapper>
+      )}
+      onRefresh={handleRefresh}
+      refreshing={refreshing}
+      onEndReached={handleLoadMore}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingVertical: 5,
+        paddingHorizontal: 8,
+        backgroundColor: transparentBackground ? 'transparent' : '#fff',
+        borderRadius: 20,
+      }}
+      ListHeaderComponent={
+        <>
+          {headerText && <Heading>{headerText}</Heading>}
+          {flatListProps.ListHeaderComponent}
+        </>
+      }
+      ListEmptyComponent={
+        !loading && emptyText ? <EmptyText>{emptyText}</EmptyText> : null
+      }
+    />
   );
 };
 
@@ -68,11 +72,12 @@ const PostWrapper = styled.View`
   margin-bottom: 0px;
 `;
 
-const PostsContainer = styled.ScrollView`
-  padding-vertical: 5px;
+const PostsContainer = styled.View<{ transparentBackground?: boolean }>`
+  flex: 1;
   padding-horizontal: 8px;
   margin: 0 5px 5px 5px;
-  background-color: #fff;
+  background-color: ${({ transparentBackground }) =>
+    transparentBackground ? 'transparent' : '#ffffff'};
   border-radius: 20px;
 `;
 

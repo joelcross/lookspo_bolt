@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   TextInput,
   TouchableOpacity,
   View,
@@ -51,7 +50,7 @@ export default function PostDetailScreen() {
       if (!postId || !user) return;
 
       fetchEverything();
-    }, [postId, user])
+    }, [postId, user]),
   );
 
   const fetchEverything = async () => {
@@ -89,7 +88,7 @@ export default function PostDetailScreen() {
             id,
             name,
             user:user_id (username)
-          )`
+          )`,
         )
         .eq('post_id', postId);
 
@@ -122,7 +121,7 @@ export default function PostDetailScreen() {
             cover_images: images?.map((i) => i.posts.image_url) || [],
             post_count: count || 0,
           };
-        })
+        }),
       );
 
       setSavedCollections(enrichedCollections);
@@ -196,7 +195,7 @@ export default function PostDetailScreen() {
 
     const trimmed = editedCaption.trim();
     const validPieces = editedPieces.every(
-      (p) => p.name.trim() && p.brand.trim()
+      (p) => p.name.trim() && p.brand.trim(),
     );
 
     if (!validPieces) {
@@ -292,7 +291,7 @@ export default function PostDetailScreen() {
                   <TouchableOpacity
                     onPress={() =>
                       setEditedPieces((prev) =>
-                        prev.filter((_, idx) => idx !== i)
+                        prev.filter((_, idx) => idx !== i),
                       )
                     }
                   >
@@ -424,7 +423,7 @@ const Overlay = styled.Pressable`
 `;
 
 const ModalCard = styled.View`
-  width: 80vw;
+  width: 85vw;
   background-color: #fff;
   border-radius: 16px;
   padding: 16px;
@@ -439,6 +438,7 @@ const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
   text-align: center;
   margin-bottom: 12px;
 `;

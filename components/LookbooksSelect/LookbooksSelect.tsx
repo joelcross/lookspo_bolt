@@ -11,7 +11,6 @@ import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Button } from '../Button/Button';
-import TextInput from '../CustomTextInput/CustomTextInput';
 import LookbookItem from '../LookbookItem/LookbookItem';
 import { FlashList } from '@shopify/flash-list';
 import CustomTextInput from '../CustomTextInput/CustomTextInput';
@@ -74,7 +73,7 @@ export default function LookbooksSelect({
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -232,7 +231,7 @@ const Overlay = styled.Pressable`
 `;
 
 const ModalCard = styled.View`
-  width: 88%;
+  width: 85vw;
   background-color: #fff;
   border-radius: 20px;
   padding: 24px;
@@ -247,7 +246,7 @@ const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
   text-align: center;
   margin-bottom: 12px;
-  color: ${colors.primary[900]};
 `;

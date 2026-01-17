@@ -21,14 +21,14 @@ type EditableProfile = {
 
 export default function EditProfileScreen() {
   const [initialProfile, setInitialProfile] = useState<EditableProfile | null>(
-    null
+    null,
   );
   const [draftProfile, setDraftProfile] = useState<EditableProfile | null>(
-    null
+    null,
   );
 
   const [activeField, setActiveField] = useState<keyof EditableProfile | null>(
-    null
+    null,
   );
   const [tempValue, setTempValue] = useState('');
 
@@ -351,6 +351,7 @@ const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
   text-align: center;
   margin-bottom: 12px;
 `;

@@ -1,13 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  Modal,
-  Pressable,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Modal, Pressable } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Post, Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
@@ -34,12 +26,8 @@ export default function CollectionScreen() {
 
   const isOwnCollection = collection?.user_id === user.id;
 
-  const mode = useMemo(() => {
-    return { type: 'collection', collectionId: collection?.id };
-  }, [collection?.id]);
-
   const { posts, loading, refreshing, handleLoadMore, handleRefresh } =
-    usePosts(mode);
+    usePosts(id ? { type: 'collection', collectionId: id } : { type: 'all' });
 
   const handleCustomPress = () => setMenuVisible(true);
 
@@ -55,7 +43,7 @@ export default function CollectionScreen() {
         .eq('id', collection.id);
 
       setCollection(
-        (prev) => prev && { ...prev, name: newCollectionName.trim() }
+        (prev) => prev && { ...prev, name: newCollectionName.trim() },
       );
     } catch (err) {
       console.error('Failed to rename collection', err);
@@ -104,7 +92,7 @@ export default function CollectionScreen() {
               is_liked: !!likeData,
               is_saved: true,
             };
-          })
+          }),
         );
 
         //setPosts(postsWithStatus.filter(Boolean) as Post[]);
@@ -193,19 +181,25 @@ export default function CollectionScreen() {
               <Pressable onPress={(e) => e.stopPropagation()}>
                 <ModalCard>
                   <ModalTitle>Rename Collection</ModalTitle>
-                  <CustomTextInput
-                    placeholder="Enter new collection name"
-                    value={newCollectionName}
-                    onChangeText={setNewCollectionName}
-                    autoFocus
-                  />
-                  <ButtonRow>
-                    <Button
-                      title="Cancel"
-                      variant="secondary"
-                      onPress={() => setRenameModalVisible(false)}
+                  <TextInputWrapper>
+                    <CustomTextInput
+                      placeholder="Enter new collection name"
+                      value={newCollectionName}
+                      onChangeText={setNewCollectionName}
+                      autoFocus
                     />
-                    <Button title="Done" onPress={handleRename} />
+                  </TextInputWrapper>
+                  <ButtonRow>
+                    <ButtonWrapper>
+                      <Button
+                        title="Cancel"
+                        variant="secondary"
+                        onPress={() => setRenameModalVisible(false)}
+                      />
+                    </ButtonWrapper>
+                    <ButtonWrapper>
+                      <Button title="Done" onPress={handleRename} />
+                    </ButtonWrapper>
                   </ButtonRow>
                 </ModalCard>
               </Pressable>
@@ -222,12 +216,16 @@ export default function CollectionScreen() {
                   Are you sure you want to delete this collection?
                 </ModalTitle>
                 <ButtonRow>
-                  <Button
-                    title="Cancel"
-                    variant="secondary"
-                    onPress={() => setdeleteModalVisible(false)}
-                  />
-                  <Button title="Delete" onPress={handleDeleteCollection} />
+                  <ButtonWrapper>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setdeleteModalVisible(false)}
+                    />
+                  </ButtonWrapper>
+                  <ButtonWrapper>
+                    <Button title="Delete" onPress={handleDeleteCollection} />
+                  </ButtonWrapper>
                 </ButtonRow>
               </ModalCard>
             </Overlay>
@@ -299,7 +297,7 @@ const Overlay = styled.Pressable`
 `;
 
 const ModalCard = styled.View`
-  width: 80vw;
+  width: 85vw;
   background-color: #fff;
   border-radius: 20px;
   padding: 16px;
@@ -313,19 +311,21 @@ const ModalCard = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+`;
+
+const TextInputWrapper = styled.View`
+  margin-bottom: 24px;
 `;
 
 const ButtonRow = styled.View`
-  margin-top: 12px;
   flex-direction: row;
-  justify-content: space-between;
+  gap: 5px;
 `;
 
-const ErrorText = styled.Text`
-  font-size: 16px;
-  color: #999;
-  text-align: center;
-  margin-top: 40px;
+const ButtonWrapper = styled.View`
+  flex: 1;
 `;

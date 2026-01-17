@@ -56,7 +56,7 @@ export default function SaveModal({
                 cover_images: images?.map((i) => i.posts.image_url) || [],
                 post_count: count || 0,
               };
-            })
+            }),
           );
 
           // 3. Save enriched list
@@ -74,7 +74,7 @@ export default function SaveModal({
     try {
       // Remove from collections not selected anymore
       const toDelete = currentCollectionIds.filter(
-        (id) => !selectedIds.includes(id)
+        (id) => !selectedIds.includes(id),
       );
       if (toDelete.length > 0) {
         await supabase
@@ -86,7 +86,7 @@ export default function SaveModal({
 
       // Add to newly selected collections
       const toAdd = selectedIds.filter(
-        (id) => !currentCollectionIds.includes(id)
+        (id) => !currentCollectionIds.includes(id),
       );
       if (toAdd.length > 0) {
         const saveInserts = toAdd.map((collectionId) => ({
@@ -166,5 +166,8 @@ const HeaderRow = styled.View`
 const ModalTitle = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
-  color: ${colors.secondary.medium};
+  font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.primary[900]};
+  text-align: center;
+  margin-bottom: 12px;
 `;

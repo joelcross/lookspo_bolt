@@ -37,7 +37,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
-    null
+    null,
   );
 
   const targetProfile = isOwnProfile ? ownProfile : otherProfile;
@@ -46,18 +46,29 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [newLookbookName, setNewLookbookName] = useState('');
 
-  const mode = useMemo(() => {
-    if (!selectedLookbook) return null;
-    return { type: 'collection' as const, collectionId: selectedLookbook.id };
-  }, [selectedLookbook]);
-
+  // Only initialize hook once
   const {
     posts,
     loading: postsLoading,
     refreshing,
     handleLoadMore,
     handleRefresh,
-  } = usePosts(mode);
+    fetchPosts,
+  } = usePosts({ type: 'user', userId: targetProfile?.id ?? '' });
+
+  // When switching collections:
+  useEffect(() => {
+    if (!targetProfile) return;
+
+    if (selectedLookbook) {
+      fetchPosts(
+        { type: 'collection', collectionId: selectedLookbook.id },
+        true,
+      );
+    } else {
+      fetchPosts({ type: 'user', userId: targetProfile.id }, true);
+    }
+  }, [targetProfile, selectedLookbook]);
 
   const fetchOtherProfile = async () => {
     if (!otherUsername || !user) return;
@@ -114,7 +125,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
           cover_images: images?.map((i) => i.posts.image_url) || [],
           post_count: count || 0,
         };
-      })
+      }),
     );
 
     setCollections(collectionsWithImages);
@@ -205,12 +216,12 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         prev.map((c) =>
           c.id === selectedLookbook.id
             ? { ...c, name: newLookbookName.trim() }
-            : c
-        )
+            : c,
+        ),
       );
 
       setSelectedLookbook((prev) =>
-        prev ? { ...prev, name: newLookbookName.trim() } : prev
+        prev ? { ...prev, name: newLookbookName.trim() } : prev,
       );
     } catch (err) {
       console.error('Failed to rename lookbook', err);
@@ -227,7 +238,7 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
       await supabase.from('collections').delete().eq('id', selectedLookbook.id);
 
       setCollections((prev) =>
-        prev.filter((c) => c.id !== selectedLookbook.id)
+        prev.filter((c) => c.id !== selectedLookbook.id),
       );
 
       setSelectedLookbook(null);
@@ -254,137 +265,133 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         right={isOwnProfile ? 'settings' : undefined}
       />
 
-      <ScrollableContent showsVerticalScrollIndicator={false}>
-        <BioCard
-          image={targetProfile.avatar_url}
-          name={targetProfile.name}
-          bio={targetProfile.bio}
-        >
-          <BioButtonWrapper>
-            {isOwnProfile ? (
-              <Button
-                title={'Edit Profile'}
-                variant={'secondary'}
-                onPress={() => router.push('/edit-profile')}
-              />
-            ) : (
-              <Button
-                title={isFollowing ? 'Following' : 'Follow'}
-                variant={isFollowing ? 'secondary' : 'default'}
-                onPress={handleFollowToggle}
-              />
-            )}
-          </BioButtonWrapper>
-        </BioCard>
-
-        <View style={{ marginTop: 5 }}>
-          <PostsContent>
-            {loading ? (
-              <ActivityIndicator size="small" color="#000" />
-            ) : (
-              <LookbooksDisplay
-                collections={collections}
-                displayMode="carousel"
-                hideAuthor
-                selectable
-                onSelectionChange={(collection) =>
-                  setSelectedLookbook(collection)
-                }
-              />
-            )}
-          </PostsContent>
-        </View>
-
-        <Bridge />
-
-        <View style={{ marginBottom: 5 }}>
-          <PostsContent>
-            <LookbookMetadata>
-              <SelectedLookbookTitle>
-                {selectedLookbook?.name}
-              </SelectedLookbookTitle>
-              {isOwnProfile && !selectedLookbook?.is_default && (
-                <Icons>
-                  <Pressable onPress={() => setRenameModalVisible(true)}>
-                    <PencilIcon size={18} color={colors.tertiary.dark} />
-                  </Pressable>
-                  <Pressable onPress={() => setDeleteModalVisible(true)}>
-                    <TrashIcon size={18} color={colors.tertiary.dark} />
-                  </Pressable>
-                </Icons>
-              )}
-            </LookbookMetadata>
-
-            <PostList
-              posts={posts}
-              loading={postsLoading}
-              refreshing={refreshing}
-              emptyText={'No looks to display.'}
-              handleLoadMore={handleLoadMore}
-              handleRefresh={handleRefresh}
-              hideTopBar
-            />
-          </PostsContent>
-        </View>
-
-        {renameModalVisible && (
-          <Modal transparent animationType="fade" visible={renameModalVisible}>
-            <Overlay onPress={() => setRenameModalVisible(false)}>
-              <TouchableOpacity activeOpacity={1}>
-                <ModalCard>
-                  <ModalText>Rename Lookbook</ModalText>
-                  <ModalTextInputWrapper>
-                    <CustomTextInput
-                      placeholder="Enter new name"
-                      value={newLookbookName}
-                      onChangeText={setNewLookbookName}
-                      autoFocus
+      <PostsContent>
+        <PostList
+          posts={posts}
+          loading={postsLoading}
+          refreshing={refreshing}
+          emptyText="No looks to display."
+          handleLoadMore={handleLoadMore}
+          handleRefresh={handleRefresh}
+          hideTopBar
+          transparentBackground
+          ListHeaderComponent={
+            <>
+              <BioCard
+                image={targetProfile.avatar_url}
+                name={targetProfile.name}
+                bio={targetProfile.bio}
+              >
+                <BioButtonWrapper>
+                  {isOwnProfile ? (
+                    <Button
+                      title="Edit Profile"
+                      variant="secondary"
+                      onPress={() => router.push('/edit-profile')}
                     />
-                  </ModalTextInputWrapper>
-                  <ButtonRow>
-                    <ModalButtonWrapper>
-                      <Button
-                        title="Cancel"
-                        variant="secondary"
-                        onPress={() => setRenameModalVisible(false)}
-                      />
-                    </ModalButtonWrapper>
-                    <ModalButtonWrapper>
-                      <Button title="Done" onPress={handleRenameLookbook} />
-                    </ModalButtonWrapper>
-                  </ButtonRow>
-                </ModalCard>
-              </TouchableOpacity>
-            </Overlay>
-          </Modal>
-        )}
+                  ) : (
+                    <Button
+                      title={isFollowing ? 'Following' : 'Follow'}
+                      variant={isFollowing ? 'secondary' : 'default'}
+                      onPress={handleFollowToggle}
+                    />
+                  )}
+                </BioButtonWrapper>
+              </BioCard>
 
-        {deleteModalVisible && (
-          <Modal transparent animationType="fade" visible={deleteModalVisible}>
-            <Overlay onPress={() => setDeleteModalVisible(false)}>
-              <TouchableOpacity activeOpacity={1}>
-                <ModalCard>
-                  <ModalText>
-                    Are you sure you want to delete this lookbook?
-                  </ModalText>
-                  <ButtonRow>
-                    <ModalButtonWrapper>
-                      <Button
-                        title="Cancel"
-                        variant="secondary"
-                        onPress={() => setDeleteModalVisible(false)}
-                      />
-                    </ModalButtonWrapper>
-                    <ModalButtonWrapper>
-                      <Button title="Delete" onPress={handleDeleteLookbook} />
-                    </ModalButtonWrapper>
-                  </ButtonRow>
-                </ModalCard>
-              </TouchableOpacity>
-            </Overlay>
-          </Modal>
-        )}
-      </ScrollableContent>
+              <View style={{ marginTop: 5 }}>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#000" />
+                ) : (
+                  <LookbooksDisplay
+                    collections={collections}
+                    displayMode="carousel"
+                    hideAuthor
+                    selectable
+                    onSelectionChange={setSelectedLookbook}
+                  />
+                )}
+              </View>
+
+              <Bridge />
+
+              <LookbookMetadata>
+                <SelectedLookbookTitle>
+                  {selectedLookbook?.name}
+                </SelectedLookbookTitle>
+                {isOwnProfile && !selectedLookbook?.is_default && (
+                  <Icons>
+                    <Pressable onPress={() => setRenameModalVisible(true)}>
+                      <PencilIcon size={18} color={colors.tertiary.dark} />
+                    </Pressable>
+                    <Pressable onPress={() => setDeleteModalVisible(true)}>
+                      <TrashIcon size={18} color={colors.tertiary.dark} />
+                    </Pressable>
+                  </Icons>
+                )}
+              </LookbookMetadata>
+            </>
+          }
+        />
+      </PostsContent>
+
+      {renameModalVisible && (
+        <Modal transparent animationType="fade" visible={renameModalVisible}>
+          <Overlay onPress={() => setRenameModalVisible(false)}>
+            <TouchableOpacity activeOpacity={1}>
+              <ModalCard>
+                <ModalText>Rename Lookbook</ModalText>
+                <ModalTextInputWrapper>
+                  <CustomTextInput
+                    placeholder="Enter new name"
+                    value={newLookbookName}
+                    onChangeText={setNewLookbookName}
+                    autoFocus
+                  />
+                </ModalTextInputWrapper>
+                <ButtonRow>
+                  <ModalButtonWrapper>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setRenameModalVisible(false)}
+                    />
+                  </ModalButtonWrapper>
+                  <ModalButtonWrapper>
+                    <Button title="Done" onPress={handleRenameLookbook} />
+                  </ModalButtonWrapper>
+                </ButtonRow>
+              </ModalCard>
+            </TouchableOpacity>
+          </Overlay>
+        </Modal>
+      )}
+
+      {deleteModalVisible && (
+        <Modal transparent animationType="fade" visible={deleteModalVisible}>
+          <Overlay onPress={() => setDeleteModalVisible(false)}>
+            <TouchableOpacity activeOpacity={1}>
+              <ModalCard>
+                <ModalText>
+                  Are you sure you want to delete this lookbook?
+                </ModalText>
+                <ButtonRow>
+                  <ModalButtonWrapper>
+                    <Button
+                      title="Cancel"
+                      variant="secondary"
+                      onPress={() => setDeleteModalVisible(false)}
+                    />
+                  </ModalButtonWrapper>
+                  <ModalButtonWrapper>
+                    <Button title="Delete" onPress={handleDeleteLookbook} />
+                  </ModalButtonWrapper>
+                </ButtonRow>
+              </ModalCard>
+            </TouchableOpacity>
+          </Overlay>
+        </Modal>
+      )}
     </Container>
   );
 };
@@ -400,8 +407,8 @@ const ScrollableContent = styled.ScrollView`
 `;
 
 const PostsContent = styled.View`
-  background-color: #ffffffff;
   border-radius: 20px;
+  flex: 1;
 `;
 
 const LookbookMetadata = styled.View`

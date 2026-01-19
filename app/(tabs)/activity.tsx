@@ -48,7 +48,7 @@ export default function ActivityScreen() {
           id,
           name
         )
-      `
+      `,
         )
         .order('created_at', { ascending: false })
         .limit(50);
@@ -103,11 +103,7 @@ export default function ActivityScreen() {
   };
 
   const renderActivity = ({ item }: { item: Activity }) => (
-    <ActivityItem
-      activity={item}
-      feedType={feedType}
-      currentUserId={user?.id}
-    />
+    <ActivityItem activity={item} currentUserId={user?.id} />
   );
 
   return (
@@ -139,6 +135,10 @@ export default function ActivityScreen() {
           refreshing={refreshing}
           ListEmptyComponent={renderEmpty}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingTop: 76, // Content starts below header
+            paddingBottom: 94, // Space for navbar
+          }}
         />
       </Content>
     </Container>

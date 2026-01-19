@@ -40,7 +40,6 @@ export interface Activity {
 
 interface ActivityItemProps {
   activity: Activity;
-  feedType: 'you' | 'following' | 'all';
   currentUserId?: string;
 }
 
@@ -75,7 +74,6 @@ const formatTimeAgo = (dateString: string) => {
 
 const ActivityItem: React.FC<ActivityItemProps> = ({
   activity,
-  feedType,
   currentUserId,
 }) => {
   const router = useRouter();
@@ -161,7 +159,7 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
 
 const Container = styled.View`
   flex-direction: row;
-  padding: 10px 10px;
+  padding: 10px;
   background-color: #fff;
 `;
 
@@ -173,8 +171,8 @@ const IconWrapper = styled.View<{ type: ActivityType }>`
     type === 'like'
       ? colors.like.light
       : type === 'follow'
-      ? colors.follow.light
-      : colors.save.light};
+        ? colors.follow.light
+        : colors.save.light};
   align-items: center;
   justify-content: center;
 `;

@@ -52,7 +52,8 @@ const PostList: React.FC<PostListProps> = ({
         minHeight: '100%',
         backgroundColor: '#fff',
         borderRadius: 20,
-        paddingBottom: 5,
+        paddingTop: 76, // Content starts below header
+        paddingBottom: 94, // Space for navbar
       }}
       ListHeaderComponent={
         <>

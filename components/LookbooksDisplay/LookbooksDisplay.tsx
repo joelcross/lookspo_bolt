@@ -36,7 +36,7 @@ const LookbooksDisplay: React.FC<LookbooksDisplayProps> = ({
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(true);
   const [selectedLookbook, setSelectedLookbook] = useState<Collection | null>(
-    null
+    null,
   );
 
   const isProfileScreen =
@@ -100,8 +100,9 @@ const LookbooksDisplay: React.FC<LookbooksDisplayProps> = ({
               pointerEvents="none"
             />
           )}
-
           <FlashList
+            scrollEnabled={displayMode === 'carousel'}
+            nestedScrollEnabled
             ref={flatListRef}
             data={collections}
             numColumns={displayMode === 'grid' ? NUM_COLUMNS : 1}

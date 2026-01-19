@@ -56,7 +56,7 @@ const LookbookItem: React.FC<LookbookItemProps> = ({
                 weight="light"
               />
             </Placeholder>
-          )
+          ),
         )}
 
         <CountBadge
@@ -236,8 +236,8 @@ const CountText = styled.Text<{ isSelected?: boolean; isDefault?: boolean }>`
     isSelected
       ? '#fff'
       : isDefault
-      ? colors.neutral[400]
-      : colors.secondary.medium};
+        ? colors.neutral[400]
+        : colors.secondary.medium};
   font-size: 12px;
   font-weight: 600;
 `;

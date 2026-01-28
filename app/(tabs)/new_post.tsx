@@ -188,27 +188,25 @@ export default function NewPostScreen() {
   );
 }
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
+  margin: 5px;
   flex: 1;
   border-radius: 20px;
-  overflow: hidden;
 `;
 
 const ScrollableContent = styled.ScrollView`
   flex: 1;
+  padding-vertical: 79px;
 `;
 
 const Content = styled.View`
   gap: 5px;
-  margin-bottom: 5px;
 `;
 
 // Empty State
 const EmptyUpload = styled.Pressable`
   flex: 1;
   border-radius: 20px;
-  margin-horizontal: 5px;
-  margin-bottom: 5px;
   justify-content: center;
   align-items: center;
   background-color: white;

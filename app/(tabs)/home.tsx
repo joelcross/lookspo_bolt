@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { usePosts } from '@/hooks/usePosts';
 import styled from 'styled-components/native';
 import SectionTabs from '@/components/SectionTabs/SectionTabs';
 import PostList from '@/components/PostList/PostList';
 import { View } from 'react-native';
+import { usePathname } from 'expo-router';
 
 type FeedType = 'following' | 'explore';
 
@@ -45,7 +46,6 @@ export default function HomeScreen() {
       <View
         style={{
           flex: 1,
-          margin: 5,
           borderRadius: 20,
           overflow: 'hidden',
         }}
@@ -69,4 +69,5 @@ export default function HomeScreen() {
 
 const Container = styled.SafeAreaView`
   flex: 1;
+  margin: 5px;
 `;

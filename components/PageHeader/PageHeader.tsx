@@ -79,7 +79,7 @@ export function Header({
           left: 0,
           right: 0,
           bottom: 0,
-          borderRadius: 24,
+          borderRadius: 0,
           overflow: 'hidden',
         }}
       />
@@ -101,11 +101,11 @@ const Container = styled.View`
   align-self: center;
   z-index: 999;
 
-  min-width: 70%;
-  height: 48px;
+  min-width: 85vw;
+  height: 60px;
 
   background-color: rgba(119, 119, 119, 0.1);
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
 
   border-width: 1px;

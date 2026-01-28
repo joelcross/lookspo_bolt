@@ -59,6 +59,7 @@ export default function SettingsScreen() {
 const Container = styled.View`
   margin: 5px;
   gap: 5px;
+  padding-top: 79px;
 `;
 
 const ItemContainer = styled.TouchableOpacity`

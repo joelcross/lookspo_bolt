@@ -147,12 +147,12 @@ export default function ActivityScreen() {
 
 const Container = styled.SafeAreaView`
   flex: 1;
+  margin: 5px;
 `;
 
 const Content = styled.View`
   background-color: #fff;
   flex: 1;
-  margin: 5px;
   border-radius: 20px;
   overflow: hidden;
 `;

@@ -52,7 +52,7 @@ export default function SaveToLookbooksScreen() {
               cover_images: images?.map((i) => i.posts.image_url) || [],
               post_count: count || 0,
             };
-          })
+          }),
         );
 
         // 3. Save enriched list
@@ -157,5 +157,6 @@ const SelectListWrapper = styled.View`
   flex: 1;
   background-color: #fff;
   margin-horizontal: 5px;
+  padding-top: 79px;
   border-radius: 20px;
 `;

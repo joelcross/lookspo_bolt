@@ -80,7 +80,7 @@ const SectionTabs = <T extends TabValue>({
           left: 0,
           right: 0,
           bottom: 0,
-          borderRadius: 24,
+          borderRadius: 0,
           overflow: 'hidden',
         }}
       />
@@ -122,11 +122,12 @@ const SectionTabs = <T extends TabValue>({
 const Container = styled.View`
   position: absolute;
   top: 12px;
+  height: 60px;
   align-self: center;
   z-index: 998;
 
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
 
   border-width: 1px;

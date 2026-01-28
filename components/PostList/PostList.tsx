@@ -6,6 +6,7 @@ import { typography } from '@/theme/typography';
 import { Post } from '@/lib/types';
 import { FlashList } from '@shopify/flash-list';
 import PostCard from '../PostCard';
+import { usePathname } from 'expo-router';
 
 interface PostListProps extends FlatListProps<Post> {
   posts: Post[];
@@ -33,6 +34,8 @@ const PostList: React.FC<PostListProps> = ({
   transparentBackground = false,
   ...flatListProps
 }) => {
+  const pathname = usePathname();
+
   return (
     <FlashList
       masonry
@@ -52,8 +55,7 @@ const PostList: React.FC<PostListProps> = ({
         minHeight: '100%',
         backgroundColor: '#fff',
         borderRadius: 20,
-        paddingTop: 76, // Content starts below header
-        paddingBottom: 94, // Space for navbar
+        paddingTop: pathname === '/home' ? 70 : 0,
       }}
       ListHeaderComponent={
         <>

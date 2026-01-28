@@ -39,6 +39,7 @@ const Container = styled.View`
   background-color: #fff;
   border-radius: 20px;
   padding: 10px;
+  padding-top: 79px;
   overflow: hidden;
 `;
 

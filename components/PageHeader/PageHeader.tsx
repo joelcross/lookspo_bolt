@@ -101,8 +101,8 @@ const Container = styled.View`
   align-self: center;
   z-index: 999;
 
-  min-width: 85vw;
-  height: 60px;
+  min-width: 75vw;
+  height: 40px;
 
   background-color: rgba(119, 119, 119, 0.1);
   border-radius: 20px;
@@ -128,7 +128,6 @@ const Content = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding-horizontal: 16px;
   z-index: 1;
 `;
 

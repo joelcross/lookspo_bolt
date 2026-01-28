@@ -145,51 +145,49 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const handleFollowToggle = async () => {
     if (!user || !otherProfile) return;
 
-    const newFollowingState = !isFollowing;
-    setIsFollowing(newFollowingState);
+    setIsFollowing((prev) => {
+      const newFollowingState = !prev;
 
-    try {
-      if (newFollowingState) {
-        // Follow
-        const { error: followError } = await supabase.from('follows').insert({
-          follower_id: user.id,
-          following_id: otherProfile.id,
-        });
-        if (followError) throw followError;
+      (async () => {
+        try {
+          if (newFollowingState) {
+            // Follow
+            const { error } = await supabase.from('follows').insert({
+              follower_id: user.id,
+              following_id: otherProfile.id,
+            });
+            if (error) throw error;
 
-        // Add activity
-        const { error: activityError } = await supabase
-          .from('activities')
-          .insert({
-            actor_id: user.id,
-            target_user_id: otherProfile.id,
-            type: 'follow',
-            post_id: null,
-          });
-        if (activityError) throw activityError;
-      } else {
-        // Unfollow
-        const { error: unfollowError } = await supabase
-          .from('follows')
-          .delete()
-          .eq('follower_id', user.id)
-          .eq('following_id', otherProfile.id);
-        if (unfollowError) throw unfollowError;
+            await supabase.from('activities').insert({
+              actor_id: user.id,
+              target_user_id: otherProfile.id,
+              type: 'follow',
+              post_id: null,
+            });
+          } else {
+            // Unfollow
+            const { error } = await supabase
+              .from('follows')
+              .delete()
+              .eq('follower_id', user.id)
+              .eq('following_id', otherProfile.id);
+            if (error) throw error;
 
-        // Delete follow activity
-        const { error: deleteActivityError } = await supabase
-          .from('activities')
-          .delete()
-          .eq('actor_id', user.id)
-          .eq('target_user_id', otherProfile.id)
-          .eq('type', 'follow');
-        if (deleteActivityError) throw deleteActivityError;
-      }
-    } catch (error) {
-      console.error('Error toggling follow:', error);
-      setIsFollowing(!newFollowingState);
-    } finally {
-    }
+            await supabase
+              .from('activities')
+              .delete()
+              .eq('actor_id', user.id)
+              .eq('target_user_id', otherProfile.id)
+              .eq('type', 'follow');
+          }
+        } catch (err) {
+          console.error('Error toggling follow:', err);
+          setIsFollowing(prev); // rollback
+        }
+      })();
+
+      return newFollowingState;
+    });
   };
 
   const handleRenameLookbook = async () => {

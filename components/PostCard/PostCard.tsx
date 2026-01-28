@@ -69,15 +69,7 @@ export default function PostCard({
         activeOpacity={0.9}
         disabled={showActions}
       >
-        <SmartImage
-          uri={post.image_url}
-          resizeMode="contain"
-          style={{
-            borderRadius: 10,
-            borderBottomLeftRadius: showActions ? 0 : 10,
-            borderBottomRightRadius: showActions ? 0 : 10,
-          }}
-        />
+        <SmartImage uri={post.image_url} resizeMode="contain" />
 
         {/* Only show like/save if showActions is true */}
         {showActions && (
@@ -125,6 +117,10 @@ export default function PostCard({
 const PostContainer = styled.View`
   display: flex;
   flex-direction: column;
+  background-color: white;
+  border-radius: 20px;
+  padding-vertical: 8px;
+  overflow: hidden;
 `;
 
 const TopBanner = styled.View`
@@ -152,7 +148,6 @@ const Timestamp = styled.Text`
 `;
 
 const BottomContainer = styled.View`
-  background-color: white;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

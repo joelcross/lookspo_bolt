@@ -225,7 +225,7 @@ export default function PostDetailScreen() {
   return (
     !loading &&
     post && (
-      <Container showsVerticalScrollIndicator={false}>
+      <Container>
         <PageHeader
           text="Look"
           left="back"
@@ -233,7 +233,12 @@ export default function PostDetailScreen() {
           onCustomPress={() => setDeleteModalVisible(true)}
         />
 
-        <Content>
+        <Content
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            gap: 5,
+          }}
+        >
           <PostCardWrapper>
             <PostCard
               post={post}
@@ -245,106 +250,16 @@ export default function PostDetailScreen() {
             />
           </PostCardWrapper>
 
-          {/* Edit Mode */}
-          {isEditing ? (
-            <>
-              <TextInput
-                multiline
-                value={editedCaption}
-                onChangeText={setEditedCaption}
-                placeholder="Write a caption..."
-                style={styles.editInput}
+          {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
+
+          {savedCollections.length > 0 && (
+            <LookbooksDisplayWrapper>
+              <HeadingText>Featured In</HeadingText>
+              <LookbooksDisplay
+                collections={savedCollections}
+                displayMode="carousel"
               />
-
-              {editedPieces.map((piece, i) => (
-                <View key={i} style={styles.pieceRow}>
-                  <TextInput
-                    placeholder="Name"
-                    value={piece.name}
-                    onChangeText={(t) => {
-                      const updated = [...editedPieces];
-                      updated[i].name = t;
-                      setEditedPieces(updated);
-                    }}
-                    style={[
-                      styles.pieceInput,
-                      showValidationErrors &&
-                        !piece.name.trim() &&
-                        styles.invalid,
-                    ]}
-                  />
-                  <TextInput
-                    placeholder="Brand"
-                    value={piece.brand}
-                    onChangeText={(t) => {
-                      const updated = [...editedPieces];
-                      updated[i].brand = t;
-                      setEditedPieces(updated);
-                    }}
-                    style={[
-                      styles.pieceInput,
-                      showValidationErrors &&
-                        !piece.brand.trim() &&
-                        styles.invalid,
-                    ]}
-                  />
-                  <TouchableOpacity
-                    onPress={() =>
-                      setEditedPieces((prev) =>
-                        prev.filter((_, idx) => idx !== i),
-                      )
-                    }
-                  >
-                    <X size={20} color="#999" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-
-              <TouchableOpacity
-                style={styles.addPieceBtn}
-                onPress={() =>
-                  setEditedPieces((prev) => [
-                    ...prev,
-                    { name: '', brand: '', url: '' },
-                  ])
-                }
-              >
-                <Plus size={18} color="#000" />
-                <Text style={styles.addPieceText}>Add piece</Text>
-              </TouchableOpacity>
-
-              <View style={styles.editActions}>
-                <TouchableOpacity
-                  onPress={() => setIsEditing(false)}
-                  style={styles.cancelBtn}
-                >
-                  <Text>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleSaveEdits}
-                  disabled={isSavingEdits}
-                  style={styles.saveBtn}
-                >
-                  <Text style={{ color: '#fff' }}>
-                    {isSavingEdits ? 'Saving...' : 'Save Changes'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          ) : (
-            <>
-              {post.pieces?.length > 0 && <PiecesCard pieces={post.pieces} />}
-
-              {savedCollections.length > 0 && (
-                <LookbooksDisplayWrapper>
-                  <HeadingText>Featured In</HeadingText>
-                  <LookbooksDisplay
-                    collections={savedCollections}
-                    displayMode="carousel"
-                  />
-                </LookbooksDisplayWrapper>
-              )}
-            </>
+            </LookbooksDisplayWrapper>
           )}
         </Content>
 
@@ -387,13 +302,13 @@ export default function PostDetailScreen() {
   );
 }
 
-const Container = styled.ScrollView`
+const Container = styled.View`
   flex: 1;
 `;
 
-const Content = styled.View`
-  gap: 5px;
-  padding-bottom: 40px;
+const Content = styled.ScrollView`
+  padding-top: 60px;
+  padding-bottom: 20px;
 `;
 
 const PostCardWrapper = styled.View`

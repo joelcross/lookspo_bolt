@@ -1,12 +1,13 @@
 import React from 'react';
-import { FlatListProps, View } from 'react-native';
+import { FlatListProps, Pressable, View } from 'react-native';
 import styled from 'styled-components/native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Post } from '@/lib/types';
 import { FlashList } from '@shopify/flash-list';
 import PostCard from '../PostCard';
-import { usePathname } from 'expo-router';
+import { router, usePathname } from 'expo-router';
+import SmartImage from '../SmartImage/SmartImage';
 
 interface PostListProps extends FlatListProps<Post> {
   posts: Post[];
@@ -43,9 +44,14 @@ const PostList: React.FC<PostListProps> = ({
       keyExtractor={(item) => item.id}
       numColumns={numColumns}
       renderItem={({ item }) => (
-        <PostWrapper>
-          <PostCard post={item} showActions={false} hideTopBar={hideTopBar} />
-        </PostWrapper>
+        <Pressable
+          style={{ borderRadius: 20, overflow: 'hidden' }}
+          onPress={() => router.push(`/post/${item.id}`)}
+        >
+          <View style={{ padding: 4 }}>
+            <SmartImage uri={item.image_url} borderRadius={10} />
+          </View>
+        </Pressable>
       )}
       onRefresh={handleRefresh}
       refreshing={refreshing}
@@ -55,7 +61,9 @@ const PostList: React.FC<PostListProps> = ({
         minHeight: '100%',
         backgroundColor: '#fff',
         borderRadius: 20,
+
         paddingTop: pathname === '/home' ? 70 : 0,
+        paddingHorizontal: 2,
       }}
       ListHeaderComponent={
         <>
@@ -69,11 +77,6 @@ const PostList: React.FC<PostListProps> = ({
     />
   );
 };
-
-const PostWrapper = styled.View`
-  margin: 5px;
-  margin-bottom: 0px;
-`;
 
 const Heading = styled.Text`
   font-family: ${typography.heading3.fontFamily};

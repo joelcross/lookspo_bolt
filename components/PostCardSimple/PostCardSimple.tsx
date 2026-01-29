@@ -1,27 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  Pressable,
-} from 'react-native';
-import { Post } from '@/lib/types';
-import { getTimeAgo } from '@/lib/utils';
-import { router } from 'expo-router';
+import React from 'react';
+import { Dimensions, Pressable } from 'react-native';
 import styled from 'styled-components/native';
-import { Avatar } from '../Avatar/Avatar';
 import { typography } from '@/theme/typography';
 import { colors } from '@/theme/colors';
-import {
-  HeartIcon,
-  CheckCircleIcon,
-  PlusCircleIcon,
-} from 'phosphor-react-native';
 import SmartImage from '../SmartImage/SmartImage';
-import CustomTextInput from '../CustomTextInput/CustomTextInput';
-
-const width = Dimensions.get('window').width - 20;
 
 interface PostCardSimpleProps {
   image: string;
@@ -63,20 +45,11 @@ export default function PostCardSimple({
 }
 
 const PostContainer = styled.View`
-  margin-horizontal: 5px;
   display: flex;
   flex-direction: column;
   background-color: white;
   border-radius: 20px;
   overflow: hidden;
-`;
-
-const TopBanner = styled.View`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
 `;
 
 const Username = styled.Text`

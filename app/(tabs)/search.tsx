@@ -161,9 +161,7 @@ const SearchBarWrapper = styled.View`
   padding-top: 12vh;
 `;
 
-const UsersList = styled.View`
-  padding: 16px;
-`;
+const UsersList = styled.View``;
 
 const UserRow = styled.TouchableOpacity`
   flex-direction: row;

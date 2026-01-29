@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Image, TouchableOpacity } from 'react-native';
 import { Post } from '@/lib/types';
 import { getTimeAgo } from '@/lib/utils';
 import { router } from 'expo-router';
@@ -119,7 +119,6 @@ const PostContainer = styled.View`
   flex-direction: column;
   background-color: white;
   border-radius: 20px;
-  padding-vertical: 8px;
   overflow: hidden;
 `;
 
@@ -128,7 +127,7 @@ const TopBanner = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  padding: 6px;
 `;
 
 const Username = styled.Text`

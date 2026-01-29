@@ -1,16 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  TextInput,
-  TouchableOpacity,
-  View,
-  Text,
-  Modal,
-  Pressable,
-} from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Modal, Pressable, Animated } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, X } from 'lucide-react-native';
 import { Post, Collection } from '@/lib/types';
 import PostCard from '@/components/PostCard';
 import PageHeader from '@/components/PageHeader/PageHeader';
@@ -43,6 +35,8 @@ export default function PostDetailScreen() {
 
   const isOwnPost = post?.user_id === user.id;
   const router = useRouter();
+
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   // Fetch post + likes + saves + collections in ONE optimized query
   useFocusEffect(
@@ -231,6 +225,7 @@ export default function PostDetailScreen() {
           left="back"
           right={isOwnPost ? 'trash' : undefined}
           onCustomPress={() => setDeleteModalVisible(true)}
+          scrollY={scrollY}
         />
 
         <Content
@@ -238,6 +233,11 @@ export default function PostDetailScreen() {
           contentContainerStyle={{
             gap: 5,
           }}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true },
+          )}
+          scrollEventThrottle={16}
         >
           <PostCardWrapper>
             <PostCard
@@ -304,6 +304,7 @@ export default function PostDetailScreen() {
 
 const Container = styled.View`
   flex: 1;
+  margin-horizontal: 5px;
 `;
 
 const Content = styled.ScrollView`
@@ -311,13 +312,10 @@ const Content = styled.ScrollView`
   padding-bottom: 20px;
 `;
 
-const PostCardWrapper = styled.View`
-  margin-horizontal: 5px;
-`;
+const PostCardWrapper = styled.View``;
 
 const LookbooksDisplayWrapper = styled.View`
   background-color: #ffffffff;
-  margin-horizontal: 5px;
   border-radius: 20px;
 `;
 

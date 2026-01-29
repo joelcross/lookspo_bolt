@@ -21,7 +21,7 @@ export default function SettingsScreen() {
   };
 
   const handlePressFeedback = async () => {
-    router.replace('/feedback');
+    router.push('/feedback');
   };
 
   const handlePressEditProfile = async () => {
@@ -47,8 +47,8 @@ export default function SettingsScreen() {
         </ItemContainer>
         <ItemContainer onPress={handleSignOut}>
           <ItemWrapper>
-            <HandWavingIcon color="#ff3b30" size={20} />
-            <ItemText>Sign Out</ItemText>
+            <HandWavingIcon color={colors.like.dark} size={20} />
+            <SignOutText>Sign Out</SignOutText>
           </ItemWrapper>
         </ItemContainer>
       </ListContent>
@@ -59,7 +59,7 @@ export default function SettingsScreen() {
 const Container = styled.View`
   margin: 5px;
   gap: 5px;
-  padding-top: 79px;
+  padding-top: 60px;
 `;
 
 const ItemContainer = styled.TouchableOpacity`
@@ -81,4 +81,10 @@ const ItemText = styled.Text`
   font-family: ${typography.body.fontFamily};
   font-size: ${typography.body.fontSize}px;
   color: ${colors.text.primary};
+`;
+
+const SignOutText = styled.Text`
+  font-family: ${typography.body.fontFamily};
+  font-size: ${typography.body.fontSize}px;
+  color: ${colors.like.dark};
 `;

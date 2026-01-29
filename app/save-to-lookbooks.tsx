@@ -157,6 +157,6 @@ const SelectListWrapper = styled.View`
   flex: 1;
   background-color: #fff;
   margin-horizontal: 5px;
-  padding-top: 79px;
+  margin-top: 60px;
   border-radius: 20px;
 `;

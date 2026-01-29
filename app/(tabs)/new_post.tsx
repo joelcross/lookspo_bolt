@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Modal, Platform } from 'react-native';
+import { Alert, Animated, Modal, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { Upload } from 'lucide-react-native';
@@ -19,6 +19,7 @@ export default function NewPostScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showDiscardModal, setShowDiscardModal] = useState(false);
+  const scrollY = new Animated.Value(0);
 
   // Image Picker
   const pickImage = async () => {
@@ -122,10 +123,22 @@ export default function NewPostScreen() {
 
   return (
     <Container>
-      <PageHeader text="New Look" left="back" onCustomLeftPress={handleBack} />
+      <PageHeader
+        text="New Look"
+        left="back"
+        onCustomLeftPress={handleBack}
+        scrollY={scrollY}
+      />
 
       {/* Main Scrollable Content */}
-      <ScrollableContent showsVerticalScrollIndicator={false}>
+      <ScrollableContent
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true },
+        )}
+        scrollEventThrottle={16}
+      >
         <Content>
           <PostCardSimple
             image={image}
@@ -143,11 +156,7 @@ export default function NewPostScreen() {
             isMakingPost={true}
           />
 
-          <Button
-            title="Next"
-            onPress={handleNext}
-            style={{ marginHorizontal: 5 }}
-          />
+          <Button title="Next" onPress={handleNext} />
         </Content>
       </ScrollableContent>
 
@@ -196,7 +205,8 @@ const Container = styled.View`
 
 const ScrollableContent = styled.ScrollView`
   flex: 1;
-  padding-vertical: 79px;
+  padding-top: 60px;
+  padding-bottom: 70px;
 `;
 
 const Content = styled.View`

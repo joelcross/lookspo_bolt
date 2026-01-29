@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Pressable } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Post, Collection } from '@/lib/types';
+import { Collection } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import PostCard from '@/components/PostCard/PostCard';
 import PageHeader from '@/components/PageHeader/PageHeader';
 import styled from 'styled-components/native';
 import { typography } from '@/theme/typography';
@@ -23,7 +22,6 @@ export default function CollectionScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-
   const isOwnCollection = collection?.user_id === user.id;
 
   const { posts, loading, refreshing, handleLoadMore, handleRefresh } =
@@ -116,26 +114,6 @@ export default function CollectionScreen() {
     }
   };
 
-  const renderPost = ({ item }: { item: Post }) => (
-    <PostCard post={item} showActions={false} />
-  );
-
-  // if (loading) {
-  //   return (
-  //     <Container>
-  //       <ActivityIndicator size="large" color="#000" />
-  //     </Container>
-  //   );
-  // }
-
-  // if (!collection) {
-  //   return (
-  //     <Container>
-  //       <ErrorText>Collection not found</ErrorText>
-  //     </Container>
-  //   );
-  // }
-
   return (
     collection && (
       <Container>
@@ -145,6 +123,16 @@ export default function CollectionScreen() {
           right={isOwnCollection ? 'more' : undefined}
           onCustomPress={handleCustomPress}
         />
+        <ContentWrapper showsVerticalScrollIndicator={false}>
+          <PostList
+            posts={posts}
+            loading={loading}
+            refreshing={refreshing}
+            emptyText={'This lookbook is empty.'}
+            handleLoadMore={handleLoadMore}
+            handleRefresh={handleRefresh}
+          />
+        </ContentWrapper>
 
         {/* Three vertical dots dropdown */}
         {menuVisible && (
@@ -231,21 +219,21 @@ export default function CollectionScreen() {
             </Overlay>
           </Modal>
         )}
-        <PostList
-          posts={posts}
-          loading={loading}
-          refreshing={refreshing}
-          emptyText={'This lookbook is empty.'}
-          handleLoadMore={handleLoadMore}
-          handleRefresh={handleRefresh}
-        />
       </Container>
     )
   );
 }
 
-const Container = styled.SafeAreaView`
+const Container = styled.View`
   flex: 1;
+`;
+
+const ContentWrapper = styled.ScrollView`
+  margin: 60px 5px 5px 5px;
+  background-color: #fff;
+  flex: 1;
+  border-radius: 20px;
+  padding-vertical: 5px;
 `;
 
 // Modal components

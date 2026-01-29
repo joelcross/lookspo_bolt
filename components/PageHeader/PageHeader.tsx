@@ -3,7 +3,7 @@ import { typography } from '@/theme/typography';
 import React from 'react';
 import styled from 'styled-components/native';
 import { router } from 'expo-router';
-import { Platform } from 'react-native';
+import { Platform, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Button } from '../Button/Button';
 
@@ -13,6 +13,7 @@ type HeaderProps = {
   right?: 'settings' | 'more' | 'trash';
   onCustomLeftPress?: () => void;
   onCustomPress?: () => void;
+  scrollY?: Animated.Value;
 };
 
 export function Header({
@@ -21,6 +22,7 @@ export function Header({
   right,
   onCustomLeftPress,
   onCustomPress,
+  scrollY,
 }: HeaderProps) {
   const handleLeftButtonPress = () => {
     onCustomLeftPress ? onCustomLeftPress() : router.back();
@@ -68,8 +70,17 @@ export function Header({
     return null;
   };
 
+  const solidOpacity = scrollY
+    ? scrollY.interpolate({
+        inputRange: [0, 100],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+      })
+    : new Animated.Value(1);
+
   return (
     <Container>
+      {/* Always render blur effect */}
       <BlurView
         intensity={80}
         tint="light"
@@ -83,6 +94,12 @@ export function Header({
           overflow: 'hidden',
         }}
       />
+
+      {/* Semi-transparent background layer */}
+      <BackgroundTint />
+
+      {/* Solid background overlay - fades out when scrolling */}
+      <SolidBackground style={{ opacity: solidOpacity }} />
 
       <Content>
         <LeftWrapper>{renderLeftButton()}</LeftWrapper>
@@ -101,10 +118,9 @@ const Container = styled.View`
   align-self: center;
   z-index: 999;
 
-  min-width: 75vw;
+  min-width: 70vw;
   height: 40px;
 
-  background-color: rgba(119, 119, 119, 0.1);
   border-radius: 20px;
   overflow: hidden;
 
@@ -121,6 +137,24 @@ const Container = styled.View`
     : `
       elevation: 4;
     `}
+`;
+
+const BackgroundTint = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(119, 119, 119, 0.1);
+`;
+
+const SolidBackground = styled(Animated.View)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #fff;
 `;
 
 const Content = styled.View`

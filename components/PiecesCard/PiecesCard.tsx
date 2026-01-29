@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, View } from 'react-native';
+import { Linking } from 'react-native';
 import styled from 'styled-components/native';
 import { Plus, X, ShoppingCart } from 'lucide-react-native';
 import { colors } from '@/theme/colors';
@@ -74,7 +74,6 @@ const Container = styled.View`
   background-color: white;
   border-radius: 20px;
   padding: 20px;
-  margin-horizontal: 5px;
   elevation: 5;
 `;
 

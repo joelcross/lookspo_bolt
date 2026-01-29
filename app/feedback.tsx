@@ -1,4 +1,3 @@
-// screens/FeedbackScreen.tsx or wherever you keep it
 import React, { useState } from 'react';
 import { Alert, Linking, View } from 'react-native';
 import styled from 'styled-components/native';
@@ -83,6 +82,7 @@ const OuterContainer = styled.SafeAreaView`
 
 const InnerContainer = styled.View`
   flex: 1;
+  margin-top: 60px;
 `;
 
 const Content = styled.View`

@@ -178,7 +178,7 @@ export default function EditProfileScreen() {
           onCustomLeftPress={handleBack}
         />
 
-        <View>
+        <View style={{ marginTop: 60 }}>
           <ListContent>
             <EditRow
               label="Username"

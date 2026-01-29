@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, TouchableOpacity, Alert } from 'react-native';
+import { Modal, Alert } from 'react-native';
 import styled from 'styled-components/native';
-import { XIcon } from 'phosphor-react-native';
 import { colors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { Piece } from './PiecesCard';
@@ -51,16 +50,12 @@ export const PieceModal: React.FC<PieceModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
-      <Overlay>
-        <ModalContainer>
-          <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={onClose}>
-            <XIcon size={20} color={colors.neutral[400]} />
-          </TouchableOpacity>
+    <Modal visible={visible} transparent animationType="fade">
+      <Overlay onPress={onClose}>
+        <ModalCard onPress={(e) => e.stopPropagation()}>
+          <ModalText>{piece ? 'Edit Piece' : 'Add New Piece'}</ModalText>
 
-          <Title>{piece ? 'Edit Piece' : 'Add New Piece'}</Title>
-
-          <InputContainer>
+          <ModalTextInputWrapper>
             <CustomTextInput
               placeholder="Name"
               value={name}
@@ -76,36 +71,36 @@ export const PieceModal: React.FC<PieceModalProps> = ({
               value={url}
               onChangeText={setUrl}
             />
-          </InputContainer>
+          </ModalTextInputWrapper>
           <ButtonRow>
-            <ButtonWrapper>
+            <ModalButtonWrapper>
               <Button title="Cancel" variant="secondary" onPress={onClose} />
-            </ButtonWrapper>
-            <ButtonWrapper>
+            </ModalButtonWrapper>
+            <ModalButtonWrapper>
               <Button title="Save" onPress={handleSave} />
-            </ButtonWrapper>
+            </ModalButtonWrapper>
           </ButtonRow>
-        </ModalContainer>
+        </ModalCard>
       </Overlay>
     </Modal>
   );
 };
 
-const Overlay = styled.View`
+const Overlay = styled.Pressable`
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.2);
-  justify-content: flex-end;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
 `;
 
-const ModalContainer = styled.View`
-  background-color: white;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 24px;
-  padding-top: 16px;
+const ModalCard = styled.Pressable`
+  width: 85vw;
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 16px;
 `;
 
-const Title = styled.Text`
+const ModalText = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: ${typography.heading3.fontWeight};
@@ -114,12 +109,12 @@ const Title = styled.Text`
   margin-bottom: 12px;
 `;
 
-const InputContainer = styled.View`
-  gap: 5px;
+const ModalTextInputWrapper = styled.View`
   margin-bottom: 24px;
+  gap: 5px;
 `;
 
-const ButtonWrapper = styled.View`
+const ModalButtonWrapper = styled.View`
   flex: 1;
 `;
 

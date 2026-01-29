@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
+  Animated,
 } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,6 +46,8 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [newLookbookName, setNewLookbookName] = useState('');
+
+  const scrollY = new Animated.Value(0);
 
   const mode = useMemo(() => {
     if (!selectedLookbook) return null;
@@ -250,30 +253,40 @@ const ProfileBase: React.FC<ProfileBaseProps> = ({ isOwnProfile = false }) => {
         text={`@${targetProfile.username}`}
         left={isOwnProfile ? undefined : 'back'}
         right={isOwnProfile ? 'settings' : undefined}
+        scrollY={scrollY}
       />
 
-      <ScrollableContent showsVerticalScrollIndicator={false}>
-        <BioCard
-          image={targetProfile.avatar_url}
-          name={targetProfile.name}
-          bio={targetProfile.bio}
-        >
-          <BioButtonWrapper>
-            {isOwnProfile ? (
-              <Button
-                title={'Edit Profile'}
-                variant={'secondary'}
-                onPress={() => router.push('/edit-profile')}
-              />
-            ) : (
-              <Button
-                title={isFollowing ? 'Following' : 'Follow'}
-                variant={isFollowing ? 'secondary' : 'default'}
-                onPress={handleFollowToggle}
-              />
-            )}
-          </BioButtonWrapper>
-        </BioCard>
+      <ScrollableContent
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true },
+        )}
+        scrollEventThrottle={16}
+      >
+        <View style={{ marginTop: 60 }}>
+          <BioCard
+            image={targetProfile.avatar_url}
+            name={targetProfile.name}
+            bio={targetProfile.bio}
+          >
+            <BioButtonWrapper>
+              {isOwnProfile ? (
+                <Button
+                  title={'Edit Profile'}
+                  variant={'secondary'}
+                  onPress={() => router.push('/edit-profile')}
+                />
+              ) : (
+                <Button
+                  title={isFollowing ? 'Following' : 'Follow'}
+                  variant={isFollowing ? 'secondary' : 'default'}
+                  onPress={handleFollowToggle}
+                />
+              )}
+            </BioButtonWrapper>
+          </BioCard>
+        </View>
 
         <View style={{ marginTop: 5 }}>
           <PostsContent>
@@ -451,14 +464,14 @@ const ModalText = styled.Text`
   font-family: ${typography.heading3.fontFamily};
   font-size: ${typography.heading3.fontSize}px;
   font-weight: ${typography.heading3.fontWeight};
+  color: ${colors.text.primary};
   text-align: center;
   margin-bottom: 12px;
 `;
 
 const ButtonRow = styled.View`
   flex-direction: row;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 5px;
 `;
 
 export default ProfileBase;
